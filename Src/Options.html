@@ -1,0 +1,79 @@
+<html>
+	<head>
+	<title>F! Downloader Options</title>
+	<link rel="stylesheet" type="text/css" href="options.css">
+	<script src="scripts/jquery-2.0.3.min.js"></script>
+</head>
+<body>
+	<div id="content">
+		<div id="left">
+			<!--<div class="mainDiv">
+				Grab Links in background:
+			</div>-->
+			<div class="mainDiv">
+				Incognito Downloads:
+			</div>
+			<div class="mainDiv">
+				Icon Interaction:
+			</div>
+			<div class="mainDiv">
+				Folder Name:
+			</div>
+			<div class="mainDiv">
+				Filename Structure:
+			</div>
+		</div>
+		<div id="right">
+			<!--<div class="checkbox">
+				<input title="This is faster but might slow down page loading speeds when browsing normally" type="checkbox" id="runbackground" value="runbackground">
+			</div>-->
+			<div class="checkbox">
+				<input title="Removes the downloaded file from the Downloads History upon completion." type="checkbox" id="hiddenmode" value="hiddenmode">
+			</div>
+			<div class="dropdown">
+				<select id="buttonaction">
+					<option value="download">Download</option>
+					<option value="links">Show Links</option>
+					<!--<option value="hidden">Hidden</option>-->
+				</select>
+			</div>
+			<div class="dropdown">
+				<select id="foldername">
+					<option value="manganame">Manga Name</option>
+					<option value="series">Series Name</option>
+					<option value="authorname">Author Name</option>
+					<option value="translator">Translator</option>
+				</select>
+			</div>
+			<div class="dropdown">
+				<select id="filedivtype">
+					<option value="manganame">Manga Name</option>
+					<option value="series">Series Name</option>
+					<option value="authorname">Author Name</option>
+					<option value="language">Language</option>
+					<option value="translator">Translator</option>
+					<option value="pagenumber">Page Number</option>
+					<option value="tags">Tags</option>
+				</select>
+				<button id="addFileDiv">Add</button>
+				<div id="removeColumn"></div>
+			</div>
+		</div>
+	
+	<!--
+	<br><input type="checkbox" id="textarea1" value="textarea1">Show Textfield on the Manga Information page.
+	<br><input type="checkbox" id="textarea2" value="textarea2">Show Textfield on the Read Page.
+	<br>
+	-->
+		<div id="fileColumns"></div>
+		<div id="fileName"></div>
+		<div id="status" class="save"></div>
+		<div>
+			<button id="save" class="save">Save</button>
+			<a id="changelog" href="changelog.txt">Change Log</a>
+		</div>
+	</div>
+</body>
+<script src="scripts/options.js"></script>
+<script src="scripts/dragable.js"></script>
+</html>

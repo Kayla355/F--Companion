@@ -1,0 +1,21 @@
+// Version 0.1
+- First release
+
+// Version 0.2
+- General stability fixes when grabbing mangas.
+- Added option for turning on or off run in background.
+
+// Version 0.2.1
+- Removed run in background option(for now) as it was causing issues when loading multiple tabs with mangas at once.
+- Fixed issues when trying to download multiple mangas at once. It now waits until it has triggered all previous downloads.
+- Added error message and solution(hopefully) that should fix any issues that might happen if the downloader gets interrupted.
+
+// Version 0.2.2
+- Fixed issues when the folder that was created ended with a "."(Actually a windows issue...), resulting in a failed download.
+
+// Version 0.2.3
+- Fixed an issue with options not saving.
+
+// Version 0.3
+- Added option for Incognito Downloads. (Useful if you don't actually want your Downloads History to be pretty much unusable because of spam from single pages)
+- Fixed issues when trying to create a folder containing one of the following characters, \/:*?"<>|
