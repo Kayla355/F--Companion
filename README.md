@@ -1,2 +1,2 @@
-F--Project
+F! Downloader Chrome Extension
 ==========
