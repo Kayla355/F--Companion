@@ -87,6 +87,9 @@ function grabLinks() {
 					}
 				}
             }
+        },
+        error: function() {
+        	msgError();
         }
    });
 };
@@ -106,10 +109,17 @@ function grabLinks() {
 			}
 		});
 	});
-	
+	// Sends a message stating that the links have been grabbed properly.
 	function msgDocReadyLink() {
-			chrome.runtime.sendMessage({msg: "docReadyLink"}, function(response) {
-			//console.log("Message Sent: DocReadyLink");
-			});
+		chrome.runtime.sendMessage({msg: "docReadyLink"}, function(response) {
+		//console.log("Message Sent: DocReadyLink");
+		});
+	}
+	// Sends a message stating that there was an error when grabbing the links.
+	// This is used by GrabInfo as well.
+	function msgError() {
+		chrome.runtime.sendMessage({msg: "Error"}, function(response) {
+		//console.log("Message Sent: Error");
+		});
 	}
 }

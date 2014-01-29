@@ -92,9 +92,13 @@ function grabInfo() {
 							msgDocReadyInfo();
 						}
 						
+        },
+        error: function() {
+        	msgError();
         }
    });
 };
+	// Sends a message stating that the link information have been grabbed properly.
 	function msgDocReadyInfo() {
 			chrome.runtime.sendMessage({msg: "docReadyInfo"}, function(response) {
 			//console.log("Message Sent: DocReadyInfo");

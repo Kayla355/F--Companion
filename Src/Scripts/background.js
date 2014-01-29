@@ -220,15 +220,17 @@ function downloadLinks() {
 }
 
 chrome.downloads.onChanged.addListener(function (downloadID) {
-	if (downloadID.state) {
-		if (downloadID.state.current == "complete") {
-			chrome.downloads.search({id: downloadID.id}, function(result) {
-				if (result[0].byExtensionName == "F! Downloader") {
-					chrome.downloads.erase({id: downloadID.id})
-					//console.log("Erased: " + downloadID.id);
-				}
-				//console.log(result);
-			});
+	if (hiddenMode) {
+		if (downloadID.state) {
+			if (downloadID.state.current == "complete") {
+				chrome.downloads.search({id: downloadID.id}, function(result) {
+					if (result[0].byExtensionName == "F! Downloader") {
+						chrome.downloads.erase({id: downloadID.id})
+						//console.log("Erased: " + downloadID.id);
+					}
+					//console.log(result);
+				});
+			}
 		}
 	}
 	//console.log(downloadID);

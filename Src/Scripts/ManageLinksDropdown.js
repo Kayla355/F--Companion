@@ -5,6 +5,7 @@
 	var grabinfo 		= false;
 	var downloadsDone 	= false;
 	var notDone			= false;
+	var errorReport		= false;
 	
 // Messages that prompt the GrabLinks and GrabInfo to start
 
@@ -155,6 +156,14 @@ if (localStorage["button_action"] == "download") {
 	requestDownload();
 }
 
+// Listener listening for any potential error.
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.msg == "Error") {
+		sendResponse({msg: "recieved"});
+		errorReport = true;
+	}
+});
+
 // Recursive Function to check if the links are ready for download.
 // And then sends a message to the background script to begin download of the links.
 function requestDownload() {
@@ -174,6 +183,10 @@ function requestDownload() {
 		$('div#content center').css("width", "312px");
 		$('div#content center b').text("Something seems to have gone wrong, try again.");
 		localStorage["downloads_done"] = "true";
+	} else if (errorReport) {
+		//console.log("Error message recieved from the server");
+		$('div#content center').css("width", "312px");
+		$('div#content center b').text("Something seems to have gone wrong, try again.");
 	} else {
 		//console.log("Waiting for other downloads to finish");
 		$('div#content center').css("width", "238px");
