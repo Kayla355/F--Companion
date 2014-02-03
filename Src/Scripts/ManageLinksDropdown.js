@@ -6,6 +6,7 @@
 	var downloadsDone 	= false;
 	var notDone			= false;
 	var errorReport		= false;
+	var errorMsg 		= null;
 	
 // Messages that prompt the GrabLinks and GrabInfo to start
 
@@ -159,14 +160,28 @@ if (localStorage["button_action"] == "download") {
 // Listener listening for any potential error.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.msg == "Error") {
-		sendResponse({msg: "recieved"});
-		errorReport = true;
+		if (!errorReport) {
+			sendResponse({msg: "recieved"});
+			errorReport = true;
+			errorMsg = request.errorMessage;
+			//console.log("Error Report Recieved")
+			//console.log(request.errorMessage);
+		}
 	}
 });
 
 // Recursive Function to check if the links are ready for download.
 // And then sends a message to the background script to begin download of the links.
 function requestDownload() {
+	if (errorReport) {
+		//console.log("Error message recieved from the server");
+		$('div#content center').css("width", "234px");
+		$('div#content center b').text("Error recieved from server, try again.");
+		$('div#content center').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
+		$('div#content center').css("height", "40px");
+		return;
+	}
+
 	if (localStorage["downloads_done"] != "false") {
 		if (docReadyLink && docReadyInfo) {
 			chrome.extension.sendMessage({msg: "downloadLinks"})
@@ -183,16 +198,15 @@ function requestDownload() {
 		$('div#content center').css("width", "312px");
 		$('div#content center b').text("Something seems to have gone wrong, try again.");
 		localStorage["downloads_done"] = "true";
-	} else if (errorReport) {
-		//console.log("Error message recieved from the server");
-		$('div#content center').css("width", "312px");
-		$('div#content center b').text("Something seems to have gone wrong, try again.");
+		return;
 	} else {
 		//console.log("Waiting for other downloads to finish");
 		$('div#content center').css("width", "238px");
 		$('div#content center b').text("Waiting for other downloads to finish.");
+		return;
 	}
 	//console.log("Called Function RequestDownload");
+	//console.log(errorReport);
 	var query = new Array();
 	query[0] = "fakku";
 	chrome.downloads.search({orderBy: ["-startTime"], query: query}, function(results) {
