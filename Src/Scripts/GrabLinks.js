@@ -88,8 +88,9 @@ function grabLinks() {
 				}
             }
         },
-        error: function() {
-        	msgError();
+        error: function(error) {
+        	msgError(error);
+        	//console.log("Error!");
         }
    });
 };
@@ -117,8 +118,8 @@ function grabLinks() {
 	}
 	// Sends a message stating that there was an error when grabbing the links.
 	// This is used by GrabInfo as well.
-	function msgError() {
-		chrome.runtime.sendMessage({msg: "Error"}, function(response) {
+	function msgError(error) {
+		chrome.runtime.sendMessage({msg: "Error", errorMessage: error}, function(response) {
 		//console.log("Message Sent: Error");
 		});
 	}

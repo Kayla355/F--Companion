@@ -93,8 +93,9 @@ function grabInfo() {
 						}
 						
         },
-        error: function() {
-        	msgError();
+        error: function(error) {
+        	msgError(error);
+        	//console.log("Error!!");
         }
    });
 };
