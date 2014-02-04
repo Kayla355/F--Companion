@@ -42,8 +42,14 @@ function checkForValidUrl(tabId, changeInfo, tab) {
   }
 };
 
+
+
+
+
 var optionsArray 	= new Array();
 var hiddenMode 		= new Boolean();
+var linkarray 		= new Array();
+var infoarray 		= new Array();
 
 // Fetch request for options array.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -66,46 +72,23 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.msg == "downloadLinks") {
 		//console.log("DownloadLinks Triggered");
-		checkStorage();
+		linkarray = request.linkdata;
+		infoarray = request.infodata;
+		downloadLinks();
 		sendResponse({msg: "done"});
 	}
 });
 
-/* function fetchLinks() {
-		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			chrome.tabs.sendMessage(tabs[0].id, {fetchLink: "getLinkArray"}, function(response) {
-				localStorage["link_array"] = response.link;
-				console.log("response.link recieved" + response.link);
-			});
-		});
-		chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-			chrome.tabs.sendMessage(tabs[0].id, {fetchInfo: "getInfoArray"}, function(response) {
-				localStorage["info_array"] = response.info;
-				console.log("response.info recieved" + response.info);
-			});
-		});
-	checkStorage();
-} */
 
-function checkStorage() {
-	if (localStorage["link_array"] == undefined || localStorage["info_array"] == undefined) {
-		setTimeout(checkStorage,200)
-		//console.log("Checking localStorage");
-	} else {
-		downloadLinks();
-	}
-}
+
+
 
 // Function for downloading the links.
 function downloadLinks() {
 		
-		//console.log(localStorage["info_array"]);
-		//console.log(localStorage["link_array"]);
-		
-	var linkarray 		= JSON.parse(localStorage["link_array"]);
-	var infoarray 		= JSON.parse(localStorage["info_array"]);
-	localStorage["link_array"] = undefined;
-	localStorage["info_array"] = undefined;
+	//console.log(localStorage["info_array"]);
+	//console.log(localStorage["link_array"]);
+	
 	var imgURL 			= linkarray[1];
 	var quant  			= infoarray[1];
 	var quant2 			= parseInt(quant);
@@ -116,6 +99,7 @@ function downloadLinks() {
 	var language		= infoarray[5];
 	var translator		= infoarray[6];
 	var tags			= infoarray[7];
+	var description 	= infoarray[8];
 	var folderStructure = localStorage["folder_name"];
 	var fileStructure	= JSON.parse(localStorage["file_structure"]);
 	var fslen 			= fileStructure.length - 1;

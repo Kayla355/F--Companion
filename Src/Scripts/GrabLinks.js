@@ -7,10 +7,10 @@ if (window.location.pathname.match(/\/.*\/favorites$/) || window.location.pathna
 // Getting Options Array from Background Page
 chrome.runtime.sendMessage({fetch: "getOptionsArray"}, function(response) {
 	var options_array = JSON.parse(response.data);
-	localStorage["run_background"] = options_array[0];
+	runBackground = options_array[0];
 });
 
-if (localStorage["run_background"] == "true") {
+if (runBackground == "true") {
 	$(document).ready(grabLinks);
 	
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -30,8 +30,11 @@ if (localStorage["run_background"] == "true") {
 	});
 }
 
-var linkarray = new Array();
-var docReadyLink = false;
+var linkarray 		= new Array();
+var infoarray 		= new Array();
+var runBackground 	= new Array();
+var docReadyLink 	= false;
+
 // Function for grabbing links
 function grabLinks() {
 
@@ -80,7 +83,7 @@ function grabLinks() {
 				linkarray[i] = copypasta;
 				
 				if (i == quant) {
-					if (localStorage["run_background"] == "true") {
+					if (runBackground == "true") {
 						docReadyLink = true;
 					} else {
 						msgDocReadyLink();
@@ -94,28 +97,13 @@ function grabLinks() {
         }
    });
 };
-
-	//localStorage["link_array"] = JSON.stringify(linkarray);
-	// Change this to a long lived connection for both info_array and link_array
-	chrome.runtime.onConnect.addListener(function(port) {
-		console.assert(port.name == "getArray");
-		port.onMessage.addListener(function(msg) {
-			if (msg.fetch == "linkArray")  {
-				var link_array = JSON.stringify(linkarray);
-				port.postMessage({link: link_array});
-			}
-			if (msg.fetch == "infoArray") {
-				var info_array = localStorage["info_array"];
-				port.postMessage({link: info_array});
-			}
-		});
-	});
 	// Sends a message stating that the links have been grabbed properly.
 	function msgDocReadyLink() {
-		chrome.runtime.sendMessage({msg: "docReadyLink"}, function(response) {
+		chrome.runtime.sendMessage({msg: "docReadyLink", data: linkarray}, function(response) {
 		//console.log("Message Sent: DocReadyLink");
 		});
 	}
+
 	// Sends a message stating that there was an error when grabbing the links.
 	// This is used by GrabInfo as well.
 	function msgError(error) {

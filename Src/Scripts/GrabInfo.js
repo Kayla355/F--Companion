@@ -7,10 +7,10 @@ if (window.location.pathname.match(/\/.*\/favorites$/) || window.location.pathna
 // Getting Options Array from Background Page
 chrome.runtime.sendMessage({fetch: "getOptionsArray"}, function(response) {
 	var options_array = JSON.parse(response.data);
-	localStorage["run_background"] = options_array[0];
+	runBackground = options_array[0];
 });
 	
-if (localStorage["run_background"] == "true") {
+if (runBackground == "true") {
 	$(document).ready(grabInfo);
 
 	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -30,9 +30,12 @@ if (localStorage["run_background"] == "true") {
 	});
 }
 
+var infoarray		= new Array();
+var runBackground 	= new Array();
+var docReadyInfo 	= false;
 
-var docReadyInfo = false;
 
+// Function for grabbing manga information
 function grabInfo() {
 
 	if (window.location.pathname.match(/.*\/read$/)) {
@@ -59,7 +62,6 @@ function grabInfo() {
         success: function(html) {
 			//console.log("Grab Info Success");
 
-			var infoarray	= new Array();
 			var quant 		= $(html).find('div#right div.wrap div.row.small div.left b').text();
 			var manganame 	= $(html).find('div#right div.wrap div.content-name h1').text();
 			var series		= $(html).find('div#right div.wrap div:nth-child(2) div.left:first-child').text().slice(8, -1);
@@ -67,14 +69,15 @@ function grabInfo() {
 			var language 	= $(html).find('div#right div.wrap div:nth-child(2) div.right span a').text();
 			var translator 	= $(html).find('div#right div.wrap div:nth-child(3) div.right span:first-child').text().slice(13, -1);
 			var tags	 	= $(html).find('div#right div.wrap div:nth-child(7)').text().slice(7, -1);
+			var description = $(html).find('div#right div.wrap div:nth-child(6)').text().slice(14, -1);
 			//console.log("pages: " + quant);
 			//console.log("name: " + manganame);
 			//console.log("series: " + series);
 			//console.log("author: " + authorname);
 			//console.log("language: " + language);
 			//console.log("translator: " + translator);
-			//console.log("tags: " + tags);	
-			localStorage["quant_pages"] = quant;
+			//console.log("tags: " + tags);
+			//console.log("description: " + description);
 			
 						infoarray[0] = "infoarray";
 						infoarray[1] = quant;
@@ -84,7 +87,8 @@ function grabInfo() {
 						infoarray[5] = language;
 						infoarray[6] = translator;
 						infoarray[7] = tags;
-						localStorage["info_array"] = JSON.stringify(infoarray);
+						infoarray[8] = description;
+
 						
 						if (localStorage["run_background"] == "true") {
 							docReadyInfo = true;
@@ -101,7 +105,7 @@ function grabInfo() {
 };
 	// Sends a message stating that the link information have been grabbed properly.
 	function msgDocReadyInfo() {
-			chrome.runtime.sendMessage({msg: "docReadyInfo"}, function(response) {
+			chrome.runtime.sendMessage({msg: "docReadyInfo", data: infoarray}, function(response) {
 			//console.log("Message Sent: DocReadyInfo");
 			});
 	}
