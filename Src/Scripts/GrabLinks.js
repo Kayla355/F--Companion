@@ -3,7 +3,8 @@
 // ManageLinks.js and GrabLinks.js have different includes and excludes!!!!
 if (window.location.pathname.match(/\/.*\/favorites$/) || window.location.pathname.match(/\/.*\/favorites\/.*/) || window.location.pathname.match(/\/.*\/english$/) || window.location.pathname.match(/\/.*\/english\/.*/) || window.location.pathname.match(/\/.*\/japanese$/) || window.location.pathname.match(/\/.*\/japanese\/.*/) || window.location.pathname.match(/\/.*\/artists$/) || window.location.pathname.match(/\/.*\/artists\/.*/) || window.location.pathname.match(/\/.*\/translators$/) || window.location.pathname.match(/\/.*\/translators\/.*/) || window.location.pathname.match(/\/.*\/series$/) || window.location.pathname.match(/\/.*\/series\/.*/) || window.location.pathname.match(/\/.*\/newest$/) || window.location.pathname.match(/\/.*\/newest\/.*/) || window.location.pathname.match(/\/.*\/popular$/) || window.location.pathname.match(/\/.*\/popular\/.*/) || window.location.pathname.match(/\/.*\/downloads$/) || window.location.pathname.match(/\/.*\/downloads\/.*/) || window.location.pathname.match(/\/.*\/controversial$/) || window.location.pathname.match(/\/.*\/controversial\/.*/) || window.location.pathname.match(/\/.*\/tags\/.*/)  ) {
 	} else {
-	
+
+
 // Getting Options Array from Background Page
 chrome.runtime.sendMessage({fetch: "getOptionsArray"}, function(response) {
 	var options_array = JSON.parse(response.data);
@@ -60,18 +61,16 @@ function grabLinks() {
         async: false,
         success: function(html) {
 		//console.log("GrabLinks Success");
-			var extfull = html.match(/http:\/\/t.fakku.net\/.*\/images\/.*/);
-			var extstr = extfull.toString();
-			var extslice = extstr.slice(-6);
-			var ext = extslice.slice(0, -2);
-			
+			var ext = html.match(/http:\/\/t.fakku.net\/.*\/images\/.*/).toString().slice(-6).slice(0, -2);
             var imgURL = html.match(/http:\/\/t.fakku.net\/.*\/images\//) + "001" + ext;
 			
+
 				if (window.location.pathname.match(/.*\/read.*/)) {
 					var quant = $('select.drop option:last-child').val();
 				} else {
 					var quant = $('div#right div.wrap div.row.small div.left b').text();
 				}
+
 
 			quant2 = parseInt(quant, 10) + 1;
 			linkarray[0] = "linkarray";
