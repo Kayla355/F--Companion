@@ -8,29 +8,24 @@ var alertCheck = new Boolean();
 		if($('div#fileColumns div:nth-child('+ i +')').text() == "Page Number") {
 			alertCheck = false;
 			
-			// Load in the Background(not currently in use)
-			  //var runbackground = document.getElementById("runbackground");
-			  //localStorage["run_background"] = runbackground.checked;
-			 // Incognito Downloads
+			// Incognito Downloads
 			  var hiddenmode = document.getElementById("hiddenmode");
 			  localStorage["hidden_mode"] = hiddenmode.checked;
+
 			// What happens when the icon is pressed
 			  var select = document.getElementById("buttonaction");
 			  var buttonaction = select.children[select.selectedIndex].value;
 			  localStorage["button_action"] = buttonaction;
+
+			// What happens when there is a file conflic
+			  var select = document.getElementById("conflictaction");
+			  var conflictaction = select.children[select.selectedIndex].value;
+			  localStorage["conflict_action"] = conflictaction;
+
 			// Name of the created Folder
 			  var select = document.getElementById("foldername");
 			  var foldername = select.children[select.selectedIndex].value;
 			  localStorage["folder_name"] = foldername;
-
-			/*
-			// Show Textarea1
-			  var textarea1 = document.getElementById("textarea1");
-			  localStorage["text_area1"] = textarea1.checked;
-			// Show Textarea2
-			  var textarea2 = document.getElementById("textarea2");
-			  localStorage["text_area2"] = textarea2.checked;
-			*/
 			
 			// Save the current order of file Structure
 				var fileSArray = new Array();
@@ -65,20 +60,8 @@ var alertCheck = new Boolean();
 function restore_options() {
 // Global Variables
 var fileSArray = JSON.parse(localStorage["file_structure"]);
-//var folderSArray = JSON.stringify(localStorage["folder_structure"]);
+//var folderSArray = JSON.parse(localStorage["folder_structure"]);
 var fileChild = fileSArray.length - 1;
-
-/*
-// Restore Run in Background Status
-    var runbackground = localStorage["run_background"];
-  if (!runbackground) {
-    return;
-  }
-  var select = document.getElementById("runbackground");
-    if (runbackground == "true") {
-      select.checked = true;
-    }
-*/
 
 // Restore Run in Background Status
     var hiddenmode = localStorage["hidden_mode"];
@@ -104,6 +87,20 @@ var fileChild = fileSArray.length - 1;
     }
   }
   
+// Restore Conflict Action Status
+  var conflictaction = localStorage["conflict_action"];
+  if (!conflictaction) {
+    return;
+  }
+  var select = document.getElementById("conflictaction");
+  for (var i = 0; i < select.children.length; i++) {
+    var child = select.children[i];
+    if (child.value == conflictaction) {
+      child.selected = "true";
+      break;
+    }
+  }
+
 // Restore Folder Name Status
   var foldername = localStorage["folder_name"];
   if (!foldername) {
@@ -118,29 +115,6 @@ var fileChild = fileSArray.length - 1;
     }
   }
 
-/*
-// Restore Show Textfield #1
-    var textarea1 = localStorage["text_area1"];
-  if (!textarea1) {
-    return;
-  }
-  var select = document.getElementById("textarea1");
-    if (textarea1 == "true") {
-      select.checked = true;
-    }
-	
-// Restore Show Textfield #2
-    var textarea2 = localStorage["text_area2"];
-  if (!textarea2) {
-    return;
-  }
-  var select = document.getElementById("textarea2");
-    if (textarea2 == "true") {
-      select.checked = true;
-    }
-*/
-
-	
 // Restore file Structure
 	for (var i = 1; i <= fileChild; i++) {
 		var text = fileSArray[i].toString();

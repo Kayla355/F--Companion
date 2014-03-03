@@ -59,8 +59,11 @@ a {
   width: 40px;
   padding: 0px;
 }
+.checkbox{
+  height: 24px;
+}
 .checkbox input[type="checkbox"] {
-  margin: 3px 3px 3px 0px;
+  margin: 5px 3px 3px 0px;
 }
 /* Style for draggable elements */
 /* Prevent the text contents of draggable elements from being selectable. */

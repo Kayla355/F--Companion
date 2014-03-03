@@ -1,8 +1,8 @@
 // Variables
-var dragSrcEl = null;
-var dragTrgtEl = null;
-var colsFile = null;
-var remFile = null;
+var dragSrcEl 	= null;
+var dragTrgtEl 	= null;
+var colsFile 	= null;
+var remFile 	= null;
 
 // Drag Start
 function handleDragStart(e) {

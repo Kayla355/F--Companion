@@ -10,6 +10,7 @@
 	var errorMsg 		= null;
 	var linkarray 		= null;
 	var infoarray 		= null;
+	var conflictCheck 	= false;
 	
 // Message that prompts the grabLinks to start.
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
@@ -155,15 +156,22 @@ function requestDownload() {
 		return;
 	}
 
-	//if (localStorage["downloads_done"] != "false") {
-	if (docReadyLink && docReadyInfo) {
+	if (docReadyLink && docReadyInfo && conflictCheck) {
+		docReadyLink = false;
+		docReadyInfo = false;
+		
+		$('div#content center').css("width", "300px");
+		$('div#content center b').text("Download was skipped as it already exists.");
+	}
+
+	if (docReadyLink && docReadyInfo && !conflictCheck) {
 		chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray})
 		docReadyLink = false;
 		docReadyInfo = false;
 		
 		$('div#content center').css("width", "186px");
 		$('div#content center b').text("Success! Downloading Now.");
-		//localStorage["downloads_done"] = "false";
+
 	return;
 	}
 	setTimeout(requestDownload ,200);

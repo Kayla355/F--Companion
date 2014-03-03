@@ -12,13 +12,18 @@
 	if (localStorage["button_action"] == undefined) {
 		localStorage["button_action"] = "download";
 
-	}	
+	}
+	if (localStorage["conflict_action"] == undefined) {
+		localStorage["conflict_action"] = "uniquify";
+
+	}
 	if (localStorage["folder_name"] == undefined) {
 		localStorage["folder_name"] = "manganame";
 	}	
 	if (localStorage["file_structure"] == undefined) {
 		localStorage["file_structure"] = '[null,"Page Number"]'
 	}
+	
 // Listen for any changes to the URL of any tab.
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	if (changeInfo.status === "complete") {
@@ -103,7 +108,8 @@ function downloadLinks() {
 	var folderStructure = localStorage["folder_name"];
 	var fileStructure	= JSON.parse(localStorage["file_structure"]);
 	var fslen 			= fileStructure.length - 1;
-	var filename		= "";
+	var filename		= new String();
+	var conflictRes 	= localStorage["conflict_action"];
 
 // Convert the folderStructure variable into the proper format	
 		if (folderStructure == "manganame") {
@@ -195,7 +201,9 @@ function downloadLinks() {
 		var filename2 = filename.replace("pagenumber", str);
 		//console.log(folderStructure + "/" + filename2 + ext);
 		//console.log(copypasta2);
-			chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext});
+
+			chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
+			
 
 		if (i == quant) {
 			localStorage["downloads_done"] = "true";
