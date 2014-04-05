@@ -1,8 +1,9 @@
 - Saving manga information to text file.
+
 - Overhaul the options menu:
 	- Create a proper drop & drag system or swap it out for a text formatting system, for both Image Name and Folder Name.
 	- Look into adding more options to the File Conflict dropdown.
 	- Tabs for options, changelog and potentially more.
-	- Option to check for direct download links first. (Depends on what hosts are being used as to how worthwhile is see it as being)
+	- Option to check for direct download links first. (Depends on what hosts are being used as to how worthwhile I see it as being)
 
 

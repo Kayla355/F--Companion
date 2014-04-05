@@ -22,3 +22,4 @@
 - Fixed issues when trying to create a folder containing one of the following characters, \/:*?"<>|
 - Added error messages when the server responded with an error when trying to grab links and info.
 - Removed some defunct code that was no longer necessary.
+- Fixed issues with grabbing the correct manga when browsing a random manga using /random

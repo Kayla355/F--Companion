@@ -39,6 +39,9 @@ var docReadyInfo 	= false;
 // Function for grabbing manga information
 function grabInfo() {
 
+/*
+	// Old function not necessary anymore
+	// ----------------
 	if (window.location.pathname.match(/.*\/read$/)) {
 		var str = "http://www.fakku.net" + window.location.pathname;
 		var currenturl = str.slice(0, -5)
@@ -51,10 +54,19 @@ function grabInfo() {
 		var str = "http://www.fakku.net" + window.location.pathname;
 		var currenturl = str.slice(0, -9);
 	}
-	if (!window.location.pathname.match(/.*\/read.*/) && !window.location.pathname.match(/.*\/related$/) && !window.location.pathname.match(/.*\/download$/)) {
+	if (!window.location.pathname.match(/.*\/read$/) && !window.location.pathname.match(/.*\/related$/) && !window.location.pathname.match(/.*\/download$/)) {
 		var currenturl = "http://www.fakku.net" + window.location.pathname;
 	}
-	
+*/
+
+	if (window.location.pathname.match(/.*\/read$/)) {
+		var currenturl = "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
+		//console.log("GrabInfo URL: " + currenturl);
+	} else {
+		var currenturl = "http://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
+		//console.log("GrabInfo URL: " + currenturl);
+	}
+
     $.ajax({     
         type: "GET",		
         url: currenturl,

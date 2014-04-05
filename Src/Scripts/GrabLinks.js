@@ -39,6 +39,9 @@ var docReadyLink 	= false;
 // Function for grabbing links
 function grabLinks() {
 
+/*
+	// Old function not necessary anymore
+	// ----------------
 	if (window.location.pathname.match(/.*\/read$/)) {
 		var currenturl = "http://www.fakku.net" + window.location.pathname;
 	}
@@ -53,7 +56,15 @@ function grabLinks() {
 	if (!window.location.pathname.match(/.*\/read$/) && !window.location.pathname.match(/.*\/related$/) && !window.location.pathname.match(/.*\/download$/)) {
 		var currenturl = "http://www.fakku.net" + window.location.pathname + "/read";
 	}
-	
+*/
+	if (window.location.pathname.match(/.*\/read$/)) {
+		var currenturl = "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
+		//console.log("GrabLinks URL: " + currenturl);
+	} else {
+		var currenturl = "http://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
+		//console.log("GrabLinks URL: " + currenturl);
+	}
+
     $.ajax({     
         type: "GET",		
         url: currenturl,
