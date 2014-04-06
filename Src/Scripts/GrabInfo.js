@@ -4,35 +4,16 @@
 if (window.location.pathname.match(/\/.*\/favorites$/) || window.location.pathname.match(/\/.*\/favorites\/.*/) || window.location.pathname.match(/\/.*\/english$/) || window.location.pathname.match(/\/.*\/english\/.*/) || window.location.pathname.match(/\/.*\/japanese$/) || window.location.pathname.match(/\/.*\/japanese\/.*/) || window.location.pathname.match(/\/.*\/artists$/) || window.location.pathname.match(/\/.*\/artists\/.*/) || window.location.pathname.match(/\/.*\/translators$/) || window.location.pathname.match(/\/.*\/translators\/.*/) || window.location.pathname.match(/\/.*\/series$/) || window.location.pathname.match(/\/.*\/series\/.*/) || window.location.pathname.match(/\/.*\/newest$/) || window.location.pathname.match(/\/.*\/newest\/.*/) || window.location.pathname.match(/\/.*\/popular$/) || window.location.pathname.match(/\/.*\/popular\/.*/) || window.location.pathname.match(/\/.*\/downloads$/) || window.location.pathname.match(/\/.*\/downloads\/.*/) || window.location.pathname.match(/\/.*\/controversial$/) || window.location.pathname.match(/\/.*\/controversial\/.*/) || window.location.pathname.match(/\/.*\/tags\/.*/)  ) {
 	} else {
 
-
-// Getting Options Array from Background Page
-chrome.runtime.sendMessage({fetch: "getOptionsArray"}, function(response) {
-	var options_array = JSON.parse(response.data);
-	runBackground = options_array[0];
+// Listen for message to start gathering the info
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.msg == "grabInfo") {
+		sendResponse({response: "grabInfoOK"});
+		grabInfo();
+		//console.log("Grabbing Info");
+	}
 });
-	
-if (runBackground == "true") {
-	$(document).ready(grabInfo);
-
-	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-		if (request.msg == "grabInfo" && docReadyInfo) {
-			sendResponse({response: "grabInfoOK"});
-			msgDocReadyInfo();
-			//console.log("Grabbing Info");
-		}
-	});
-} else {
-	chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-		if (request.msg == "grabInfo") {
-			sendResponse({response: "grabInfoOK"});
-			grabInfo();
-			//console.log("Grabbing Info");
-		}
-	});
-}
 
 var infoarray		= new Array();
-var runBackground 	= new Array();
 var docReadyInfo 	= false;
 
 
@@ -67,12 +48,12 @@ function grabInfo() {
 		//console.log("GrabInfo URL: " + currenturl);
 	}
 
-    $.ajax({     
-        type: "GET",		
-        url: currenturl,
-        dataType: "html",
-        async: false,
-        success: function(html) {
+	$.ajax({     
+		type: "GET",		
+		url: currenturl,
+		dataType: "html",
+		async: false,
+		success: function(html) {
 			//console.log("Grab Info Success");
 
 			var quant 		= $(html).find('div#right div.wrap div.row.small div.left b').text();
@@ -92,29 +73,24 @@ function grabInfo() {
 			//console.log("tags: " + tags);
 			//console.log("description: " + description);
 			
-						infoarray[0] = "infoarray";
-						infoarray[1] = quant;
-						infoarray[2] = manganame;
-						infoarray[3] = series;
-						infoarray[4] = authorname;
-						infoarray[5] = language;
-						infoarray[6] = translator;
-						infoarray[7] = tags;
-						infoarray[8] = description;
+			infoarray[0] = "infoarray";
+			infoarray[1] = quant;
+			infoarray[2] = manganame;
+			infoarray[3] = series;
+			infoarray[4] = authorname;
+			infoarray[5] = language;
+			infoarray[6] = translator;
+			infoarray[7] = tags;
+			infoarray[8] = description;
 
+			msgDocReadyInfo();
 						
-						if (localStorage["run_background"] == "true") {
-							docReadyInfo = true;
-						} else {
-							msgDocReadyInfo();
-						}
-						
-        },
-        error: function(error) {
-        	msgError(error);
-        	//console.log("Error!!");
-        }
-   });
+		},
+		error: function(error) {
+			msgError(error);
+			//console.log("Error!!");
+		}
+	});
 };
 	// Sends a message stating that the link information have been grabbed properly.
 	function msgDocReadyInfo() {

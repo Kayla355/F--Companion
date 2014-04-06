@@ -3,9 +3,6 @@
 // found in the LICENSE file.
 
 // Default options for first launch.
-	if (localStorage["run_background"] == undefined) {
-		localStorage["run_background"] = "false";
-	}	
 	if (localStorage["hidden_mode"] == undefined) {
 		localStorage["hidden_mode"] = "false";
 	}	
@@ -60,7 +57,6 @@ var infoarray 		= new Array();
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.fetch == "getOptionsArray") {
 		
-		optionsArray[0] = localStorage["run_background"]
 		optionsArray[1] = localStorage["button_action"];
 		optionsArray[2] = localStorage["text_area1"];
 		optionsArray[3] = localStorage["text_area2"];

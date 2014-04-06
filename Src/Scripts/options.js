@@ -63,7 +63,7 @@ var fileSArray = JSON.parse(localStorage["file_structure"]);
 //var folderSArray = JSON.parse(localStorage["folder_structure"]);
 var fileChild = fileSArray.length - 1;
 
-// Restore Run in Background Status
+// Restore Incognito downloads Status
     var hiddenmode = localStorage["hidden_mode"];
   if (!hiddenmode) {
     return;
