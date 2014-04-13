@@ -210,7 +210,7 @@ function downloadLinks() {
 chrome.downloads.onChanged.addListener(function (downloadID) {
 	if (hiddenMode) {
 		if (downloadID.state) {
-			if (downloadID.state.current == "complete") {
+			if (downloadID.state.current == "complete" || downloadID.state.current == "interrupted") {
 				chrome.downloads.search({id: downloadID.id}, function(result) {
 					if (result[0].byExtensionName == "F! Downloader") {
 						chrome.downloads.erase({id: downloadID.id})
