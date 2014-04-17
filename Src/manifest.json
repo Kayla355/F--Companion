@@ -10,14 +10,22 @@
   "web_accessible_resources": ["scripts/jquery-2.0.3.min.map", "images/trashcan.png"],
   
   "permissions": [
-	"tabs", "downloads", "http://t.fakku.net/*", "http://www.fakku.net/*"
+	"tabs", 
+  "downloads", 
+  "cookies", 
+  "http://www.fakku.net/*"
   ],
-  
+
+  "browser_action": {
+    "default_icon": "images/icon-256.png",
+    "default_popup": "Dropdown.html"
+  },
+/*
   "page_action": {
     "default_icon": "images/icon-256.png",
     "default_popup": "Dropdown.html"
   },
-  
+*/  
   "content_scripts": [
 		{
 			"matches": ["http://www.fakku.net/doujinshi/*", "http://www.fakku.net/manga/*"],

@@ -4,7 +4,6 @@
 	var fetchReady		= false;
 	var grablinks 		= false;
 	var grabinfo 		= false;
-	var downloadsDone 	= false;
 	var notDone 		= false;
 	var errorReport		= false;
 	var errorMsg 		= null;
@@ -109,9 +108,6 @@ function requestLinks() {
 				while (str.length < 3) str = '0' + str;
 				copypasta2 = copypasta2 + linkarray[i].toString() + "\n" ;
 				
-					if (i == quant) {
-						localStorage["downloads_done"] = "true";
-					}
 			}
 
 			document.getElementById('copypasta').value=copypasta2;
@@ -128,7 +124,7 @@ function requestLinks() {
 			});
 		return;
 	}
-	setTimeout(requestLinks ,200);
+	setTimeout(requestLinks ,20);
 }
 
 
@@ -174,5 +170,5 @@ function requestDownload() {
 
 	return;
 	}
-	setTimeout(requestDownload ,200);
+	setTimeout(requestDownload ,20);
 }
