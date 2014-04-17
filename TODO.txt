@@ -6,4 +6,12 @@
 	- Tabs for options, changelog and potentially more.
 	- Option to check for direct download links first. (Depends on what hosts are being used as to how worthwhile I see it as being)
 
+- Download subscriptions
+	- Check if cookie has expired, if so notification to log in again.
+	- Automatic checker on timer
+	- Automatic mode & notify mode
+	- remove notification for downloaded
+	- Notification icon + dropdown
 
+- Download series/artist
+	- Download everything when searching/browsing an artist
