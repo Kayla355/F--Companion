@@ -1,4 +1,4 @@
-- Saving manga information to text file.
+- Saving manga information to text file.(Pretty sure this can't be done :( )
 
 - Overhaul the options menu:
 	- Create a proper drop & drag system or swap it out for a text formatting system, for both Image Name and Folder Name.
@@ -12,6 +12,9 @@
 	- Automatic mode & notify mode
 	- remove notification for downloaded
 	- Notification icon + dropdown
+	- remove old localStorage notification data
+	or
+	- parse x amount at a time and scrolling causes older ones to appear(would need to fix the way arraynames are stored.)
 
 - Download series/artist
 	- Download everything when searching/browsing an artist

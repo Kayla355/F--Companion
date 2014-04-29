@@ -32,6 +32,9 @@
 	if (localStorage["fakku_notes"] == undefined) {
 		localStorage["fakku_notes"] = "false";
 	}
+	if (localStorage["update_interval"] == undefined) {
+		localStorage["update_interval"] = 60;
+	}
 
 
 // Listen for change of active tab.
@@ -109,6 +112,7 @@ var optionsArray 	= new Array();
 var incognitoMode 	= new Boolean();
 var linkarray 		= new Array();
 var infoarray 		= new Array();
+var checkNotes;
 
 // Fetch request for options array.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -152,91 +156,124 @@ if (localStorage["fakku_notes"] == "true") {
 
 // Function to check for notifications
 function notificationCheck() {
-	$.ajax({
-		type: "GET",
-		url: "http://www.fakku.net/subscriptions",
-		dataType: "html",
-		async: false,
-		success: function(html) {
+	if (localStorage["fakku_notes"] == "true") {
+		// Check if Login cookie has expired.
+		chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
+			if (!results) {
+				localStorage["badge_number"] = "Err";
+				chrome.browserAction.setBadgeText({text: "Err"});
+				chrome.browserAction.setBadgeBackgroundColor({color: [200, 0, 0, 255]})
+				recursiveNote(10000);
+			} else {
+				$.ajax({
+					type: "GET",
+					url: "http://www.fakku.net/subscriptions",
+					dataType: "html",
+					async: false,
+					success: function(html) {
 
-		// Keep track of the names of the arrays
-			var nArrayNames = new Array();
+					// Keep track of the names of the arrays
+						var nArrayNames = new Array();
 
-		// Find each notification
-			$(html).find("div.right-content.notifications div.notification").each(function(i) {
-				i++;
+					// Find each notification
+						$(html).find("div.right-content.notifications div.notification").each(function(i) {
+							i++;
 
-				var nTagName = new Array();
-				var nTagHref = new Array();
-			// Find each <a> under the current notification
-				$(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a").each(function(n) {
-					n++;
-					
-					var tagCheck = $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-child(" + n + ")").attr("href");
-				// If the <a> is a tag link add it to the tag array
-					if (tagCheck.match(/\/tags\/.*/)) {
-						nTagName.push($(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-child(" + n + ")").text());
+							var nTagName = new Array();
+							var nTagHref = new Array();
+						// Find each <a> under the current notification
+							$(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a").each(function(n) {
+								n++;
+								
+								var tagCheck = $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-child(" + n + ")").attr("href");
+							// If the <a> is a tag link add it to the tag array
+								if (tagCheck.match(/\/tags\/.*/)) {
+									nTagName.push($(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-child(" + n + ")").text());
+								}
+							});
+
+							var nName 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").text();
+							var nHref 	= "http://www.fakku.net" + $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").attr("href");
+							var nOld	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") i").text();
+
+			/*				console.log("Checked Notifications");
+							console.log("Name: " + nName);
+							console.log("Link: " + nHref);
+							console.log("Uploaded: " + nOld);
+							console.log("Under Tags: " + JSON.stringify(nTagName));
+							console.log("Tag Link: " + JSON.stringify(nTagHref));*/
+
+							var noteArray 	= new Array();
+							var nStorage 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").attr("href");
+							if (localStorage[nStorage + "--note"]) {
+								var nExists		= JSON.parse(localStorage[nStorage + "--note"]);
+
+								if (nExists[0] == "old" || localStorage["first_time"] == "true") {
+									localStorage["first_time"] = "false";
+									noteArray[0] = "old";
+								} else {
+									noteArray[0] = "new";
+									var i = localStorage["badge_number"];
+									i++
+									localStorage["badge_number"] = i;
+								}
+
+							} else {
+								noteArray[0] = "new"
+								var i = localStorage["badge_number"];
+								i++
+								localStorage["badge_number"] = i;
+							}
+
+							noteArray[1] = nName;
+							noteArray[2] = nHref;
+							noteArray[3] = nOld;
+							noteArray[4] = JSON.stringify(nTagName);
+
+							localStorage[nStorage + "--note"] = JSON.stringify(noteArray)
+
+							nArrayNames.push(nStorage + "--note");
+
+							//console.log(noteArray);
+							//console.log(nStorage);
+							console.log(localStorage[nStorage + "--note"]);
+
+						});
+						
+						localStorage["n_array_names"] = JSON.stringify(nArrayNames);
+						//console.log(localStorage["n_array_names"]);
+
+					},
+					error: function(error) {
+						//msgError(error);
+						//console.log("Error: " + error);
 					}
 				});
-
-				var nName 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").text();
-				var nHref 	= "http://www.fakku.net" + $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").attr("href");
-				var nOld	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") i").text();
-
-/*				console.log("Checked Notifications");
-				console.log("Name: " + nName);
-				console.log("Link: " + nHref);
-				console.log("Uploaded: " + nOld);
-				console.log("Under Tags: " + JSON.stringify(nTagName));
-				console.log("Tag Link: " + JSON.stringify(nTagHref));*/
-
-				var noteArray 	= new Array();
-				var nStorage 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").attr("href");
-				if (localStorage[nStorage]) {
-					var nExists		= JSON.parse(localStorage[nStorage]);
-
-					if (nExists[0] == "old" || localStorage["first_time"] == "true") {
-						localStorage["first_time"] = "false";
-						noteArray[0] = "old";
-					} else {
-						noteArray[0] = "new";
-					}
-
-				} else {
-					noteArray[0] = "new"
+				// Update Badgenumber if it is Error or if it is 0
+				if (localStorage["badge_number"] == "Err") {
+					chrome.browserAction.setBadgeText({text: ""});
+					chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]});
+					localStorage["badge_number"] = 0;
+				} else if (localStorage["badge_number"] != 0) {
+					chrome.browserAction.setBadgeText({text: localStorage["badge_number"]});
+					chrome.browserAction.setBadgeBackgroundColor({color: [200, 0, 0, 255]});
+					localStorage["badge_number"] = 0;
 				}
-
-				noteArray[1] = nName;
-				noteArray[2] = nHref;
-				noteArray[3] = nOld;
-				noteArray[4] = JSON.stringify(nTagName);
-
-				localStorage[nStorage] = JSON.stringify(noteArray)
-
-				nArrayNames.push(nStorage);
-
-				console.log(noteArray);
-				console.log(nStorage);
-				console.log(localStorage[nStorage]);
-
-			});
-			
-			localStorage["n_array_names"] = JSON.stringify(nArrayNames);
-			console.log(localStorage["n_array_names"]);
-
-		},
-		error: function(error) {
-			//msgError(error);
-			console.log("Error: " + error);
-		}
-	});
-
-	if (localStorage["fakku_notes"] == "true") {
-		setTimeout(notificationCheck, 120000); //120 Seconds temporary until variable is defined in options
+				// Call the recursive function
+					recursiveNote(localStorage["update_interval"] * 60 * 1000); // Get update interval from localStorage
+			}
+		});
+	} else {
+		clearTimeout(checkNotes);
 	}
 }
 
-
+function recursiveNote(cookieCheck) {
+	// Resursive function to check for updates
+	clearTimeout(checkNotes);
+	var updateInterval = cookieCheck;
+	checkNotes = setTimeout(notificationCheck, updateInterval);
+}
 
 // Function for downloading the links.
 function downloadLinks() {

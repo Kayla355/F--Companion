@@ -12,6 +12,18 @@ var alertCheck = new Boolean();
 				var select = document.getElementById("incognitomode");
 				localStorage["incognito_mode"] = select.checked;
 
+			// Fakku Notifications
+				var select = document.getElementById("fakkunotes");
+				// Message to enable/disable recursive function
+					chrome.runtime.sendMessage({msg: "GrabNotes"}, function(response) {
+						//console.log("Updated Notifications");
+					});
+				localStorage["fakku_notes"] = select.checked;
+
+			// Update Interval
+				var select = document.getElementById("updateinterval");
+				localStorage["update_interval"] = select.value;
+
 			// What happens when the icon is pressed
 				var select = document.getElementById("buttonaction");
 				var buttonaction = select.children[select.selectedIndex].value;
@@ -36,16 +48,6 @@ var alertCheck = new Boolean();
 				}
 
 				localStorage["file_structure"] = JSON.stringify(fileSArray);
-
-			// Fakku Notifications
-				var select = document.getElementById("fakkunotes");
-				// If true start function
-					if (select.checked && localStorage["fakku_notes"] != select.checked.toString()) {
-						chrome.runtime.sendMessage({msg: "GrabNotes"}, function(response) {
-							//console.log("Updated Notifications");
-						});
-					}
-				localStorage["fakku_notes"] = select.checked;
 
 			// Update status to let user know options were saved.
 				var status = document.getElementById("status");
@@ -84,6 +86,24 @@ var fileChild = fileSArray.length - 1;
 		if (incognitomode == "true") {
 			select.checked = true;
 		}
+
+// Restore Fakku Notifications Status
+	var fakkuNotes = localStorage["fakku_notes"];
+	if (!fakkuNotes) {
+		return;
+	}
+	var select = document.getElementById("fakkunotes");
+		if (fakkuNotes == "true") {
+			select.checked = true;
+		}
+
+// Restore Update Interval
+	var updateinterval = localStorage["update_interval"];
+	if (!updateinterval) {
+		return;
+	}
+	var select = document.getElementById("updateinterval");
+		select.value = updateinterval;
 
 // Restore Button Action Status
 	var buttonaction = localStorage["button_action"];
@@ -136,16 +156,6 @@ var fileChild = fileSArray.length - 1;
 			chrome.extension.sendMessage({msg: "runQueryLoaded"})
 		}
 	}
-
-// Restore Fakku Notifications Status
-	var fakkuNotes = localStorage["fakku_notes"];
-	if (!fakkuNotes) {
-		return;
-	}
-	var select = document.getElementById("fakkunotes");
-		if (fakkuNotes == "true") {
-			select.checked = true;
-		}
 }
 document.addEventListener('DOMContentLoaded', restore_options);
 document.querySelector('#save').addEventListener('click', save_options);

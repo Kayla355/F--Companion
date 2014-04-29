@@ -65,6 +65,19 @@ a {
 .checkbox input[type="checkbox"] {
   margin: 5px 3px 3px 0px;
 }
+.textbox{
+  margin: 0 0 2px 0;
+}
+.textbox input[type="number"] {
+  width: 25px;
+  padding: 0px;
+  text-align: center;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
 /* Style for draggable elements */
 /* Prevent the text contents of draggable elements from being selectable. */
 [draggable] {

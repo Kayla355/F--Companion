@@ -16,9 +16,8 @@ function grabLinks(downloadurl) {
 		var currenturl = "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
-		console.log("GrabInfo triggered from DropdownNotes");
+		//console.log("GrabLinks triggered from DropdownNotes");
 		var currenturl = downloadurl + "/read";
-		return;
 	} else {
 		var currenturl = "http://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
@@ -62,7 +61,7 @@ function msgDocReadyLink() {
 	chrome.runtime.sendMessage({msg: "docReadyLink", data: linkarray}, function(response) {
 	//console.log("Message Sent: DocReadyLink");
 	});
-	nDocReadyLink();
+	nDocReadyLink(linkarray);
 }
 
 // Sends a message stating that there was an error when grabbing the links.
