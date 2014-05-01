@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 var infoarray		= new Array();
 
 // Function for grabbing manga information
-function grabInfo(downloadurl, notifications, nold, nseen) {
+function grabInfo(downloadurl, notifications, ndownload, nold, nseen) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
 		var currenturl 		= "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
@@ -69,7 +69,7 @@ function grabInfo(downloadurl, notifications, nold, nseen) {
 				notificationInfo(infoarray, downloadurl, nold, nseen);
 				//console.log("notifications Grabinfo triggered");
 			} else {
-				msgDocReadyInfo();
+				msgDocReadyInfo(ndownload);
 				//console.log("Download Grabinfo triggered");
 			}
 						
@@ -91,9 +91,11 @@ function grabInfo(downloadurl, notifications, nold, nseen) {
 };
 
 // Sends a message stating that the link information have been grabbed properly.
-function msgDocReadyInfo() {
+function msgDocReadyInfo(ndownload) {
 		chrome.runtime.sendMessage({msg: "docReadyInfo", data: infoarray}, function(response) {
 		//console.log("Message Sent: DocReadyInfo");
 		});
-		nDocReadyInfo(infoarray);
+		if (ndownload) {
+			nDocReadyInfo(infoarray);
+		}
 }

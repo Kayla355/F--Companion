@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 var linkarray 		= new Array();
 
 // Function for grabbing links
-function grabLinks(downloadurl) {
+function grabLinks(downloadurl, notifications, ndownload) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
 		var currenturl = "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
@@ -30,8 +30,8 @@ function grabLinks(downloadurl) {
 		async: false,
 		success: function(html) {
 		//console.log("GrabLinks Success");
-			var ext 	= html.match(/http:\/\/t.fakku.net\/.*\/images\/.*/).toString().slice(-6).slice(0, -2);
-			var imgURL 	= html.match(/http:\/\/t.fakku.net\/.*\/images\//) + "001" + ext;
+			var ext 	= html.match(/:\/\/t.fakku.net\/.*\/images\/.*/).toString().slice(-6).slice(0, -2);
+			var imgURL 	= "http" + html.match(/:\/\/t.fakku.net\/.*\/images\//) + "001" + ext;
 
 			var quant = JSON.parse(html.match(/window\.params\.thumbs = \[.*\];/).toString().replace("window.params.thumbs = ", "").replace(";","")).length;
 			
@@ -47,7 +47,7 @@ function grabLinks(downloadurl) {
 
 			}
 
-			msgDocReadyLink();
+			msgDocReadyLink(ndownload);
 		},
 		error: function(error) {
 			msgError(error);
@@ -57,11 +57,13 @@ function grabLinks(downloadurl) {
 };
 
 // Sends a message stating that the links have been grabbed properly.
-function msgDocReadyLink() {
+function msgDocReadyLink(ndownload) {
 	chrome.runtime.sendMessage({msg: "docReadyLink", data: linkarray}, function(response) {
 	//console.log("Message Sent: DocReadyLink");
 	});
-	nDocReadyLink(linkarray);
+	if (ndownload) {
+		nDocReadyLink(linkarray);
+	}
 }
 
 // Sends a message stating that there was an error when grabbing the links.

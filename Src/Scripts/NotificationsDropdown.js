@@ -31,12 +31,11 @@ chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(re
 			if (localStorage[nInfo[2] + "--info"]) {
 				notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0]);
 			} else {
-				grabInfo(nInfo[2], true, nInfo[3], nInfo[0]);
+				grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0]);
 				//console.log(nInfo[2]);
 			}
 
 		});
-		//requestDownload();
 // End //
 	}
 });
@@ -123,11 +122,11 @@ function popupDL() {
 }
 
 // Function waiting for the links to finish being grabbed.
-function nDocReadyLink(data) {
+function nDocReadyLink() {
 	docReadyLink = true;
 };
 // Function waiting for the info to finish being grabbed.
-function nDocReadyInfo(data) {
+function nDocReadyInfo() {
 	docReadyInfo = true;
 };
 // Function listening for any potential error.
@@ -150,8 +149,8 @@ function requestDownload(href) {
 	// Grab Info and Links
 	//console.log(href);
 
-	grabInfo(href, false);
-	grabLinks(href, false);
+	grabInfo(href, false, true);
+	grabLinks(href, false, true);
 	
 	startDownload();
 }
@@ -166,7 +165,7 @@ function startDownload() {
 		return;
 
 	}
-
+	console.log("docReadyInfo: " + docReadyInfo + " & docReadyLink: " + docReadyLink);
 	if (docReadyLink && docReadyInfo) {
 		chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray})
 		docReadyLink = false;
