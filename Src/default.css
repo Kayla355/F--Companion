@@ -2,6 +2,9 @@ body {
 	font-family:Arial, "Helvetica Neue", Helvetica, sans-serif;
 	font-size: 13px;
 }
+#content {
+	display: inline-block;
+}
 #left 
 {
 	white-space: normal;
@@ -174,4 +177,53 @@ a:hover
 {
 	color: #9D0A0A;
 	font-weight: 700;
+}
+
+// Loading Animation
+
+div .loadingtrail, 
+div .loadingtrailnotes {
+	display: inline-block;
+}
+.loadingtrail {
+	display: inline-block;
+	position: relative;
+	top: 4px;
+	right: 6px;
+	width: 18px;
+	height: 18px;
+}
+.loadingtrailnotes {
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+}
+.loadingtrail:before, .loadingtrailnotes:before {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border-top: 2px solid #ccc;
+	border-right: 2px solid #333;
+	content: "";
+	-webkit-animation: spin 1s ease infinite;
+	animation: spin 1s ease infinite;
+	border-radius: 100%;
+}
+@-webkit-keyframes spin {
+	100% {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
+  }
+}
+@-ms-keyframes spin {
+  100% {
+		-ms-transform: rotate(360deg);
+		transform: rotate(360deg);
+  }
+}
+@keyframes spin {
+  100% {
+		-webkit-transform: rotate(360deg);
+		transform: rotate(360deg);
+  }
 }

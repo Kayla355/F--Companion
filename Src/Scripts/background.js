@@ -35,6 +35,9 @@
 	if (localStorage["update_interval"] == undefined) {
 		localStorage["update_interval"] = 60;
 	}
+	if (localStorage["badge_number"] == undefined) {
+		localStorage["badge_number"] = 0;
+	}
 
 
 // Listen for change of active tab.

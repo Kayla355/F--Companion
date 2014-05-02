@@ -73,10 +73,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		
 // If the button option is set to "Links" then...
 if (localStorage["button_action"] == "links" ) {
-	$('div#content').append("<center style='text-align:center'></center>");
-	$('div#content center').css("width", "136px");
-	$('div#content center').css("height", "20px");
-	$('div#content center').append("<b>Preparing Links</b>");
+	$('div#content').append("<div id='center' style='text-align:center; display: inline-block;'></div>");
+	$('div#center').append("<div id='loading' class='loadingtrail'></div>");
+	$('div#center').css("width", "160px");
+	$('div#center').css("height", "25px");
+	$('div#center').append("<b>Preparing Links</b>");
 	requestLinks();
 }
 
@@ -96,10 +97,11 @@ function requestLinks() {
 				//console.log("RequestLinks: " + linkarray);
 				//console.log("RequestLinks: " + infoarray);
 				
-				$('div#content center').css("width", "");
-				$('div#content center').css("height", "");
-				$('div#content center b').remove();
-				$('div#content center').append("<textarea id='copypasta' wrap='off' cols ='" + quantlen + "' rows='" + quant2 + "' readonly style='overflow:hidden;padding-bottom:3px;resize:none'>");
+				$('div#loading').hide();
+				$('div#center').css("width", "");
+				$('div#center').css("height", "");
+				$('div#center b').remove();
+				$('div#center').append("<textarea id='copypasta' wrap='off' cols ='" + quantlen + "' rows='" + quant2 + "' readonly style='overflow:hidden;padding-bottom:3px;resize:none'>");
 							
 						
 			var copypasta2 = "";
@@ -133,10 +135,11 @@ function requestLinks() {
 
 // If the button option is set to "Download" then...
 if (localStorage["button_action"] == "download") {
-	$('div#content').append("<center style='text-align:center'></center>");
-	$('div#content center').css("width", "136px");
-	$('div#content center').css("height", "20px");
-	$('div#content center').append("<b>Preparing Download</b>");
+	$('div#content').append("<div id='center' style='text-align:center; display: inline-block;'></div>");
+	$('div#center').append("<div id='loading' class='loadingtrail'></div>");
+	$('div#center').css("width", "160px");
+	$('div#center').css("height", "25px");
+	$('div#center').append("<b>Preparing Download</b>");
 	requestDownload();
 }
 
@@ -145,10 +148,11 @@ if (localStorage["button_action"] == "download") {
 function requestDownload() {
 	if (errorReport) {
 		//console.log("Error message recieved from the server");
-		$('div#content center').css("width", "234px");
-		$('div#content center b').text("Error recieved from server, try again.");
-		$('div#content center').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
-		$('div#content center').css("height", "40px");
+		$('div#loading').hide();
+		$('div#center').css("width", "234px");
+		$('div#center b').text("Error recieved from server, try again.");
+		$('div#center').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
+		$('div#center').css("height", "40px");
 		return;
 	}
 
@@ -156,8 +160,9 @@ function requestDownload() {
 		docReadyLink = false;
 		docReadyInfo = false;
 		
-		$('div#content center').css("width", "300px");
-		$('div#content center b').text("Download was skipped as it already exists.");
+		$('div#loading').hide();
+		$('div#center').css("width", "300px");
+		$('div#center b').text("Download was skipped as it already exists.");
 	}
 
 	if (docReadyLink && docReadyInfo && !conflictCheck) {
@@ -165,8 +170,9 @@ function requestDownload() {
 		docReadyLink = false;
 		docReadyInfo = false;
 		
-		$('div#content center').css("width", "186px");
-		$('div#content center b').text("Success! Downloading Now.");
+		$('div#loading').hide();
+		$('div#center').css("width", "186px");
+		$('div#center b').text("Success! Downloading Now.");
 
 	return;
 	}

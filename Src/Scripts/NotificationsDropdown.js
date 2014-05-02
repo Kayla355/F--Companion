@@ -12,33 +12,36 @@
 		// $('div#content center').append("<b>Placeholder for notifications</b>");
 
 // Check if Login cookie has expired.
-chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
-	if (!results) {
-		$('div#content').append("<center><b></b></center>");
-		$('div#content center').css("width", "200px");
-		$('div#content center').css("height", "20px");
-		$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
-	} else {
-	// Else gather and create notifications 
-	// IF necessary
-		$('div#content').css("width", "545px");
+function checkCookies() {
+	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
+		if (!results) {
+			$('div#content').append("<center><b></b></center>");
+			$('div#content center').css("width", "200px");
+			$('div#content center').css("height", "20px");
+			$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
+		} else {
+		// Else gather and create notifications 
+		// IF necessary
+			$('div#content').css("width", "545px");
 
-		var nArrayNames = JSON.parse(localStorage["n_array_names"]);
-		
-		nArrayNames.forEach(function(name) {
-			//var name = nArrayNames[0];
-			var nInfo = JSON.parse(localStorage[name]);
-			if (localStorage[nInfo[2] + "--info"]) {
-				notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0]);
-			} else {
-				grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0]);
-				//console.log(nInfo[2]);
-			}
+			var nArrayNames = JSON.parse(localStorage["n_array_names"]);
+			
+			nArrayNames.forEach(function(name) {
+				//var name = nArrayNames[0];
+				var nInfo = JSON.parse(localStorage[name]);
+				if (localStorage[nInfo[2] + "--info"]) {
+					notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0]);
+				} else {
+					grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0]);
+					//console.log(nInfo[2]);
+				}
 
-		});
-// End //
-	}
-});
+			});
+	// End //
+		}
+	});
+}
+setTimeout(checkCookies, 20); // Workaround to get the loadingtrail to appear instead of nothing
 
 // Function waiting for the information from GrabInfo
 function notificationInfo(infodata, href, nold, nseen) {
@@ -91,6 +94,7 @@ function notificationInfo(infodata, href, nold, nseen) {
 																							//console.log($(document).scrollTop());
 																							$('div#content').css("opacity", "0.6");
 																							$('div#float').show();
+																							$('div#float').prepend("<div id='loading' class='loadingtrail'></div>");;
 																							$('div#float b').text("Preparing Download");
 																							$('div#float').css("left", x + 15);
 																							$('div#float').css("top", y + offsetY - 10);
@@ -108,6 +112,7 @@ function notificationInfo(infodata, href, nold, nseen) {
 	}
 	chrome.browserAction.setBadgeText({text: ""});
 	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
+	$('div#loading').hide();
 };
 // Function for removing the popup download box
 function popupDL() {
@@ -160,8 +165,9 @@ function startDownload() {
 		errorReport = false;
 		//console.log("Error message recieved from the server");
 		//console.log(errorMsg.status + ": " + errorMsg.statusText);
-		$('div#content div#float b').text("Error recieved from server, try again.");
-		$('div#content div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
+		$('div#loading').hide();
+		$('div#float b').text("Error recieved from server, try again.");
+		$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
 		return;
 
 	}
@@ -171,7 +177,7 @@ function startDownload() {
 		docReadyLink = false;
 		docReadyInfo = false;
 		//console.log("sent message to background");
-		
+		$('div#loading').hide();
 		$('div#float b').text("Success! Downloading Now.");
 
 		return;
