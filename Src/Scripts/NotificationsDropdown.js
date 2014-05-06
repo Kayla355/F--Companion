@@ -99,9 +99,9 @@ function notificationInfo(infodata, href, nold, nseen) {
 			// create artist link, if last in array do not use ", "
 			artistArray.forEach(function(e) {
 				if (artistArray[artistArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-") + "' target='_blank'>" + e + "</a>");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-").toLowerCase() + "' target='_blank'>" + e + "</a>");
 				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-") + "' target='_blank'>" + e + "</a>, ");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-").toLowerCase() + "' target='_blank'>" + e + "</a>, ");
 				}
 			});
 		// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
