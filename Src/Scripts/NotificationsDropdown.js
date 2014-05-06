@@ -48,6 +48,33 @@ function notificationInfo(infodata, href, nold, nseen) {
 	var tagArray 	= infodata[7].split(", ");
 	var artistArray	= infodata[4].split(", ");
 
+  // Variables mapping what characters translates into what
+  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|\s&\s|\s+\s|\ |\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\☆|\★|\α|\×/gi;
+	var eMapped = {
+		" & ":"-",
+		" + ":"-",
+		" ":"-",
+		".":"",
+		"!":"",
+		"@":"",
+		"(":"",
+		")":"",
+		"'":"",
+		"_":"",
+		"+":"-",
+		"%":"",
+		"?":"",
+	  // Specials
+		"☆":"byb",
+		"★":"bzb",
+		"α":"bab",
+		"×":"b-b",
+	  // iDOLM@STER special cases (hate inconsistencies...)
+	  	"The iDOLM@STER":"the-idolmaster",
+	  	"The iDOLM@STER Cinderella Girls":"the-idolmster-cinderella-girls",
+	};
+	console.log("Gensou Stlavus × Funyaten!!".replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase());
+  // Adds "--info" to the end of the href string to match the name in localStorage
 	if (!localStorage[href + "--info"]) {
 		localStorage[href + "--info"] = JSON.stringify(infodata);
 	}
@@ -76,11 +103,11 @@ function notificationInfo(infodata, href, nold, nseen) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='content-name'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='left'>Series: <a href='http://www.fakku.net/series/" + infodata[3].replace(" ", "-") + "' target='_blank'>" + infodata[3] + "</a></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a href='http://www.fakkku.net/" + infodata[5].replace(" ", "-") + "' target='_blank'>" + infodata[5] + "</a></span></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='left'>Series: <a href='http://www.fakku.net/series/" + infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase() + "' target='_blank'>" + infodata[3] + "</a></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a href='http://www.fakkku.net/" + infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase() + "' target='_blank'>" + infodata[5] + "</a></span></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'><a href='http://www.fakku.net/translators/" + infodata[6].replace(" ", "-") + "' target='_blank'>"+ infodata[6] + "</a></span></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'><a href='http://www.fakku.net/translators/" + infodata[6].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase() + "' target='_blank'>"+ infodata[6] + "</a></span></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-small'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
@@ -88,20 +115,32 @@ function notificationInfo(infodata, href, nold, nseen) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full itemprop='keywords'><b>Tags: </b></div>");
 		// For each in array do...
-			// create tag link, if last in array do not use ", "
+		  // Create Tag Link
 			tagArray.forEach(function(e) {
+			  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
+				var er = e.replace(rMapped, function(matched) {
+					return eMapped[matched];
+				}).toLowerCase()
+
+			  // If last in array do not use ", "
 				if (tagArray[tagArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + e.replace(" ", "") + "' target='_blank'>" + e + "</a>");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + er + "' target='_blank'>" + e + "</a>");
 				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + e.replace(" ", "") + "' target='_blank'>" + e + "</a>, ");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + er + "' target='_blank'>" + e + "</a>, ");
 				}
 			});
-			// create artist link, if last in array do not use ", "
+			// Create Artist Link"
 			artistArray.forEach(function(e) {
+			  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
+				var er = e.replace(rMapped, function(matched) {
+					return eMapped[matched];
+				}).toLowerCase()
+
+			  // If last in array do not use ", "
 				if (artistArray[artistArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-").toLowerCase() + "' target='_blank'>" + e + "</a>");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>");
 				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-").toLowerCase() + "' target='_blank'>" + e + "</a>, ");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>, ");
 				}
 			});
 		// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
