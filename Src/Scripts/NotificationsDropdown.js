@@ -45,10 +45,13 @@ setTimeout(checkCookies, 20); // Workaround to get the loadingtrail to appear in
 
 // Function waiting for the information from GrabInfo
 function notificationInfo(infodata, href, nold, nseen) {
+	var tagArray 	= infodata[7].split(", ");
+	var artistArray	= infodata[4].split(", ");
+
 	if (!localStorage[href + "--info"]) {
 		localStorage[href + "--info"] = JSON.stringify(infodata);
 	}
-	//$('div#content center b').html(infodata);
+
 	if (infodata[2]) {
 		idCounter++
 			// Main Div
@@ -76,14 +79,31 @@ function notificationInfo(infodata, href, nold, nseen) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='left'>Series: <a href='http://www.fakku.net/series/" + infodata[3].replace(" ", "-") + "' target='_blank'>" + infodata[3] + "</a></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a href='http://www.fakkku.net/" + infodata[5].replace(" ", "-") + "' target='_blank'>" + infodata[5] + "</a></span></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: <a href='http://www.fakku.net/artist/" + infodata[4].replace(" ", "-") + "'>" + infodata[4] + "</a></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'><a href='http://www.fakku.net/translators/" + infodata[6].replace(" ", "-") + "' target='_blank'>"+ infodata[6] + "</a></span></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-small'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='hr></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full itemprop='keywords'><b>Tags: </b>" + infodata[7] + "</div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full itemprop='keywords'><b>Tags: </b></div>");
+		// For each in array do...
+			// create tag link, if last in array do not use ", "
+			tagArray.forEach(function(e) {
+				if (tagArray[tagArray.length - 1] == e) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + e.replace(" ", "") + "' target='_blank'>" + e + "</a>");
+				} else {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + e.replace(" ", "") + "' target='_blank'>" + e + "</a>, ");
+				}
+			});
+			// create artist link, if last in array do not use ", "
+			artistArray.forEach(function(e) {
+				if (artistArray[artistArray.length - 1] == e) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-") + "' target='_blank'>" + e + "</a>");
+				} else {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + e.replace(" ", "-") + "' target='_blank'>" + e + "</a>, ");
+				}
+			});
 		// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') a#download').mousedown(function(event) {
 																							event.preventDefault();
@@ -105,15 +125,31 @@ function notificationInfo(infodata, href, nold, nseen) {
 																							requestDownload(href);
 																						});
 	}
+	// If new change to old to indicate that the entry has been seen
 	if (nseen == "new") {
 		var note = JSON.parse(localStorage[href.replace("http://www.fakku.net", "") + "--note"]);
 		note[0] = "old"
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
+	// If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
+	if (idCounter == JSON.parse(localStorage["n_array_names"]).length - 1) {
+		notesDone();
+		//console.log("notesDone triggered");
+	}
+};
+
+// Function that is run when all notes have been created
+function notesDone() {
 	chrome.browserAction.setBadgeText({text: ""});
 	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
+
 	$('div#loading').hide();
-};
+	// Workaround for scrollbar not showing
+	setTimeout(function() {
+		$('body').css("overflow", "scroll");
+	}, 10);
+}
+
 // Function for removing the popup download box
 function popupDL() {
 	$(document).on("click", function(event) {
@@ -143,6 +179,7 @@ function msgError(error) {
 		//console.log(request.errorMessage);
 	}
 };
+// Function to check for new notifications
 function refreshNotes() {
 	// Message that prompts the grabNotes to start. 
 	chrome.runtime.sendMessage({msg: "GrabNotes"}, function(response) {
@@ -171,7 +208,7 @@ function startDownload() {
 		return;
 
 	}
-	console.log("docReadyInfo: " + docReadyInfo + " & docReadyLink: " + docReadyLink);
+	//console.log("docReadyInfo: " + docReadyInfo + " & docReadyLink: " + docReadyLink);
 	if (docReadyLink && docReadyInfo) {
 		chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray})
 		docReadyLink = false;

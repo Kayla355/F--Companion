@@ -42,6 +42,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen) {
 			var description = $(html).find('div#right div.wrap div:nth-child(6)').text().slice(14, -1);
 			var imgCover 	= $(html).find('div#left div.wrap div.images a img.cover').attr('src');
 			var imgSample	= $(html).find('div#left div.wrap div.images a img.sample').attr('src');
+			
 			// console.log("pages: " + quant);
 			// console.log("name: " + manganame);
 			// console.log("series: " + series);
