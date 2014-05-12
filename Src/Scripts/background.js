@@ -402,7 +402,7 @@ chrome.downloads.onChanged.addListener(function (downloadID) {
 		if (downloadID.state) {
 			if (downloadID.state.current == "complete" || downloadID.state.current == "interrupted") {
 				chrome.downloads.search({id: downloadID.id}, function(result) {
-					if (result[0].byExtensionName == "F! Downloader" || "F! Downloader Dev") {
+					if (result[0].byExtensionName == "F! Downloader" || result[0].byExtensionName == "F! Downloader Dev") {
 						chrome.downloads.erase({id: downloadID.id})
 						//console.log("Erased: " + downloadID.id);
 					}
