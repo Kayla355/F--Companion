@@ -30,9 +30,9 @@ function checkCookies() {
 				//var name = nArrayNames[0];
 				var nInfo = JSON.parse(localStorage[name]);
 				if (localStorage[nInfo[2] + "--info"]) {
-					notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0]);
+					notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
 				} else {
-					grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0]);
+					grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5]);
 					//console.log(nInfo[2]);
 				}
 
@@ -44,7 +44,7 @@ function checkCookies() {
 setTimeout(checkCookies, 20); // Workaround to get the loadingtrail to appear instead of nothing
 
 // Function waiting for the information from GrabInfo
-function notificationInfo(infodata, href, nold, nseen) {
+function notificationInfo(infodata, href, nold, nseen, nshown) {
 	var tagArray 	= infodata[7].split(", ");
 	var artistArray	= infodata[4].split(", ");
 
@@ -73,7 +73,7 @@ function notificationInfo(infodata, href, nold, nseen) {
 	  	"The iDOLM@STER":"the-idolmaster",
 	  	"The iDOLM@STER Cinderella Girls":"the-idolmster-cinderella-girls",
 	};
-	console.log("Gensou Stlavus × Funyaten!!".replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase());
+
   // Adds "--info" to the end of the href string to match the name in localStorage
 	if (!localStorage[href + "--info"]) {
 		localStorage[href + "--info"] = JSON.stringify(infodata);
@@ -100,6 +100,7 @@ function notificationInfo(infodata, href, nold, nseen) {
 		// Right Div Content
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') ').append("<div id='right'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right').append("<div class='wrap'></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div id='hidediv'><button title='Remove' class='close'>Close</button></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='content-name'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
@@ -143,7 +144,7 @@ function notificationInfo(infodata, href, nold, nseen) {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>, ");
 				}
 			});
-		// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
+		  // Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') a#download').mousedown(function(event) {
 																							event.preventDefault();
 																							var x=event.clientX; 
@@ -163,6 +164,30 @@ function notificationInfo(infodata, href, nold, nseen) {
 																							event.preventDefault();
 																							requestDownload(href);
 																						});
+		  // Hide div click action
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') button.close').mousedown(function(event) {
+																							event.preventDefault();
+																							var x=event.clientX; 
+																							var y=event.clientY;
+																							var offsetY=$(document).scrollTop();
+																							//console.log(x + ", " + y);
+																							//console.log($(document).scrollTop());
+																							$('div#content').css("opacity", "0.6");
+																							$('div#float').show();
+																							$('div#float b').text("Removed");
+																							$('div#float').css("left", x - 90);
+																							$('div#float').css("top", y + offsetY);
+																							localStorage[href.replace("http://www.fakku.net", "") + "--note"] = localStorage[href.replace("http://www.fakku.net", "") + "--note"].replace("shown", "hidden");
+																							$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
+																							popupDL()
+																						});
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') button.close').mouseup(function(event) {
+																							event.preventDefault();
+																						});
+	  // Hide div depending on nshown
+		if (nshown == "hidden") {
+			$('div#content div.noteDiv:nth-child(' + idCounter + ')').hide();
+		}
 	}
 	// If new change to old to indicate that the entry has been seen
 	if (nseen == "new") {
@@ -193,7 +218,7 @@ function notesDone() {
 function popupDL() {
 	$(document).on("click", function(event) {
 		event.preventDefault();
-		if(event.target.id != 'download') {
+		if(event.target.id != 'download' && event.target.id != 'hidediv') {
 			$('div#content').css("opacity", "1");
 			$('div#float').hide();
 			$(document).off("click");

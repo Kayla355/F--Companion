@@ -177,27 +177,28 @@ function notificationCheck() {
 
 					// Keep track of the names of the arrays
 						var nArrayNames = new Array();
+						var nLength = $(html).find("div.right-content.notifications div.notification").length;
 
 					// Find each notification
-						$(html).find("div.right-content.notifications div.notification").each(function(i) {
-							i++;
+						$(html).find("div.right-content.notifications div.notification").each(function(e) {
+							e++;
 
 							var nTagName = new Array();
 							var nTagHref = new Array();
 						// Find each <a> under the current notification
-							$(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a").each(function(n) {
+							$(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a").each(function(n) {
 								n++;
 								
-								var tagCheck = $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-child(" + n + ")").attr("href");
+								var tagCheck = $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").attr("href");
 							// If the <a> is a tag link add it to the tag array
 								if (tagCheck.match(/\/tags\/.*/)) {
-									nTagName.push($(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-child(" + n + ")").text());
+									nTagName.push($(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").text());
 								}
 							});
 
-							var nName 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").text();
-							var nHref 	= "http://www.fakku.net" + $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").attr("href");
-							var nOld	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") i").text();
+							var nName 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").text();
+							var nHref 	= "http://www.fakku.net" + $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
+							var nOld	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") i").text();
 
 			/*				console.log("Checked Notifications");
 							console.log("Name: " + nName);
@@ -207,12 +208,13 @@ function notificationCheck() {
 							console.log("Tag Link: " + JSON.stringify(nTagHref));*/
 
 							var noteArray 	= new Array();
-							var nStorage 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + i + ") a:nth-last-of-type(1)").attr("href");
+							var nStorage 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
+						  // Assigning states for old/new & hidden/shown
 							if (localStorage[nStorage + "--note"]) {
 								var nExists		= JSON.parse(localStorage[nStorage + "--note"]);
 
+							  // Checks if old or new
 								if (nExists[0] == "old" || localStorage["first_time"] == "true") {
-									localStorage["first_time"] = "false";
 									noteArray[0] = "old";
 								} else {
 									noteArray[0] = "new";
@@ -220,12 +222,23 @@ function notificationCheck() {
 									i++
 									localStorage["badge_number"] = i;
 								}
+							  // Checks if hidden or shown
+								if (nExists[5] == "hidden" || localStorage["first_time"] == "true") {
+									noteArray[5] = "hidden";
+								} else {
+									noteArray[5] = "shown";
+								}
 
 							} else {
 								noteArray[0] = "new"
 								var i = localStorage["badge_number"];
 								i++
 								localStorage["badge_number"] = i;
+								noteArray[5] = "shown";
+							}
+						  // If last notification then set first_time to false if it was previously true
+							if (e == nLength && localStorage["first_time"] == "true") {
+								localStorage["first_time"] = "false";
 							}
 
 							noteArray[1] = nName;

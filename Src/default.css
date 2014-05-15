@@ -103,6 +103,9 @@ body {
 	-webkit-border-radius: 0 6px 6px 0;
 	border: 1px solid #000000;
 }
+.content-name {
+	width: 96%;
+}
 #float
 {
 	position: absolute;
@@ -113,6 +116,26 @@ body {
 	padding: 4 10 4 10;
 	z-index: 100000;
 	display: none;
+}
+#hidediv
+{
+	float: right;
+	position: relative;
+	right: 10px;
+}
+.close {
+	background: -webkit-linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), -webkit-radial-gradient(#F2D6D6, #FACCCC);
+	border-radius: 50px;
+	border: 0px solid #e6e6e6;
+	height: 12px;
+	width: 12px;
+	text-indent: -9999px;
+	position: absolute;
+	text-decoration: none;
+}
+.close:hover {
+	background: -webkit-linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), -webkit-radial-gradient(#FF0000, #FF9393);
+	cursor: pointer;
 }
 ul
 {
