@@ -7,11 +7,13 @@
 	- Option to check for direct download links first. (Depends on what hosts are being used as to how worthwhile I see it as being)
 
 - Download subscriptions
-	- "x" button to remove a specific notification (add a value stating show/hide in the array)
-	- option to only show mangas in english/japanese
+	- possibly add a system that will grab the latest mangas and prompt you when a new one is added (might be that subscriptions is enough)
+	- add refresh button prompting the background script to fetch notifications
+	- option to only show mangas in english/japanese, possibly even other options(which would make it more into a filter system)
 	- remove old localStorage notification data
 	or
 	- parse x amount at a time and scrolling causes older ones to appear(would need to change the way arraynames are stored.)
+	- Possibly add some way of telling when you have already downloaded/read a manga
 
 - Download series/artist
 	- Download everything when searching/browsing an artist

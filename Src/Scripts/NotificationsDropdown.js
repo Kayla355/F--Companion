@@ -139,9 +139,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 
 			  // If last in array do not use ", "
 				if (artistArray[artistArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>");
 				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(3) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>, ");
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>, ");
 				}
 			});
 		  // Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
