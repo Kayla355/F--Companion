@@ -45,8 +45,9 @@ setTimeout(checkCookies, 20); // Workaround to get the loadingtrail to appear in
 
 // Function waiting for the information from GrabInfo
 function notificationInfo(infodata, href, nold, nseen, nshown) {
-	var tagArray 	= infodata[7].split(", ");
-	var artistArray	= infodata[4].split(", ");
+	var tagArray 		= infodata[7].split(", ");
+	var artistArray		= infodata[4].split(", ");
+	var translatorArray	= infodata[6].split(", ");
 
   // Variables mapping what characters translates into what
   	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|\s&\s|\s+\s|\ |\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\☆|\★|\α|\×/gi;
@@ -108,13 +109,13 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a href='http://www.fakkku.net/" + infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase() + "' target='_blank'>" + infodata[5] + "</a></span></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'><a href='http://www.fakku.net/translators/" + infodata[6].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase() + "' target='_blank'>"+ infodata[6] + "</a></span></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-small'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='hr></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full itemprop='keywords'><b>Tags: </b></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div id='description' class='row-left-full' itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
 		// For each in array do...
 		  // Create Tag Link
 			tagArray.forEach(function(e) {
@@ -130,7 +131,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + er + "' target='_blank'>" + e + "</a>, ");
 				}
 			});
-			// Create Artist Link"
+		  // Create Artist Link"
 			artistArray.forEach(function(e) {
 			  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
 				var er = e.replace(rMapped, function(matched) {
@@ -144,6 +145,66 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>, ");
 				}
 			});
+		  // Create Translator Link"
+			translatorArray.forEach(function(e) {
+			  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
+				var er = e.replace(rMapped, function(matched) {
+					return eMapped[matched];
+				}).toLowerCase()
+
+			  // If last in array do not use ", "
+				if (translatorArray[translatorArray.length - 1] == e) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a href='http://www.fakku.net/translators/" + er + "' target='_blank'>"+ e + "</a>");
+				} else {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a href='http://www.fakku.net/translators/" + er + "' target='_blank'>"+ e + "</a>, ");
+				}
+			});
+		  // Description dropdown
+			if ($('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').height() > 32) {
+			  	console.log("Shit too long man!");
+
+			  // Create dropdown button
+			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').css("height", "32px")
+			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
+			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
+			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
+
+
+			  // Mousedown Action
+				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
+					if ($(event.target.parentNode).height() > 32) {
+					  // Hide dropdown
+						$(event.target.parentNode).css("height", "32");
+						$(event.target).html("\&#9658\;Description: ");
+
+					  // Rescale Image
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "");
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "");
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0]).css("height", $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[1]).height() - 60);
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "100%");
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "100%");
+					} else {
+					  // Show dropdown
+					  	$(event.target.parentNode).css("height", "");
+					  	$(event.target).html("\&#9660\;Description: ");
+					  
+					  // Recalculate height
+					  	console.log(event);
+					  	console.log(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0]);
+					 
+					  // Rescale Image
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "");
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "");
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0]).css("height", $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[1]).height() - 60);
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "100%");
+						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "100%");
+					}
+																																});
+				}
+		  // Fix left div height
+				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images').css("height", $('div#content div.noteDiv:nth-child(' + idCounter + ') div#right').height() - 60);
+				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images img').css("height", "100%");
+
 		  // Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') a#download').mousedown(function(event) {
 																							event.preventDefault();
