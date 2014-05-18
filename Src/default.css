@@ -55,7 +55,7 @@ div
 {
 	display: inline-block;
 	font: 300 14px/14px Arial,"Helvetica Neue",Helvetica,sans-serif;
-	margin-bottom: 6px;
+	margin-bottom: 8px;
 	width: 50%;
 }
 #right .row-small .left
@@ -133,6 +133,11 @@ div
 	position: relative;
 	right: 10px;
 }
+#center b
+{
+	position: relative;
+	top: 5px;
+}
 .close {
 	background: -webkit-linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), -webkit-radial-gradient(#F2D6D6, #FACCCC);
 	border-radius: 50px;
@@ -184,7 +189,7 @@ h1
 {
 	color: #9D0A0A;
 	font: 700 18px/24px Arial,"Helvetica Neue",Helvetica,sans-serif;
-	margin-bottom: 6px;
+	margin-bottom: 8px;
 	text-align: left;
 	text-decoration: none;
 	-webkit-margin-before: 0em;
