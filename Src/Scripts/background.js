@@ -38,6 +38,9 @@
 	if (localStorage["badge_number"] == undefined) {
 		localStorage["badge_number"] = 0;
 	}
+	if (localStorage["app_version"] == undefined) {
+		localStorage["app_version"] = chrome.app.getDetails().version;
+	}
 
 
 // Listen for change of active tab.

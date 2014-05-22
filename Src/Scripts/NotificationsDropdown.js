@@ -28,11 +28,16 @@ function checkCookies() {
 		  // For each arrayname in localstorage
 			nArrayNames.forEach(function(name) {
 				var nInfo = JSON.parse(localStorage[name]);
-				if (localStorage[nInfo[2] + "--info"]) {
+			  // Check if manga exists and if version saved in localStorage matches current version
+				if (localStorage[nInfo[2] + "--info"] && localStorage["app_version"] == chrome.app.getDetails().version) {
 					notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
 				} else {
 					grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5]);
 					//console.log(nInfo[2]);
+				  // Update the app_version localStorage to current version
+					if (nArrayNames[nArrayNames.length - 1] == name && localStorage["app_version"] != chrome.app.getDetails().version) {
+						localStorage["app_version"] = chrome.app.getDetails().version;
+					}
 				}
 
 			});
