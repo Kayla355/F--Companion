@@ -20,14 +20,13 @@ function checkCookies() {
 			$('div#content center').css("height", "20px");
 			$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
 		} else {
-		// Else gather and create notifications 
-		// IF necessary
+		  // Else gather and create notifications 
 			$('div#content').css("width", "545px");
 
 			var nArrayNames = JSON.parse(localStorage["n_array_names"]);
-			
+
+		  // For each arrayname in localstorage
 			nArrayNames.forEach(function(name) {
-				//var name = nArrayNames[0];
 				var nInfo = JSON.parse(localStorage[name]);
 				if (localStorage[nInfo[2] + "--info"]) {
 					notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
@@ -37,7 +36,6 @@ function checkCookies() {
 				}
 
 			});
-	// End //
 		}
 	});
 }
@@ -116,6 +114,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='hr></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div id='description' class='row-left-full' itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
+
 		// For each in array do...
 		  // Create Tag Link
 			tagArray.forEach(function(e) {
@@ -161,7 +160,6 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 			});
 		  // Description dropdown
 			if ($('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').height() > 32) {
-			  	console.log("Shit too long man!");
 
 			  // Create dropdown button
 			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').css("height", "32px")
@@ -187,10 +185,6 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 					  // Show dropdown
 					  	$(event.target.parentNode).css("height", "");
 					  	$(event.target).html("\&#9660\;Description: ");
-					  
-					  // Recalculate height
-					  	console.log(event);
-					  	console.log(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0]);
 					 
 					  // Rescale Image
 						// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "");
@@ -205,6 +199,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images').css("height", $('div#content div.noteDiv:nth-child(' + idCounter + ') div#right').height() - 60);
 				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images img').css("height", "100%");
 
+		  // Download click action
 		  // Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') a#download').mousedown(function(event) {
 																							event.preventDefault();

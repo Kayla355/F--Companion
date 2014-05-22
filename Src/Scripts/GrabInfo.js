@@ -39,7 +39,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown) {
 			var language 	= $(html).find('div#right div.wrap div:nth-child(2) div.right span a').text();
 			var translator 	= $(html).find('div#right div.wrap div:nth-child(3) div.right span:first-child').text().slice(13, -1);
 			var tags	 	= $(html).find('div#right div.wrap div:nth-child(7)').text().slice(7, -1);
-			var description = $(html).find('div#right div.wrap div:nth-child(6)').text().slice(14, -1);
+			var description = $(html).find('div#right div.wrap div:nth-child(6)').html().replace("<b>Description:</b>", "");
 			var imgCover 	= $(html).find('div#left div.wrap div.images a img.cover').attr('src');
 			var imgSample	= $(html).find('div#left div.wrap div.images a img.sample').attr('src');
 			
