@@ -12,7 +12,7 @@
 		// $('div#content center').append("<b>Placeholder for notifications</b>");
 
 // Check if Login cookie has expired.
-function checkCookies() {
+function checkCookies(reCache) {
 	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results) {
 			$('div#content').append("<center><b></b></center>");
@@ -20,6 +20,10 @@ function checkCookies() {
 			$('div#content center').css("height", "20px");
 			$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
 		} else {
+		  // Check if version saved in localStorage matches current version
+			if (localStorage["app_version"] != chrome.app.getDetails().version) {
+				reCache = true;
+			}
 		  // Else gather and create notifications 
 			$('div#content').css("width", "545px");
 
@@ -28,8 +32,8 @@ function checkCookies() {
 		  // For each arrayname in localstorage
 			nArrayNames.forEach(function(name) {
 				var nInfo = JSON.parse(localStorage[name]);
-			  // Check if manga exists and if version saved in localStorage matches current version
-				if (localStorage[nInfo[2] + "--info"] && localStorage["app_version"] == chrome.app.getDetails().version) {
+			  // Check if manga exists and reCache is false
+				if (localStorage[nInfo[2] + "--info"] && !reCache) {
 					notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
 				} else {
 					grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5]);

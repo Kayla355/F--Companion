@@ -8,7 +8,8 @@
 
 - Download subscriptions
 	- possibly add a system that will grab the latest mangas and prompt you when a new one is added (might be that subscriptions is enough)
-	- add refresh button prompting the background script to fetch notifications
+	- add a refresh button prompting the background script to fetch notifications
+	- add a cache refresh button to force an update for stored notifications
 	- option to only show mangas in english/japanese, possibly even other options(which would make it more into a filter system)
 	- remove old localStorage notification data
 	or

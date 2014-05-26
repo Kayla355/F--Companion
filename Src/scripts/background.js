@@ -61,32 +61,47 @@ chrome.tabs.onUpdated.addListener(function(tabId, tab, changeInfo) {
 
 // Called when the url of a tab changes.
 function checkForValidUrl(tabId, tab, changeInfo) {
-// If the url is one of the following...
-	if (tab.url.match(/http:\/\/www.fakku.net\/manga\/.*/) || tab.url.match(/http:\/\/www.fakku.net\/doujinshi\/.*/) ) {
-		// Temporary solution to excludes not working properly
-		// Consider making this dynamic instead (Grabbing part of the url and putting it in a variable)
-		if (tab.url.match(/http:\/\/www.fakku.net\/.*\/favorites$/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/favorites\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/english$/) 			|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/english\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/japanese$/) 			|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/japanese\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/artists$/) 			|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/artists\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/translators$/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/translators\/.*/) 	|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/series$/) 			|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/series\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/newest$/) 			|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/newest\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/popular$/) 			|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/popular\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/downloads$/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/downloads\/.*/) 		|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/controversial$/) 	|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/controversial\/.*/) 	|| 
-			tab.url.match(/http:\/\/www.fakku.net\/.*\/tags\/.*/)) {
+  // Get current tab info as well for comparisson incase a new tab was created and not selected
+	chrome.tabs.getSelected(function(currentTab) {
+	  // If the url is one of the following...
+		if (tab.url.match(/http:\/\/www.fakku.net\/manga\/.*/) && currentTab.id == tabId || tab.url.match(/http:\/\/www.fakku.net\/doujinshi\/.*/) && currentTab.id == tabId  ) {
+			// Temporary solution to excludes not working properly
+			// Consider making this dynamic instead (Grabbing part of the url and putting it in a variable)
+			if (tab.url.match(/http:\/\/www.fakku.net\/.*\/favorites$/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/favorites\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/english$/) 			|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/english\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/japanese$/) 			|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/japanese\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/artists$/) 			|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/artists\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/translators$/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/translators\/.*/) 	|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/series$/) 			|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/series\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/newest$/) 			|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/newest\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/popular$/) 			|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/popular\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/downloads$/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/downloads\/.*/) 		|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/controversial$/) 	|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/controversial\/.*/) 	|| 
+				tab.url.match(/http:\/\/www.fakku.net\/.*\/tags\/.*/)) {
 
+				// Change browserAction to Notifications
+				if (localStorage["fakku_notes"] == "true") {
+					chrome.browserAction.setPopup({popup: "DropdownNotes.html"})
+					chrome.browserAction.enable();
+				} else {
+					chrome.browserAction.disable();
+				}
+			} else {
+				// Change browserAction to Download
+				chrome.browserAction.setPopup({popup: "Dropdown.html"})
+				chrome.browserAction.enable();
+			}
+		} else {
 			// Change browserAction to Notifications
 			if (localStorage["fakku_notes"] == "true") {
 				chrome.browserAction.setPopup({popup: "DropdownNotes.html"})
@@ -94,20 +109,8 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 			} else {
 				chrome.browserAction.disable();
 			}
-		} else {
-			// Change browserAction to Download
-			chrome.browserAction.setPopup({popup: "Dropdown.html"})
-			chrome.browserAction.enable();
 		}
-	} else {
-		// Change browserAction to Notifications
-		if (localStorage["fakku_notes"] == "true") {
-			chrome.browserAction.setPopup({popup: "DropdownNotes.html"})
-			chrome.browserAction.enable();
-		} else {
-			chrome.browserAction.disable();
-		}
-	}
+	});
 };
 
 
