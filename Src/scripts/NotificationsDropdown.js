@@ -52,12 +52,9 @@ setTimeout(checkCookies, 20); // Workaround to get the loadingtrail to appear in
 
 // Function waiting for the information from GrabInfo
 function notificationInfo(infodata, href, nold, nseen, nshown) {
-	var tagArray 		= infodata[7].split(", ");
-	var artistArray		= infodata[4].split(", ");
-	var translatorArray	= infodata[6].split(", ");
 
   // Variables mapping what characters translates into what
-  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|\s&\s|\s+\s|\ |\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\☆|\★|\α|\×/gi;
+  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|\s&\s|\s+\s|\ |\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\☆|\★|\α|\×/gi;
 	var eMapped = {
 		" & ":"-",
 		" + ":"-",
@@ -72,6 +69,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 		"+":"-",
 		"%":"",
 		"?":"",
+		":":"",
 	  // Specials
 		"☆":"byb",
 		"★":"bzb",
@@ -81,6 +79,17 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 	  	"The iDOLM@STER":"the-idolmaster",
 	  	"The iDOLM@STER Cinderella Girls":"the-idolmster-cinderella-girls",
 	};
+
+  // Variables
+	var tagArray 		= new Array();
+	var artistArray		= new Array();
+	var translatorArray	= new Array();
+	var seriesLink 		= infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase();
+	var languageLink 	= infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase();
+
+	if (infodata[7]) { tagArray 		= infodata[7].split(", "); };
+	if (infodata[4]) { artistArray 		= infodata[4].split(", "); };
+	if (infodata[6]) { translatorArray 	= infodata[6].split(", "); };
 
   // Adds "--info" to the end of the href string to match the name in localStorage
 	if (!localStorage[href + "--info"]) {
@@ -101,7 +110,8 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap').append("<ul></ul>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul').append("<li></li>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul li:nth-child(1)').append("<a href='" + href + "' target='_blank'>Read Online</a>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul li:nth-child(1)').append("<a id='read-online' href='#'>Read Online</a>");
+				newTabLink(idCounter, href, "read-online");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul').append("<li></li>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul li:nth-child(2)').append("<a id='download' href='#'>Download</a>");
 		
@@ -112,8 +122,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='content-name'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='left'>Series: <a href='http://www.fakku.net/series/" + infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase() + "' target='_blank'>" + infodata[3] + "</a></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a href='http://www.fakkku.net/" + infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase() + "' target='_blank'>" + infodata[5] + "</a></span></div>");
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + infodata[3] + "</a></div>");
+				newTabLink(idCounter, "series", seriesLink);
+			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
+				newTabLink(idCounter, "", languageLink);
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
@@ -125,7 +137,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
 
 		// For each in array do...
-		  // Create Tag Link
+		  // Create Tags Link
 			tagArray.forEach(function(e) {
 			  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
 				var er = e.replace(rMapped, function(matched) {
@@ -133,13 +145,15 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 				}).toLowerCase()
 
 			  // If last in array do not use ", "
-				if (tagArray[tagArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + er + "' target='_blank'>" + e + "</a>");
-				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a href='http://www.fakku.net/tags/" + er + "' target='_blank'>" + e + "</a>, ");
+				if (tagArray && tagArray[tagArray.length - 1] == e) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>");
+					newTabLink(idCounter, "tags", er);
+				} else if (tagArray) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+					newTabLink(idCounter, "tags", er);
 				}
 			});
-		  // Create Artist Link"
+		  // Create Artists Link"
 			artistArray.forEach(function(e) {
 			  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
 				var er = e.replace(rMapped, function(matched) {
@@ -147,13 +161,15 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 				}).toLowerCase()
 
 			  // If last in array do not use ", "
-				if (artistArray[artistArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>");
-				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a href='http://www.fakku.net/artists/" + er + "' target='_blank'>" + e + "</a>, ");
+				if (artistArray && artistArray[artistArray.length - 1] == e) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>");
+					newTabLink(idCounter, "artists", er);
+				} else if (artistArray) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+					newTabLink(idCounter, "artists", er);
 				}
 			});
-		  // Create Translator Link"
+		  // Create Translators Link"
 			translatorArray.forEach(function(e) {
 			  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
 				var er = e.replace(rMapped, function(matched) {
@@ -161,10 +177,12 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 				}).toLowerCase()
 
 			  // If last in array do not use ", "
-				if (translatorArray[translatorArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a href='http://www.fakku.net/translators/" + er + "' target='_blank'>"+ e + "</a>");
-				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a href='http://www.fakku.net/translators/" + er + "' target='_blank'>"+ e + "</a>, ");
+				if (translatorArray && translatorArray[translatorArray.length - 1] == e) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>");
+					newTabLink(idCounter, "translators", er);
+				} else if (translatorArray) {
+					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+					newTabLink(idCounter, "translators", er);
 				}
 			});
 		  // Description dropdown
@@ -249,6 +267,35 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ') button.close').mouseup(function(event) {
 																							event.preventDefault();
 																						});
+		  // New Tab Link click action
+			function newTabLink(idCounter, e, er) {
+				$('div#content div.noteDiv:nth-child(' + idCounter + ') a#' + er).click(function(event) {
+									if (event.button != 2) {
+										event.preventDefault();
+									}
+								});
+				$('div#content div.noteDiv:nth-child(' + idCounter + ') a#' + er).mousedown(function(event) {
+									if (event.button != 2) {
+										event.preventDefault();
+									}
+								});
+				$('div#content div.noteDiv:nth-child(' + idCounter + ') a#' + er).mouseup(function(event) {
+									if (event.button != 2) {
+										event.preventDefault();
+										if (er == "read-online") {
+											er = e.replace("http://www.fakku.net/", "");;
+											e  = "";
+										}
+										if (e == "") {
+											openTab("http://www.fakku.net/" + er);
+										} else {
+											openTab("http://www.fakku.net/" + e + "/" + er);
+										}
+										
+									}
+								});
+			}
+
 	  // Hide div depending on nshown
 		if (nshown == "hidden") {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ')').hide();
@@ -288,6 +335,26 @@ function popupDL() {
 			$('div#float').hide();
 			$(document).off("click");
 		}
+	});
+}
+
+// Function that is run when a link is clicked
+function openTab(tabUrl) {
+	var background = false;
+	if(event) {
+	  // If right-click return
+		if(event.button == 2) {
+			return;
+		}
+	  // if middle-click, metaKey or ctrlKey was pressed when clicking
+		if(event.button == 1 || event.metaKey || event.ctrlKey) {
+			background = true;
+		}
+	}
+  // Create Tab
+	chrome.tabs.create({
+		url: tabUrl,
+		selected: !background
 	});
 }
 
