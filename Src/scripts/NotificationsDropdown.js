@@ -145,10 +145,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 				}).toLowerCase()
 
 			  // If last in array do not use ", "
-				if (tagArray && tagArray[tagArray.length - 1] == e) {
+				if (tagArray[tagArray.length - 1] == e) {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>");
 					newTabLink(idCounter, "tags", er);
-				} else if (tagArray) {
+				} else {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
 					newTabLink(idCounter, "tags", er);
 				}
@@ -161,10 +161,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 				}).toLowerCase()
 
 			  // If last in array do not use ", "
-				if (artistArray && artistArray[artistArray.length - 1] == e) {
+				if (artistArray[artistArray.length - 1] == e) {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>");
 					newTabLink(idCounter, "artists", er);
-				} else if (artistArray) {
+				} else {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
 					newTabLink(idCounter, "artists", er);
 				}
@@ -177,10 +177,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 				}).toLowerCase()
 
 			  // If last in array do not use ", "
-				if (translatorArray && translatorArray[translatorArray.length - 1] == e) {
+				if (translatorArray[translatorArray.length - 1] == e) {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>");
 					newTabLink(idCounter, "translators", er);
-				} else if (translatorArray) {
+				} else {
 					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
 					newTabLink(idCounter, "translators", er);
 				}
@@ -300,6 +300,11 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 		if (nshown == "hidden") {
 			$('div#content div.noteDiv:nth-child(' + idCounter + ')').hide();
 		}
+	  // Remove unused Divs
+	  	if ($('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').text() == "") {
+	  		$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').html("<a>Not Specified</a>");
+	  		$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
+	  	}
 	}
 	// If new change to old to indicate that the entry has been seen
 	if (nseen == "new") {
