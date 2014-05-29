@@ -161,6 +161,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 // Timer to check for notifications
 if (localStorage["fakku_notes"] == "true") {
 	notificationCheck();
+} else {
+	chrome.browserAction.setBadgeText({text: ""});
+	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
 }
 
 // Function to check for notifications
@@ -215,12 +218,13 @@ function notificationCheck() {
 
 							var noteArray 	= new Array();
 							var nStorage 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
-						  // Assigning states for old/new & hidden/shown
+						// Assigning states for old/new & hidden/shown
+						  // Check if localStorage entry exists
 							if (localStorage[nStorage + "--note"]) {
 								var nExists		= JSON.parse(localStorage[nStorage + "--note"]);
 
 							  // Checks if old or new
-								if (nExists[0] == "old" || localStorage["first_time"] == "true") {
+								if (nExists[0] == "old") {
 									noteArray[0] = "old";
 								} else {
 									noteArray[0] = "new";
@@ -229,17 +233,22 @@ function notificationCheck() {
 									localStorage["badge_number"] = i;
 								}
 							  // Checks if hidden or shown
-								if (nExists[5] == "hidden" || localStorage["first_time"] == "true") {
+								if (nExists[5] == "hidden") {
 									noteArray[5] = "hidden";
 								} else {
 									noteArray[5] = "shown";
 								}
-
+						  // If it does not exist
 							} else {
-								noteArray[0] = "new"
-								var i = localStorage["badge_number"];
-								i++
-								localStorage["badge_number"] = i;
+								if (localStorage["first_time"] == "true") {
+									noteArray[0] = "old";
+								} else {
+									noteArray[0] = "new";
+									var i = localStorage["badge_number"];
+									i++
+									localStorage["badge_number"] = i;
+								}
+
 								noteArray[5] = "shown";
 							}
 						  // If last notification then set first_time to false if it was previously true

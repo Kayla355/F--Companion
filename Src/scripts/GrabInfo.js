@@ -39,9 +39,11 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown) {
 			var language 	= $(html).find('div#right div.wrap div:nth-child(2) div.right span a').text();
 			var translator 	= $(html).find('div#right div.wrap div:nth-child(3) div.right span:first-child').text().slice(13, -1);
 			var tags	 	= $(html).find('div#right div.wrap div:nth-child(7)').text().slice(7, -1);
-			var description = $(html).find('div#right div.wrap div:nth-child(6)').html().replace("<b>Description:</b>", "");
 			var imgCover 	= $(html).find('div#left div.wrap div.images a img.cover').attr('src');
 			var imgSample	= $(html).find('div#left div.wrap div.images a img.sample').attr('src');
+			var error 		= $(html).find('div#error.message h3').text();
+			var description = $(html).find('div#right div.wrap div:nth-child(6)').html();
+			if (description) { description = description.replace("<b>Description:</b>", "") };
 			
 			// console.log("pages: " + quant);
 			// console.log("name: " + manganame);
@@ -66,6 +68,12 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown) {
 			infoarray[9] 	= imgCover;
 			infoarray[10] 	= imgSample;
 
+			if (error) {
+				infoarray[1] = "error";
+				infoarray[2] = error;
+				infoarray[3] = downloadurl;
+			}
+
 			if (notifications) {
 				notificationInfo(infoarray, downloadurl, nold, nseen, nshown);
 				//console.log("notifications Grabinfo triggered");
@@ -78,7 +86,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown) {
 		error: function(error) {
 			if (!notifications) {
 				msgError(error);
-				//console.log("Error!!");
+				//console.log("Error: " + error);
 			}
 			if (error.status == "410") {
 				if (nseen == "new") {

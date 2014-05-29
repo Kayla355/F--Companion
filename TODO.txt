@@ -19,3 +19,5 @@
 
 - Download series/artist
 	- Download everything when searching/browsing an artist
+
+- Look into why loadingtrail freezes. Worked fine before...

@@ -33,8 +33,8 @@ function checkCookies(reCache) {
 			nArrayNames.forEach(function(name) {
 				var nInfo = JSON.parse(localStorage[name]);
 			  // Check if manga exists and reCache is false
-				if (localStorage[nInfo[2] + "--info"] && !reCache) {
-					notificationInfo(JSON.parse(localStorage[nInfo[2] + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
+				if (localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"] && !reCache) {
+					notificationInfo(JSON.parse(localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
 				} else {
 					grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5]);
 					//console.log(nInfo[2]);
@@ -84,19 +84,24 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 	var tagArray 		= new Array();
 	var artistArray		= new Array();
 	var translatorArray	= new Array();
+	var error 			= false;
+
+	if (infodata[1] == "error") { error = true; console.log("Error Parsing: " + infodata[3]); console.log("Error Message: " + infodata[2]); };
+
 	var seriesLink 		= infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase();
 	var languageLink 	= infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase();
 
 	if (infodata[7]) { tagArray 		= infodata[7].split(", "); };
 	if (infodata[4]) { artistArray 		= infodata[4].split(", "); };
 	if (infodata[6]) { translatorArray 	= infodata[6].split(", "); };
+	
 
   // Adds "--info" to the end of the href string to match the name in localStorage
-	if (!localStorage[href + "--info"]) {
-		localStorage[href + "--info"] = JSON.stringify(infodata);
+	if (!localStorage[href.replace("http://www.fakku.net", "") + "--info"]) {
+		localStorage[href.replace("http://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
 	}
-
-	if (infodata[2]) {
+  // Create divs
+	if (infodata[2] && !error) {
 		idCounter++
 			// Main Div
 			$('div#content').append("<div class='noteDiv'></div>");
@@ -294,7 +299,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 										
 									}
 								});
-			}
+			} // End of create
 
 	  // Hide div depending on nshown
 		if (nshown == "hidden") {
@@ -305,14 +310,15 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 	  		$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').html("<a>Not Specified</a>");
 	  		$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
 	  	}
-	}
-	// If new change to old to indicate that the entry has been seen
-	if (nseen == "new") {
+	} // End of create divs
+
+  // If new change to old to indicate that the entry has been seen
+	if (nseen == "new" && !error) {
 		var note = JSON.parse(localStorage[href.replace("http://www.fakku.net", "") + "--note"]);
 		note[0] = "old"
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
-	// If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
+  // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
 	if (idCounter == JSON.parse(localStorage["n_array_names"]).length - 1) {
 		notesDone();
 		//console.log("notesDone triggered");
