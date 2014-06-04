@@ -15,6 +15,7 @@
 function checkCookies(reCache) {
 	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results) {
+			$('div#loading').hide();
 			$('div#content').append("<center><b></b></center>");
 			$('div#content center').css("width", "200px");
 			$('div#content center').css("height", "20px");
@@ -313,7 +314,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 	} // End of create divs
 
   // If new change to old to indicate that the entry has been seen
-	if (nseen == "new" && !error) {
+	if (nseen == "new") {
 		var note = JSON.parse(localStorage[href.replace("http://www.fakku.net", "") + "--note"]);
 		note[0] = "old"
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
