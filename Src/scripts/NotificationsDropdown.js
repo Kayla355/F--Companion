@@ -3,7 +3,7 @@
 	var docReadyInfo	= false;
 	var errorReport		= false;
 	var errorMsg 		= null;
-	var idCounter		= 0;
+	var idCounter		= 1;
 
 // Create placeholder text
 		// $('div#content').append("<center style='text-align:center'></center>");
@@ -11,39 +11,87 @@
 		// $('div#content center').css("height", "20px");
 		// $('div#content center').append("<b>Placeholder for notifications</b>");
 
+// Create clickable menu
+$('a#refresh').mousedown(function(event) { event.preventDefault(); refreshNotes(); });
+$('a#refresh').mouseup(function(event) { event.preventDefault(); });
+
+$('a#recache').mousedown(function(event) { event.preventDefault(); recacheNotes(true); });
+$('a#recache').mouseup(function(event) { event.preventDefault(); });
+
+// Queue function
+// Thanks to debuggable for this. (http://bit.ly/dBugQFunc)
+$.queue = {
+    _timer: null,
+    _queue: [],
+    add: function(fn, context, time) {
+        var setTimer = function(time) {
+            $.queue._timer = setTimeout(function() {
+                time = $.queue.add();
+                if ($.queue._queue.length) {
+                    setTimer(time);
+                }
+            }, time || 2);
+        }
+
+        if (fn) {
+            $.queue._queue.push([fn, context, time]);
+            if ($.queue._queue.length == 1) {
+                setTimer(time);
+            }
+            return;
+        }
+
+        var next = $.queue._queue.shift();
+        if (!next) {
+            return 0;
+        }
+        next[0].call(next[1] || window);
+        return next[2];
+    },
+    clear: function() {
+        clearTimeout($.queue._timer);
+        $.queue._queue = [];
+    }
+};
+
 // Check if Login cookie has expired.
 function checkCookies(reCache) {
 	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results) {
-			$('div#loading').hide();
+			$('div#loading').remove();
 			$('div#content').append("<center><b></b></center>");
 			$('div#content center').css("width", "200px");
 			$('div#content center').css("height", "20px");
 			$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
 		} else {
 		  // Check if version saved in localStorage matches current version
-			if (localStorage["app_version"] != chrome.app.getDetails().version) {
+			if (localStorage["app_version"] != chrome.app.getDetails().version) { // CHANGE THIS BACK LATER
 				reCache = true;
 			}
-		  // Else gather and create notifications 
-			$('div#content').css("width", "545px");
+		  // Gather and create notifications 
+		  	$('div#content').css("width", "545px");
+		  	$('div#content').css("opacity", "0.6");
+			$('div#float').show();
 
 			var nArrayNames = JSON.parse(localStorage["n_array_names"]);
 
 		  // For each arrayname in localstorage
 			nArrayNames.forEach(function(name) {
-				var nInfo = JSON.parse(localStorage[name]);
-			  // Check if manga exists and reCache is false
-				if (localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"] && !reCache) {
-					notificationInfo(JSON.parse(localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
-				} else {
-					grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5]);
-					//console.log(nInfo[2]);
-				  // Update the app_version localStorage to current version
-					if (nArrayNames[nArrayNames.length - 1] == name && localStorage["app_version"] != chrome.app.getDetails().version) {
-						localStorage["app_version"] = chrome.app.getDetails().version;
+				var self = this, doBind = function() {
+					var nInfo = JSON.parse(localStorage[name]);
+				  // Check if manga exists and reCache is false
+					if (localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"] && !reCache) {
+						notificationInfo(JSON.parse(localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
+					} else {
+						grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5]);
+						//console.log(nInfo[2]);
+					  // Update the app_version localStorage to current version
+						if (nArrayNames[nArrayNames.length - 1] == name && localStorage["app_version"] != chrome.app.getDetails().version) {
+							localStorage["app_version"] = chrome.app.getDetails().version;
+						}
 					}
-				}
+		        };
+		        $.queue.add(doBind, this);
 
 			});
 		}
@@ -243,7 +291,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 																							//console.log($(document).scrollTop());
 																							$('div#content').css("opacity", "0.6");
 																							$('div#float').show();
-																							$('div#float').prepend("<div id='loading' class='loadingtrail'></div>");;
+																							$('div#float').prepend("<div id='loading' class='loadingtrail'></div>");
 																							$('div#float b').text("Preparing Download");
 																							$('div#float').css("left", x + 15);
 																							$('div#float').css("top", y + offsetY - 10);
@@ -302,9 +350,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 								});
 			} // End of create
 
-	  // Hide div depending on nshown
+	  // Change class to hidden if true
 		if (nshown == "hidden") {
-			$('div#content div.noteDiv:nth-child(' + idCounter + ')').hide();
+			$('div#content div.noteDiv:nth-child(' + idCounter + ')').attr("class", "noteDiv-hidden");
 		}
 	  // Remove unused Divs
 	  	if ($('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').text() == "") {
@@ -331,8 +379,12 @@ function notesDone() {
 	chrome.browserAction.setBadgeText({text: ""});
 	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
 
-	$('div#loading').hide();
 	// Workaround for scrollbar not showing
+	$('div#content').css("opacity", "1");
+	$('div#float').hide();
+	$('div#float').attr("class", "");
+	$('div#loading').remove();
+
 	setTimeout(function() {
 		$('body').css("overflow", "scroll");
 	}, 10);
@@ -389,11 +441,41 @@ function msgError(error) {
 };
 // Function to check for new notifications
 function refreshNotes() {
-	// Message that prompts the grabNotes to start. 
-	chrome.runtime.sendMessage({msg: "GrabNotes"}, function(response) {
+	$('div#float').attr("class", "float-load");
+	$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
+
+	$('div#content').css("width", "545px");
+  	$('div#content').css("opacity", "0.6");
+	$('div#float').show();
+
+  // Message that prompts the grabNotes to start. 
+	chrome.runtime.sendMessage({msg: "GrabNotes", from: "nDropdown"}, function(response) {
 		//console.log("Message Sent: GrabNotes ");
 	});
 	
+}
+// Listen for message that says refresh complete
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	if (request.msg == "nDropdownDone") {
+		$('div#content').css("opacity", "1");
+		$('div#float').hide();
+		$('div#float').attr("class", "");
+		$('div#loading').remove();
+		var t = JSON.parse(localStorage["n_array_names"]); t = JSON.parse(localStorage[t[0]]);
+		if (t[0] == "new") {
+			recacheNotes(false);
+		}
+	}
+});
+
+// Function to recache notifications
+function recacheNotes(reCache) {
+	idCounter		= 1;
+
+	$('div.noteDiv').remove();
+	$('div#float').attr("class", "float-load");
+	$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
+	checkCookies(reCache);
 }
 function requestDownload(href) {
 	// Grab Info and Links
@@ -410,7 +492,7 @@ function startDownload() {
 		errorReport = false;
 		//console.log("Error message recieved from the server");
 		//console.log(errorMsg.status + ": " + errorMsg.statusText);
-		$('div#loading').hide();
+		$('div#loading').remove();
 		$('div#float b').text("Error recieved from server, try again.");
 		$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
 		return;
@@ -422,7 +504,7 @@ function startDownload() {
 		docReadyLink = false;
 		docReadyInfo = false;
 		//console.log("sent message to background");
-		$('div#loading').hide();
+		$('div#loading').remove();
 		$('div#float b').text("Success! Downloading Now.");
 
 		return;

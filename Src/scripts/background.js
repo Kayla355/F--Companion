@@ -121,6 +121,7 @@ var optionsArray 	= new Array();
 var incognitoMode 	= new Boolean();
 var linkarray 		= new Array();
 var infoarray 		= new Array();
+var nDropdown		= new Boolean();
 var checkNotes;
 
 // Fetch request for options array.
@@ -153,6 +154,9 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 // Listen for a message to trigger the notifcationCheck
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.msg == "GrabNotes") {
+		if (request.from == "nDropdown") {
+			nDropdown = true;
+		}
 		notificationCheck();
 		sendResponse({msg: "done"});
 	}
@@ -252,8 +256,13 @@ function notificationCheck() {
 								noteArray[5] = "shown";
 							}
 						  // If last notification then set first_time to false if it was previously true
-							if (e == nLength && localStorage["first_time"] == "true") {
-								localStorage["first_time"] = "false";
+							if (e == nLength) {
+								if (nDropdown == true) {
+									chrome.extension.sendMessage({msg: "nDropdownDone"})
+								}
+								if (localStorage["first_time"] == "true") {
+									localStorage["first_time"] = "false";
+								}
 							}
 
 							noteArray[1] = nName;
