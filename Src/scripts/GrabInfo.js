@@ -29,6 +29,12 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown) {
 		dataType: "html",
 		async: false,
 		success: function(html) {
+		  // Fix for some issues when the domain is not included in the src link.
+			html.match(/.*src="\/.*">/g).forEach(function(m) {
+				mSecond = m.replace(/src="\//, 'http:\/\/www\.fakku\.net\/')
+				html = html.replace(m, mSecond);
+			});
+
 			//console.log("Grab Info Success");
 			//console.log(currenturl);
 
