@@ -79,6 +79,7 @@ function checkCookies(reCache) {
 			nArrayNames.forEach(function(name) {
 				var self = this, doBind = function() {
 					var nInfo = JSON.parse(localStorage[name]);
+					//console.log(nInfo);
 				  // Check if manga exists and reCache is false
 					if (localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"] && !reCache) {
 						notificationInfo(JSON.parse(localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
@@ -473,6 +474,7 @@ function recacheNotes(reCache) {
 	idCounter		= 1;
 
 	$('div.noteDiv').remove();
+	$('div.noteDiv-hidden').remove();
 	$('div#float').attr("class", "float-load");
 	$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
 	checkCookies(reCache);
