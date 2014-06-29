@@ -38,18 +38,62 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown) {
 			//console.log("Grab Info Success");
 			//console.log(currenturl);
 
-			var quant 		= $(html).find('div#right div.wrap div.row.small div.left b').text();
+			var qQuant
+			var qSeries
+			var qAuthorname
+			var qLanguage
+			var qTranslator
+			var qDesc
+
+			for (var i = 2; i <= 9; i++) {
+				switch ($(html).find('div#right div.wrap div:nth-child('+ i +') div.left').text()) {
+					case "Series":
+						qSeries 	= 'div#right div.wrap div:nth-child('+ i +') div.right';
+						break;
+					case "Artist":
+						qAuthorname = 'div#right div.wrap div:nth-child('+ i +') div.right';
+						break;
+					case "Translator":
+						qTranslator = 'div#right div.wrap div:nth-child('+ i +') div.right';
+						break;
+					case "Language":
+						qLanguage 	= 'div#right div.wrap div:nth-child('+ i +') div.right';
+						break;
+					case "Pages":
+						qQuant 		= 'div#right div.wrap div:nth-child('+ i +') div.right';
+						break;
+					case "Description":
+						qDesc 	= 'div#right div.wrap div:nth-child('+ i +') div.right';
+						break;
+				}
+			}
+
 			var manganame 	= $(html).find('div#right div.wrap div.content-name h1').text();
-			var series		= $(html).find('div#right div.wrap div:nth-child(2) div.left:first-child').text().slice(8, -1);
-			var authorname 	= $(html).find('div#right div.wrap div:nth-child(3) div.left:first-child').text().slice(8);
-			var language 	= $(html).find('div#right div.wrap div:nth-child(2) div.right span a').text();
-			var translator 	= $(html).find('div#right div.wrap div:nth-child(3) div.right span:first-child').text().slice(13, -1);
-			var tags	 	= $(html).find('div#right div.wrap div:nth-child(7)').text().slice(7, -1);
+
+			var series		= $(html).find(qSeries).text();
+			var authorname 	= $(html).find(qAuthorname).text();
+			var translator 	= $(html).find(qTranslator).text();
+			var language 	= $(html).find(qLanguage).text();
+			var quant 		= $(html).find(qQuant).text().replace(" pages", "");
+			var description = $(html).find(qDesc).html();
+			var tags	 	= $(html).find('div#right div.wrap div:last-child div.right').text().slice(0, -2).replace(/ /g, ", ");
+
 			var imgCover 	= $(html).find('div#left div.wrap div.images a img.cover').attr('src');
-			var imgSample	= $(html).find('div#left div.wrap div.images a img.sample').attr('src');
+			var imgSample	= imgCover.replace(/\d\d\d/, function(n) {
+
+				var quantN = quant - quant / 2 / 2;
+				n = Math.floor((Math.random() * quantN) + 4)
+				if (n.toString().length < 3) {
+					n = "0" + n;
+					if (n.toString().length <= 2) {
+						n = "0" + n;
+					}
+				}
+				return n;
+			});
 			var error 		= $(html).find('div#error.message h3').text();
-			var description = $(html).find('div#right div.wrap div:nth-child(6)').html();
-			if (description) { description = description.replace("<b>Description:</b>", "") };
+
+			//if (description) { description = description.replace("<b>Description:</b>", "") };
 			
 			// console.log("pages: " + quant);
 			// console.log("name: " + manganame);

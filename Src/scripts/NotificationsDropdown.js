@@ -147,9 +147,8 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 	
 
   // Adds "--info" to the end of the href string to match the name in localStorage
-	if (!localStorage[href.replace("http://www.fakku.net", "") + "--info"]) {
 		localStorage[href.replace("http://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
-	}
+		
   // Create divs
 	if (infodata[2] && !error) {
 		idCounter++
