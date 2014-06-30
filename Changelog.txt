@@ -26,3 +26,6 @@
 - Added support for notifications (requires Cookies)
 - Added loading animation to indicate that the extension is working.(When grabbing notes for the first time it would feel like it was broken because it takes a decent amount of time)
 - Should be working again from the new layout change to Fakku.
+
+// Version 0.3.1
+- Left something commented that shouldn't have been...

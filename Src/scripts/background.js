@@ -429,7 +429,7 @@ function downloadLinks() {
 		//console.log(folderStructure + "/" + filename2 + ext);
 		//console.log(copypasta2);
 
-			//chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
+			chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
 			
 	}
 }
