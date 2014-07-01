@@ -4,6 +4,7 @@
 	var errorReport		= false;
 	var errorMsg 		= null;
 	var idCounter		= 1;
+	var idCounterTemp	= 0;
 
 // Create placeholder text
 		// $('div#content').append("<center style='text-align:center'></center>");
@@ -74,26 +75,36 @@ function checkCookies(reCache) {
 			$('div#float').show();
 
 			var nArrayNames = JSON.parse(localStorage["n_array_names"]);
+			var new_nArrayNames = new Array();
 
 		  // For each arrayname in localstorage
 			nArrayNames.forEach(function(name) {
-				var self = this, doBind = function() {
-					var nInfo = JSON.parse(localStorage[name]);
-					//console.log(nInfo);
-				  // Check if manga exists and reCache is false
-					if (localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"] && !reCache) {
-						notificationInfo(JSON.parse(localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5]);
-					} else {
-						grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5]);
-						//console.log(nInfo[2]);
-					  // Update the app_version localStorage to current version
-						if (nArrayNames[nArrayNames.length - 1] == name && localStorage["app_version"] != chrome.app.getDetails().version) {
-							localStorage["app_version"] = chrome.app.getDetails().version;
+				loadNote(name, false);
+			});
+			function loadNote(name, bypass) {
+				if (JSON.parse(localStorage[name])[0] == "old" && !reCache || bypass) {
+					var self = this, doBind = function() {
+						var nInfo = JSON.parse(localStorage[name]);
+						//console.log(nInfo);
+					  // Check if manga exists and reCache is false
+						if (localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"] && !reCache) {
+							notificationInfo(JSON.parse(localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5], "append");
+						} else {
+							grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5], "prepend");
+							//console.log(nInfo[2]);
+						  // Update the app_version localStorage to current version
+							if (nArrayNames[nArrayNames.length - 1] == name && localStorage["app_version"] != chrome.app.getDetails().version) {
+								localStorage["app_version"] = chrome.app.getDetails().version;
+							}
 						}
-					}
-		        };
-		        $.queue.add(doBind, this);
-
+			        };
+			        $.queue.add(doBind, this);
+			    } else {
+			    	new_nArrayNames.unshift(name);
+			    }
+			}
+			new_nArrayNames.forEach(function(name) {
+				loadNote(name, true);
 			});
 		}
 	});
@@ -101,7 +112,7 @@ function checkCookies(reCache) {
 setTimeout(checkCookies, 20); // Workaround to get the loadingtrail to appear instead of nothing
 
 // Function waiting for the information from GrabInfo
-function notificationInfo(infodata, href, nold, nseen, nshown) {
+function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 
   // Variables mapping what characters translates into what
   	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|\s&\s|\s+\s|\ |\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\☆|\★|\α|\×/gi;
@@ -152,43 +163,49 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
   // Create divs
 	if (infodata[2] && !error) {
 		idCounter++
+		idCounterTemp = idCounter;
 			// Main Div
-			$('div#content').append("<div class='noteDiv'></div>");
+			if (idCounter == 2 || pend == "append") {
+				$('div#content').append("<div class='noteDiv'></div>");
+			} else {
+				idCounter = 2;
+				$('div#content div.noteDiv:nth-child('+ idCounter +')').before("<div class='noteDiv'></div>");
+			}
 			// Left Div Content
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') ').append("<div id='left'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left').append("<div class='wrap'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap').append("<div class='images'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') ').append("<div id='left'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left').append("<div class='wrap'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap').append("<div class='images'></div>");
 			
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[9] + "' itemprop='image'>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[10] + "' itemprop='image'>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[9] + "' itemprop='image'>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[10] + "' itemprop='image'>");
 
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap').append("<ul></ul>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul').append("<li></li>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul li:nth-child(1)').append("<a id='read-online' href='#'>Read Online</a>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap').append("<ul></ul>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul').append("<li></li>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul li:nth-child(1)').append("<a id='read-online' href='#'>Read Online</a>");
 				newTabLink(idCounter, href, "read-online");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul').append("<li></li>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap ul li:nth-child(2)').append("<a id='download' href='#'>Download</a>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul').append("<li></li>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul li:nth-child(2)').append("<a id='download' href='#'>Download</a>");
 		
 		// Right Div Content
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') ').append("<div id='right'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right').append("<div class='wrap'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div id='hidediv'><button title='Remove' class='close'>Close</button></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='content-name'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + infodata[3] + "</a></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') ').append("<div id='right'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right').append("<div class='wrap'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div id='hidediv'><button title='Remove' class='close'>Close</button></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='content-name'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + infodata[3] + "</a></div>");
 				newTabLink(idCounter, "series", seriesLink);
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
 				newTabLink(idCounter, "", languageLink);
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-small'></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='hr></div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div id='description' class='row-left-full' itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row-small'></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='hr></div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div id='description' class='row-left-full' itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
+			$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
 
 		// For each in array do...
 		  // Create Tags Link
@@ -200,10 +217,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 
 			  // If last in array do not use ", "
 				if (tagArray[tagArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>");
+					$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>");
 					newTabLink(idCounter, "tags", er);
 				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+					$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
 					newTabLink(idCounter, "tags", er);
 				}
 			});
@@ -216,10 +233,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 
 			  // If last in array do not use ", "
 				if (artistArray[artistArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>");
+					$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>");
 					newTabLink(idCounter, "artists", er);
 				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+					$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
 					newTabLink(idCounter, "artists", er);
 				}
 			});
@@ -232,25 +249,25 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 
 			  // If last in array do not use ", "
 				if (translatorArray[translatorArray.length - 1] == e) {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>");
+					$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>");
 					newTabLink(idCounter, "translators", er);
 				} else {
-					$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+					$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
 					newTabLink(idCounter, "translators", er);
 				}
 			});
 		  // Description dropdown
-			if ($('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').height() > 32) {
+			if ($('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full').height() > 32) {
 
 			  // Create dropdown button
-			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').css("height", "32px")
-			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
-			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
-			  	$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
+			  	$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full').css("height", "32px")
+			  	$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
+			  	$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
+			  	$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
 
 
 			  // Mousedown Action
-				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
+				$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
 					if ($(event.target.parentNode).height() > 32) {
 					  // Hide dropdown
 						$(event.target.parentNode).css("height", "32");
@@ -277,12 +294,12 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 																																});
 				}
 		  // Fix left div height
-				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images').css("height", $('div#content div.noteDiv:nth-child(' + idCounter + ') div#right').height() - 60);
-				$('div#content div.noteDiv:nth-child(' + idCounter + ') div#left div.wrap div.images img').css("height", "100%");
+				$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images').css("height", $('div#content div.noteDiv:nth-child('+ idCounter +') div#right').height() - 60);
+				$('div#content div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images img').css("height", "100%");
 
 		  // Download click action
 		  // Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') a#download').mousedown(function(event) {
+			$('div#content div.noteDiv:nth-child('+ idCounter +') a#download').mousedown(function(event) {
 																							event.preventDefault();
 																							var x=event.clientX; 
 																							var y=event.clientY;
@@ -297,12 +314,12 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 																							$('div#float').css("top", y + offsetY - 10);
 																							popupDL();
 																						});
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') a#download').mouseup(function(event) {
+			$('div#content div.noteDiv:nth-child('+ idCounter +') a#download').mouseup(function(event) {
 																							event.preventDefault();
 																							requestDownload(href);
 																						});
 		  // Hide div click action
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') button.close').mousedown(function(event) {
+			$('div#content div.noteDiv:nth-child('+ idCounter +') button.close').mousedown(function(event) {
 																							event.preventDefault();
 																							var x=event.clientX; 
 																							var y=event.clientY;
@@ -318,22 +335,22 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 																							$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
 																							popupDL()
 																						});
-			$('div#content div.noteDiv:nth-child(' + idCounter + ') button.close').mouseup(function(event) {
+			$('div#content div.noteDiv:nth-child('+ idCounter +') button.close').mouseup(function(event) {
 																							event.preventDefault();
 																						});
 		  // New Tab Link click action
 			function newTabLink(idCounter, e, er) {
-				$('div#content div.noteDiv:nth-child(' + idCounter + ') a#' + er).click(function(event) {
+				$('div#content div.noteDiv:nth-child('+ idCounter +') a#' + er).click(function(event) {
 									if (event.button != 2) {
 										event.preventDefault();
 									}
 								});
-				$('div#content div.noteDiv:nth-child(' + idCounter + ') a#' + er).mousedown(function(event) {
+				$('div#content div.noteDiv:nth-child('+ idCounter +') a#' + er).mousedown(function(event) {
 									if (event.button != 2) {
 										event.preventDefault();
 									}
 								});
-				$('div#content div.noteDiv:nth-child(' + idCounter + ') a#' + er).mouseup(function(event) {
+				$('div#content div.noteDiv:nth-child('+ idCounter +') a#' + er).mouseup(function(event) {
 									if (event.button != 2) {
 										event.preventDefault();
 										if (er == "read-online") {
@@ -352,15 +369,19 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 
 	  // Change class to hidden if true
 		if (nshown == "hidden") {
-			$('div#content div.noteDiv:nth-child(' + idCounter + ')').attr("class", "noteDiv-hidden");
+			$('div#content div.noteDiv:nth-child('+ idCounter +')').attr("class", "noteDiv-hidden");
 		}
 	  // Remove unused Divs
-	  	if ($('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').text() == "") {
-	  		$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').html("<a>Not Specified</a>");
-	  		$('div#content div.noteDiv:nth-child(' + idCounter + ') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
+	  	if ($('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').text() == "") {
+	  		$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').html("<a>Not Specified</a>");
+	  		$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
 	  	}
 	} // End of create divs
 
+  // If div position was set to prepend
+  	if (pend == "prepend") {
+  		idCounter = idCounterTemp;
+  	}
   // If new change to old to indicate that the entry has been seen
 	if (nseen == "new") {
 		var note = JSON.parse(localStorage[href.replace("http://www.fakku.net", "") + "--note"]);
@@ -368,7 +389,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown) {
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
-	if (idCounter == JSON.parse(localStorage["n_array_names"]).length - 1) {
+	if (idCounter == JSON.parse(localStorage["n_array_names"]).length + 1) {
 		notesDone();
 		//console.log("notesDone triggered");
 	}
@@ -471,6 +492,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // Function to recache notifications
 function recacheNotes(reCache) {
 	idCounter		= 1;
+	idCounterTemp 	= 0;
 
 	$('div.noteDiv').remove();
 	$('div.noteDiv-hidden').remove();

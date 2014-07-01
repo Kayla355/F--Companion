@@ -274,7 +274,7 @@ function notificationCheck() {
 
 							nArrayNames.push(nStorage + "--note");
 
-							//console.log(noteArray);
+							console.log(noteArray);
 							//console.log(nStorage);
 							//console.log(localStorage[nStorage + "--note"]);
 

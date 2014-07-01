@@ -29,3 +29,6 @@
 
 // Version 0.3.1
 - Left something commented that shouldn't have been...
+
+// Version 0.3.2
+- Improved the way the extension loads in new notes(it should now load all old ones before beginning any new notes that will take longer to load).
