@@ -5,6 +5,7 @@
 	var errorMsg 		= null;
 	var idCounter		= 1;
 	var idCounterTemp	= 0;
+	var errorCount		= 0;
 
 // Create placeholder text
 		// $('div#content').append("<center style='text-align:center'></center>");
@@ -158,7 +159,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 	
 
   // Adds "--info" to the end of the href string to match the name in localStorage
-		localStorage[href.replace("http://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
+	localStorage[href.replace("http://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
 		
   // Create divs
 	if (infodata[2] && !error) {
@@ -376,6 +377,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 	  		$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').html("<a>Not Specified</a>");
 	  		$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
 	  	}
+	} else {
+		console.log("Increased errorcount");
+		errorCount++
 	} // End of create divs
 
   // If div position was set to prepend
@@ -389,7 +393,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
-	if (idCounter == JSON.parse(localStorage["n_array_names"]).length + 1) {
+	if (idCounter == JSON.parse(localStorage["n_array_names"]).length + 1 - errorCount) {
 		notesDone();
 		//console.log("notesDone triggered");
 	}

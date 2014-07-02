@@ -3,7 +3,7 @@
 
   "name": "F! Downloader Dev",
   "description": "F! Downloader lets you download all pages of a manga at once or just view the links to them.",
-  "version": "0.3.0.30",
+  "version": "0.3.2.1",
   "icons": { "256": "images/icon-256.png"},
   "options_page": "Options.html",
   "background": { "scripts": ["scripts/background.js", "scripts/jquery-2.0.3.min.js"] },
@@ -20,12 +20,6 @@
     "default_icon": "images/icon-256.png",
     "default_popup": "Dropdown.html"
   },
-/*
-  "page_action": {
-    "default_icon": "images/icon-256.png",
-    "default_popup": "Dropdown.html"
-  },
-*/  
   "content_scripts": [
 		{
 			"matches": ["http://www.fakku.net/doujinshi/*", "http://www.fakku.net/manga/*"],

@@ -119,6 +119,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			infoarray[10] 	= imgSample;
 
 			if (error) {
+
 				infoarray[1] = "error";
 				infoarray[2] = error;
 				infoarray[3] = downloadurl;
@@ -144,6 +145,12 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					note[0] = "old"
 					localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 				}
+			}
+			if (notifications) {
+				infoarray[1] = "error";
+				infoarray[2] = error.status;
+				infoarray[3] = downloadurl;
+				notificationInfo(infoarray, downloadurl);
 			}
 		}
 	});
