@@ -1,4 +1,4 @@
-F! Downloader Chrome Extension
+F! Downloader Chrome/Opera Extension
 ==========
 Downloads
 ----------
