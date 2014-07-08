@@ -61,6 +61,9 @@ function checkCookies(reCache) {
 	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results) {
 			$('div#loading').remove();
+			$('div#menu').hide();
+			$('html').css("height", "20px");
+			$('body').css("height", "20px");
 			$('div#content').append("<center><b></b></center>");
 			$('div#content center').css("width", "200px");
 			$('div#content center').css("height", "20px");

@@ -64,30 +64,9 @@ function checkForValidUrl(tabId, tab, changeInfo) {
   // Get current tab info as well for comparisson incase a new tab was created and not selected
 	chrome.tabs.getSelected(function(currentTab) {
 	  // If the url is one of the following...
-		if (tab.url.match(/http:\/\/www.fakku.net\/manga\/.*/) && currentTab.id == tabId || tab.url.match(/http:\/\/www.fakku.net\/doujinshi\/.*/) && currentTab.id == tabId  ) {
+		if (tab.url.match(/http:\/\/www.fakku.net\/(manga|doujinshi)\/.*/) && currentTab.id == tabId) {
 			// Temporary solution to excludes not working properly
-			// Consider making this dynamic instead (Grabbing part of the url and putting it in a variable)
-			if (tab.url.match(/http:\/\/www.fakku.net\/.*\/favorites$/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/favorites\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/english$/) 			|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/english\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/japanese$/) 			|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/japanese\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/artists$/) 			|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/artists\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/translators$/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/translators\/.*/) 	|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/series$/) 			|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/series\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/newest$/) 			|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/newest\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/popular$/) 			|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/popular\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/downloads$/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/downloads\/.*/) 		|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/controversial$/) 	|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/controversial\/.*/) 	|| 
-				tab.url.match(/http:\/\/www.fakku.net\/.*\/tags\/.*/)) {
+			if (tab.url.match(/http:\/\/www.fakku.net\/.*\/(favorites($|\/.*)|english($|\/.*)|japanese($|\/.*)|artists($|\/.*)|translators($|\/.*)|series($|\/.*)|newest($|\/.*)|popular($|\/.*)|downloads($|\/.*)|controversial($|\/.*)|tags($|\/.*))/)) {
 
 				// Change browserAction to Notifications
 				if (localStorage["fakku_notes"] == "true") {
