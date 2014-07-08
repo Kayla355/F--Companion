@@ -38,9 +38,6 @@
 	if (localStorage["badge_number"] == undefined) {
 		localStorage["badge_number"] = 0;
 	}
-	if (localStorage["app_version"] == undefined) {
-		localStorage["app_version"] = chrome.app.getDetails().version;
-	}
 
 
 // Listen for change of active tab.
@@ -418,7 +415,7 @@ chrome.downloads.onChanged.addListener(function (downloadID) {
 		if (downloadID.state) {
 			if (downloadID.state.current == "complete" || downloadID.state.current == "interrupted") {
 				chrome.downloads.search({id: downloadID.id}, function(result) {
-					if (result[0].byExtensionName == "F! Downloader" || result[0].byExtensionName == "F! Downloader Dev") {
+					if (result[0].byExtensionName == "F! Companion" || result[0].byExtensionName == "F! Companion Dev") {
 						chrome.downloads.erase({id: downloadID.id})
 						//console.log("Erased: " + downloadID.id);
 					}

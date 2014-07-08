@@ -32,4 +32,7 @@
 
 // Version 0.3.2
 - Improved the way the extension loads in new notes(it should now load all old ones before beginning any new notes that will take longer to load).
-- Fixed an issue with notes not loading properly when an error occurred.
+
+// Version 0.3.3
+- Renamed extension to F! Companion
+- Minor fixes to when a manga did not exist.

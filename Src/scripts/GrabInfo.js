@@ -68,6 +68,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				}
 			}
 
+			var error 		= $(html).find('div#error.message h3').text();
 			var manganame 	= $(html).find('div#right div.wrap div.content-name h1').text();
 
 			var series		= $(html).find(qSeries).text();
@@ -79,19 +80,21 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			var tags	 	= $(html).find('div#right div.wrap div:last-child div.right').text().slice(0, -2).replace(/ /g, ", ");
 
 			var imgCover 	= $(html).find('div#left div.wrap div.images a img.cover').attr('src');
-			var imgSample	= imgCover.replace(/\d\d\d/, function(n) {
 
-				var quantN = quant - quant / 2 / 2;
-				n = Math.floor((Math.random() * quantN) + 4)
-				if (n.toString().length < 3) {
-					n = "0" + n;
-					if (n.toString().length <= 2) {
+			if (imgCover) {
+			  // Calculate new random page to show as sample
+				var imgSample	= imgCover.replace(/\d\d\d/, function(n) {
+					var quantN = quant - quant / 2 / 2;
+					n = Math.floor((Math.random() * quantN) + 4)
+					if (n.toString().length < 3) {
 						n = "0" + n;
+						if (n.toString().length <= 2) {
+							n = "0" + n;
+						}
 					}
-				}
-				return n;
-			});
-			var error 		= $(html).find('div#error.message h3').text();
+					return n;
+				});
+			}
 
 			//if (description) { description = description.replace("<b>Description:</b>", "") };
 			
@@ -119,7 +122,6 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			infoarray[10] 	= imgSample;
 
 			if (error) {
-
 				infoarray[1] = "error";
 				infoarray[2] = error;
 				infoarray[3] = downloadurl;

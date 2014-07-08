@@ -70,7 +70,7 @@ function checkCookies(reCache) {
 			$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
 		} else {
 		  // Check if version saved in localStorage matches current version
-			if (localStorage["app_version"] != chrome.app.getDetails().version) { // CHANGE THIS BACK LATER
+			if (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"]) {
 				reCache = true;
 			}
 		  // Gather and create notifications 
@@ -80,7 +80,6 @@ function checkCookies(reCache) {
 
 			var nArrayNames = JSON.parse(localStorage["n_array_names"]);
 			var new_nArrayNames = new Array();
-
 		  // For each arrayname in localstorage
 			nArrayNames.forEach(function(name) {
 				loadNote(name, false);
@@ -97,7 +96,7 @@ function checkCookies(reCache) {
 							grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5], "prepend");
 							//console.log(nInfo[2]);
 						  // Update the app_version localStorage to current version
-							if (nArrayNames[nArrayNames.length - 1] == name && localStorage["app_version"] != chrome.app.getDetails().version) {
+							if (nArrayNames[nArrayNames.length - 1] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
 								localStorage["app_version"] = chrome.app.getDetails().version;
 							}
 						}
@@ -381,7 +380,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 	  		$('div#content div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
 	  	}
 	} else {
-		console.log("Increased errorcount");
+		//console.log("Increased errorcount");
 		errorCount++
 	} // End of create divs
 
