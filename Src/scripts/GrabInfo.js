@@ -83,7 +83,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 
 			if (imgCover) {
 			  // Calculate new random page to show as sample
-				var imgSample	= imgCover.replace(/\d\d\d/, function(n) {
+				var imgSample	= imgCover.replace(/\/\d\d\d\./, function(n) {
 					var quantN = quant - quant / 2 / 2;
 					n = Math.floor((Math.random() * quantN) + 4)
 					if (n.toString().length < 3) {
@@ -92,6 +92,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 							n = "0" + n;
 						}
 					}
+					n = "/" + n + ".";
 					return n;
 				});
 			}

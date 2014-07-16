@@ -36,3 +36,7 @@
 // Version 0.3.3
 - Renamed extension to F! Companion
 - Minor fixes to when a manga did not exist.
+
+// Version 0.3.4 (Un-released)
+- The icon will now say "DL or "Link", depending on what option you have set, when it is the action that will be taken when pressed.
+- Fixed an issue with removed(actually hidden...) items causing issues when loading in newer items at the top.

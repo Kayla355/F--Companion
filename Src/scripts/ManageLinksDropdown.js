@@ -86,8 +86,7 @@ function requestLinks() {
 	if (docReadyLink && docReadyInfo) {
 
 			var imgURL 					= linkarray[1];
-			var quant  					= infoarray[1];
-			var quant2 					= parseInt(quant);
+			var quant  					= parseInt(infoarray[1]);
 			var quantlen 				= imgURL.length -1;
 			var textarea1 				= localStorage["text_area1"];
 			var textarea2 				= localStorage["text_area2"];
@@ -101,7 +100,7 @@ function requestLinks() {
 				$('div#center').css("width", "");
 				$('div#center').css("height", "");
 				$('div#center b').remove();
-				$('div#center').append("<textarea id='copypasta' wrap='off' cols ='" + quantlen + "' rows='" + quant2 + "' readonly style='overflow:hidden;padding-bottom:3px;resize:none'>");
+				$('div#center').append("<textarea id='copypasta' wrap='off' cols ='" + quantlen + "' rows='" + quant + "' readonly style='overflow:hidden;padding-bottom:3px;resize:none'>");
 							
 						
 			var copypasta2 = "";

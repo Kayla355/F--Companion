@@ -1,5 +1,5 @@
 // Copyright (c) 2011 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
+// Use of this source code is governed by a BSD-style license that can be 
 // found in the LICENSE file.
 
 /*! jQuery v2.0.3 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license
@@ -18,7 +18,6 @@
 	}	
 	if (localStorage["button_action"] == undefined) {
 		localStorage["button_action"] = "download";
-
 	}
 	if (localStorage["conflict_action"] == undefined) {
 		localStorage["conflict_action"] = "uniquify";
@@ -38,7 +37,6 @@
 	if (localStorage["badge_number"] == undefined) {
 		localStorage["badge_number"] = 0;
 	}
-
 
 // Listen for change of active tab.
 chrome.tabs.onActivated.addListener(function(activeInfo) {
@@ -64,25 +62,29 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 		if (tab.url.match(/http:\/\/www.fakku.net\/(manga|doujinshi)\/.*/) && currentTab.id == tabId) {
 			// Temporary solution to excludes not working properly
 			if (tab.url.match(/http:\/\/www.fakku.net\/.*\/(favorites($|\/.*)|english($|\/.*)|japanese($|\/.*)|artists($|\/.*)|translators($|\/.*)|series($|\/.*)|newest($|\/.*)|popular($|\/.*)|downloads($|\/.*)|controversial($|\/.*)|tags($|\/.*))/)) {
-
 				// Change browserAction to Notifications
 				if (localStorage["fakku_notes"] == "true") {
-					chrome.browserAction.setPopup({popup: "DropdownNotes.html"})
+					badgeUpdate("notes");
+					chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
 					chrome.browserAction.enable();
 				} else {
+					badgeUpdate("disabled");
 					chrome.browserAction.disable();
 				}
 			} else {
 				// Change browserAction to Download
-				chrome.browserAction.setPopup({popup: "Dropdown.html"})
+				badgeUpdate("download");
+				chrome.browserAction.setPopup({popup: "Dropdown.html"});
 				chrome.browserAction.enable();
 			}
 		} else {
 			// Change browserAction to Notifications
 			if (localStorage["fakku_notes"] == "true") {
-				chrome.browserAction.setPopup({popup: "DropdownNotes.html"})
+				badgeUpdate("notes");
+				chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
 				chrome.browserAction.enable();
 			} else {
+				badgeUpdate("disabled");
 				chrome.browserAction.disable();
 			}
 		}
@@ -142,21 +144,21 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 if (localStorage["fakku_notes"] == "true") {
 	notificationCheck();
 } else {
-	chrome.browserAction.setBadgeText({text: ""});
-	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
+	badgeClear(true);
 }
 
 // Function to check for notifications
 function notificationCheck() {
 	if (localStorage["fakku_notes"] == "true") {
-		// Check if Login cookie has expired.
+	  // Check if Login cookie has expired.
 		chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 			if (!results) {
-				localStorage["badge_number"] = "Err";
-				chrome.browserAction.setBadgeText({text: "Err"});
-				chrome.browserAction.setBadgeBackgroundColor({color: [200, 0, 0, 255]})
-				recursiveNote(10000);
+				badgeUpdate("error");
+				recursiveNote(1000);
 			} else {
+			  // Clear badge_number
+				localStorage["badge_number"] = 0;
+			  // Ajax Function to get the subscriptions
 				$.ajax({
 					type: "GET",
 					url: "http://www.fakku.net/subscriptions",
@@ -189,19 +191,32 @@ function notificationCheck() {
 							var nHref 	= "http://www.fakku.net" + $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
 							var nOld	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") i").text();
 
-			/*				console.log("Checked Notifications");
-							console.log("Name: " + nName);
-							console.log("Link: " + nHref);
-							console.log("Uploaded: " + nOld);
-							console.log("Under Tags: " + JSON.stringify(nTagName));
-							console.log("Tag Link: " + JSON.stringify(nTagHref));*/
+							// console.log("Checked Notifications");
+							// console.log("Name: " + nName);
+							// console.log("Link: " + nHref);
+							// console.log("Uploaded: " + nOld);
+							// console.log("Under Tags: " + JSON.stringify(nTagName));
+							// console.log("Tag Link: " + JSON.stringify(nTagHref));
 
 							var noteArray 	= new Array();
 							var nStorage 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
+
 						// Assigning states for old/new & hidden/shown
 						  // Check if localStorage entry exists
 							if (localStorage[nStorage + "--note"]) {
 								var nExists		= JSON.parse(localStorage[nStorage + "--note"]);
+
+								if (localStorage[nStorage + "--info"]) {
+									var iExists = JSON.parse(localStorage[nStorage + "--info"]);
+
+								  // Checks if the info stored has an unknown error and if true recache the note.
+									if (iExists[1] == "error" && !iExists[2].toString().match(/(Content does not exist.|404|410)/)) {
+										nExists = ""; 
+										iExists = "";
+										localStorage.removeItem(localStorage[nStorage + "--note"]);
+										localStorage.removeItem(localStorage[nStorage + "--info"]);
+									}
+								}
 
 							  // Checks if old or new
 								if (nExists[0] == "old") {
@@ -250,7 +265,7 @@ function notificationCheck() {
 
 							nArrayNames.push(nStorage + "--note");
 
-							console.log(noteArray);
+							console.log(noteArray); // Leave uncommented
 							//console.log(nStorage);
 							//console.log(localStorage[nStorage + "--note"]);
 
@@ -259,28 +274,88 @@ function notificationCheck() {
 						localStorage["n_array_names"] = JSON.stringify(nArrayNames);
 						//console.log(localStorage["n_array_names"]);
 
+					  // Remove Old localStorage data
+					  // Works, but disabled for now because I would rather make more notes appear when scrolling to the bottom. Which would also make the extension faster to load the first time.
+					  	// var key;
+					  	// for (var i = 0, len = localStorage.length; i < len; i++) {
+					  	// 	key = localStorage.key(i);
+					  	// 	if ((/\/(manga|doujinshi)\/.*--(note)/).test(key)) {
+					  	// 		if ($.inArray(key, nArrayNames) == -1) {
+					  	// 			localStorage.removeItem(key)
+					  	// 			localStorage.removeItem(key.replace("note", "info"))
+					  	// 		}
+					  	// 	}
+					  	// }
+
 					},
 					error: function(error) {
 						//msgError(error);
 						//console.log("Error: " + error);
 					}
 				});
-				// Update Badgenumber if it is Error or if it is 0
-				if (localStorage["badge_number"] == "Err") {
-					chrome.browserAction.setBadgeText({text: ""});
-					chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]});
-					localStorage["badge_number"] = 0;
-				} else if (localStorage["badge_number"] != 0) {
-					chrome.browserAction.setBadgeText({text: localStorage["badge_number"]});
-					chrome.browserAction.setBadgeBackgroundColor({color: [200, 0, 0, 255]});
-					localStorage["badge_number"] = 0;
-				}
-				// Call the recursive function
-					recursiveNote(localStorage["update_interval"] * 60 * 1000); // Get update interval from localStorage
+			  // Update Badgenumber
+				badgeUpdate("update");
+			  // Call the recursive function
+				recursiveNote(localStorage["update_interval"] * 60 * 1000); // Get update interval from localStorage
 			}
 		});
 	} else {
 		clearTimeout(checkNotes);
+	}
+}
+
+function badgeUpdate(status) {
+  // When updateBadge is triggered from the notificationCheck
+	if (status == "update") {
+		if (localStorage["badge_number"] == 0) {
+			badgeRed("");
+		} else {
+			badgeRed(localStorage["badge_number"]);
+		}
+	}
+  // When a page you can download is detected
+	if (status == "download") {
+		if (localStorage["button_action"] == "download") {
+			localStorage["badge_number_action"] = "true";
+			badgeRed("DL");
+		} else if (localStorage["button_action"] == "links") {
+			localStorage["badge_number_action"] = "true";
+			badgeRed("Link");
+		}
+  	}
+  // When you are not signed in and an error occurs
+	if (status == "error" && localStorage["badge_number_action"] != "true") {
+  		localStorage["badge_number"] = "Err";
+		badgeRed("Err");
+  	}
+  // When notifications are disabled
+  	if (status == "disabled") {
+		badgeClear(true);
+  	}
+  // When you leave a downloadable page
+  	if (status == "notes") {
+		badgeClear();
+		localStorage["badge_number_action"] = "false";
+  	}
+  // When updateBadge is triggered from the notificationCheck after an error
+  	if (status == "update" && localStorage["badge_number"] == "Err") {
+  		badgeClear(true); 
+  	}
+  // When you leave a downloadable page and have a notification
+  	if (status != "download" && localStorage["badge_number"] != 0 && localStorage["badge_number_action"] != "true") {
+  		badgeRed(localStorage["badge_number"]);
+  	}
+}
+function badgeRed (text) {
+	chrome.browserAction.setBadgeText({text: text});
+	chrome.browserAction.setBadgeBackgroundColor({color: [200, 0, 0, 255]});
+}
+
+function badgeClear(clear) {
+	chrome.browserAction.setBadgeText({text: ""});
+	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]});
+	if (clear) {
+		localStorage["badge_number"] = 0;
 	}
 }
 
@@ -294,13 +369,12 @@ function recursiveNote(cookieCheck) {
 // Function for downloading the links.
 function downloadLinks() {
 		
-	//console.log(localStorage["info_array"]);
-	//console.log(localStorage["link_array"]);
+	// console.log(infoarray);
+	// console.log(linkarray);
 	
 	var imgURL 			= linkarray[1];
-	var quant  			= infoarray[1];
-	var quant2 			= parseInt(quant);
-	var ext				= linkarray[quant2 + 1]
+	var quant 			= parseInt(infoarray[1]);
+	var ext				= linkarray[quant + 1]
 	var manganame		= infoarray[2];
 	var series			= infoarray[3];
 	var authorname		= infoarray[4];
@@ -314,65 +388,71 @@ function downloadLinks() {
 	var filename		= new String();
 	var conflictRes 	= localStorage["conflict_action"];
 
-// Convert the folderStructure variable into the proper format	
-		if (folderStructure == "manganame") {
+// Convert the folderStructure variable into the proper format
+	switch (folderStructure) {
+		case "manganame":
 			folderStructure = manganame;
-		}
-		if (folderStructure == "series") {
+			break;
+		case "series":
 			folderStructure = series;
-		}
-		if (folderStructure == "authorname") {
+			break;
+		case "authorname":
 			folderStructure = authorname;
-		}
-		if (folderStructure == "language") {
+			break;
+		case "language":
 			folderStructure = language;
-		}
-		if (folderStructure == "translator") {
+			break;
+		case "translator":
 			folderStructure = translator;
-		}
-		if (folderStructure == "pagenumber") {
+			break;
+		case "pagenumber":
 			folderStructure = pagenumber;
-		}
-		if (folderStructure == "tags") {
+			break;
+		case "tags":
 			folderStructure = tags;
-		}
-	// Remove "." if it's the last character
-		folderStructure = folderStructure + '\/:*?"<>|';
-		while (folderStructure.match("[.]$")) {
-			folderStructure = folderStructure.replace(".", "");
-		}
-	// Remove any of the following characters, \/:*?"<>|
-		while (folderStructure.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|')) {
-			//console.log(folderStructure);
-			var r = folderStructure.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|');
-			folderStructure = folderStructure.replace(r, "");
-		}
+			break;
+	}
+
+// Remove "." if it's the last character
+	folderStructure = folderStructure + '\/:*?"<>|';
+	while (folderStructure.match("[.]$")) {
+		folderStructure = folderStructure.replace(".", "");
+	}
+// Remove any of the following characters, \/:*?"<>|
+	while (folderStructure.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|')) {
+		//console.log(folderStructure);
+		var r = folderStructure.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|');
+		folderStructure = folderStructure.replace(r, "");
+	}
 
 // Convert the fileStructure array into the proper format	
 	for (var i = 1; i <= fslen; i++) {
 		var languageCheck = false;
-		if (fileStructure[i] == "Manga Name") {
-			fileStructure[i] = manganame;
+		switch (fileStructure[i]) {
+			case "Manga Name":
+				fileStructure[i] = manganame;
+				break;
+			case "Series Name":
+				fileStructure[i] = series;
+				break;
+			case "Author Name":
+				fileStructure[i] = authorname;
+				break;
+			case "Language":
+				fileStructure[i] = "(" + language + ")";
+				languageCheck = true;
+				break;
+			case "Translator":
+				fileStructure[i] = translator;
+				break;
+			case "Page Number":
+				fileStructure[i] = "pagenumber";
+				break;
+			case "Tags":
+				fileStructure[i] = tags;
+				break;
 		}
-		if (fileStructure[i] == "Series Name") {
-			fileStructure[i] = series;
-		}
-		if (fileStructure[i] == "Author Name") {
-			fileStructure[i] = authorname;
-		}
-		if (fileStructure[i] == "Language") {
-			fileStructure[i] = "(" + language + ")";
-			languageCheck = true;
-		}
-		if (fileStructure[i] == "Translator") {
-			fileStructure[i] = translator;
-		}
-		if (fileStructure[i] == "Page Number") {
-			fileStructure[i] = "pagenumber";
-		}
-		if (fileStructure[i] == "Tags") {
-			fileStructure[i] = tags;
-		}
+
 		if (i == 1) {
 			filename = fileStructure[i];
 		} else if (languageCheck) {
@@ -402,10 +482,10 @@ function downloadLinks() {
 		copypasta2 = linkarray[i];
 			
 		var filename2 = filename.replace("pagenumber", str);
-		//console.log(folderStructure + "/" + filename2 + ext);
-		//console.log(copypasta2);
+		// console.log(folderStructure + "/" + filename2 + ext);
+		// console.log(copypasta2);
 
-			chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
+		chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
 			
 	}
 }
@@ -424,7 +504,4 @@ chrome.downloads.onChanged.addListener(function (downloadID) {
 			}
 		}
 	}
-	//console.log(downloadID);
-	//console.log(downloadID.id);
-	//console.log(downloadID.state);
 });

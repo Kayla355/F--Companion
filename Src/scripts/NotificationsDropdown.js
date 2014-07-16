@@ -151,10 +151,8 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 	var error 			= false;
 
 	if (infodata[1] == "error") { error = true; console.log("Error Parsing: " + infodata[3]); console.log("Error Message: " + infodata[2]); };
-
-	var seriesLink 		= infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase();
-	var languageLink 	= infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase();
-
+	if (infodata[3]) { var seriesLink 	= infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
+	if (infodata[5]) { var languageLink = infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
 	if (infodata[7]) { tagArray 		= infodata[7].split(", "); };
 	if (infodata[4]) { artistArray 		= infodata[4].split(", "); };
 	if (infodata[6]) { translatorArray 	= infodata[6].split(", "); };
@@ -172,7 +170,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 				$('div#content').append("<div class='noteDiv'></div>");
 			} else {
 				idCounter = 2;
-				$('div#content div.noteDiv:nth-child('+ idCounter +')').before("<div class='noteDiv'></div>");
+				$('div#content div#menu').after("<div class='noteDiv'></div>");
 			}
 			// Left Div Content
 			$('div#content div.noteDiv:nth-child('+ idCounter +') ').append("<div id='left'></div>");
@@ -405,6 +403,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend) {
 function notesDone() {
 	chrome.browserAction.setBadgeText({text: ""});
 	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
+	localStorage["badge_number"] = 0;
 
 	// Workaround for scrollbar not showing
 	$('div#content').css("opacity", "1");

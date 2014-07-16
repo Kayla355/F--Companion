@@ -33,12 +33,11 @@ function grabLinks(downloadurl, notifications, ndownload) {
 			var ext 	= html.match(/:\/\/t.fakku.net\/.*\/images\/.*/).toString().slice(-6).slice(0, -2);
 			var imgURL 	= "http" + html.match(/:\/\/t.fakku.net\/.*\/images\//) + "001" + ext;
 
-			var quant = JSON.parse(html.match(/window\.params\.thumbs = \[.*\];/).toString().replace("window.params.thumbs = ", "").replace(";","")).length;
+			var quant = parseInt(JSON.parse(html.match(/window\.params\.thumbs = \[.*\];/).toString().replace("window.params.thumbs = ", "").replace(";","")).length, 10);
 			
 
-			quant2 = parseInt(quant, 10) + 1;
 			linkarray[0] = "linkarray";
-			linkarray[quant2] = ext;
+			linkarray[quant + 1] = ext;
 			for (var i = 1; i <= quant; i++) {
 				var str = '' + i;
 				while (str.length < 3) str = '0' + str;

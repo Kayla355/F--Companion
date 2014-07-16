@@ -8,7 +8,7 @@
 
 - Download subscriptions
 	- possibly add a system that will grab the latest mangas and prompt you when a new one is added (might be that subscriptions is enough)
-	- fix links located in a description closing the popup even when they are ctrl/middle-clicked
+	- fix links located in a description closing the popup even when they are ctrl/middle-clicked(This already works in Opera by default)
 	- option to only show mangas in english/japanese, possibly even other options(which would make it more into a filter system)
 	- remove old localStorage notification data
 	or
@@ -17,3 +17,7 @@
 
 - Download series/artist
 	- Download everything when searching/browsing an artist
+
+- Clicked/Floating Text
+	- Remove the floating text after a period of time. Having to click it away might be seen as counterintuitive.
+	- Possibly disable all background elements while a floating text is active. To prevent accidentally clicking twice on the remove button.
