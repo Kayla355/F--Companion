@@ -39,7 +39,5 @@
 
 // Version 0.3.4 (Un-released)
 - The icon will now say "DL or "Link", depending on what option you have set, when it is the action that will be taken when pressed.
+- Items that have previously gotten an error, with some exceptions, when fetching data will now recheck them selves on next load.
 - Fixed an issue with removed(actually hidden...) items causing issues when loading in newer items at the top.
-- Added "endless" scrolling to the notifications, which means that it will now load older entries as you reach the bottom of the page.
-- Started storing the generated html page in localstorage which means it will now load close to instantanious as it will no longer have to generate new entries from stored data at every load.
-- The menu will now always be shown at the top even when scrolling.

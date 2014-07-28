@@ -1,6 +1,4 @@
 - Saving manga information to text file.(Pretty sure this can't be done :( )
-	- Could potentially grab the manga information for mangas downloaded this session and generate an html page that can be saved manually.
-	- Actually might be able to make the html page save automatically with each download. Revived!
 
 - Overhaul the options menu:
 	- Create a proper drop & drag system or swap it out for a text formatting system, for both Image Name and Folder Name.
@@ -9,15 +7,13 @@
 	- Option to check for direct download links first. (Depends on what hosts are being used as to how worthwhile I see it as being)
 
 - Download subscriptions
-	- possibly add a system that will grab the latest mangas and notify you when a new one is added (might be that subscriptions is enough)
+	- possibly add a system that will grab the latest mangas and prompt you when a new one is added (might be that subscriptions is enough)
 	- fix links located in a description closing the popup even when they are ctrl/middle-clicked(This already works in Opera by default)
 	- option to only show mangas in english/japanese, possibly even other options(which would make it more into a filter system)
-	- remove old localStorage notification data(Working but disabled for now)
+	- remove old localStorage notification data
 	or
 	- parse x amount at a time and scrolling causes older ones to appear(would need to change the way arraynames are stored.)
 	- Possibly add some way of telling when you have already downloaded/read a manga
-	- Add an internal timer to entries so they still update after they are no longer on the notifications page.
-	- Look into gathering info and such in the background to speed up pageloads(Had issues in the past). Maybe even pass it into the localstorage variable through the background script.
 
 - Download series/artist
 	- Download everything when searching/browsing an artist
@@ -25,4 +21,3 @@
 - Clicked/Floating Text
 	- Remove the floating text after a period of time. Having to click it away might be seen as counterintuitive.
 	- Possibly disable all background elements while a floating text is active. To prevent accidentally clicking twice on the remove button.
-	- Fix loadingtrail appearing in the wrong location after an item was removed from the list

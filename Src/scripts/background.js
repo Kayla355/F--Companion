@@ -61,7 +61,7 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 	  // If the url is one of the following...
 		if (tab.url.match(/http:\/\/www.fakku.net\/(manga|doujinshi)\/.*/) && currentTab.id == tabId) {
 			// Temporary solution to excludes not working properly
-			if (tab.url.match(/http:\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
+			if (tab.url.match(/http:\/\/www.fakku.net\/.*\/(favorites($|\/.*)|english($|\/.*)|japanese($|\/.*)|artists($|\/.*)|translators($|\/.*)|series($|\/.*)|newest($|\/.*)|popular($|\/.*)|downloads($|\/.*)|controversial($|\/.*)|tags($|\/.*))/)) {
 				// Change browserAction to Notifications
 				if (localStorage["fakku_notes"] == "true") {
 					badgeUpdate("notes");
@@ -150,14 +150,11 @@ if (localStorage["fakku_notes"] == "true") {
 // Function to check for notifications
 function notificationCheck() {
 	if (localStorage["fakku_notes"] == "true") {
-	  // Clear Console
-	  console.clear();
 	  // Check if Login cookie has expired.
 		chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 			if (!results) {
 				badgeUpdate("error");
 				recursiveNote(1000);
-				console.log("Failed to find login cookie for Fakku.net");
 			} else {
 			  // Clear badge_number
 				localStorage["badge_number"] = 0;
@@ -273,22 +270,8 @@ function notificationCheck() {
 							//console.log(localStorage[nStorage + "--note"]);
 
 						});
-					// Create/Update the array of names
-						var new_nArrayNames = new Array();
-
-					  // Push localStorage array into current array
-						if (localStorage["n_array_names"]) {
-							JSON.parse(localStorage["n_array_names"]).forEach(function(name) {
-								nArrayNames.push(name);
-							});
-						}
-					  // Remove duplicates from array
-						$.each(nArrayNames, function(i, name) {
-							//console.log(i + " : " + name);
-							if ($.inArray(name, new_nArrayNames) === -1) new_nArrayNames.push(name);
-						});
 						
-						localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
+						localStorage["n_array_names"] = JSON.stringify(nArrayNames);
 						//console.log(localStorage["n_array_names"]);
 
 					  // Remove Old localStorage data
@@ -376,9 +359,10 @@ function badgeClear(clear) {
 	}
 }
 
-function recursiveNote(updateInterval) {
+function recursiveNote(cookieCheck) {
 	// Resursive function to check for updates
 	clearTimeout(checkNotes);
+	var updateInterval = cookieCheck;
 	checkNotes = setTimeout(notificationCheck, updateInterval);
 }
 
