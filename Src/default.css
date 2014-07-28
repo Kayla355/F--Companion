@@ -117,10 +117,23 @@ div
 {
 	width: 96%;
 }
+#notes
+{
+	padding-top: 20px;
+	overflow: hidden;
+}
 #menu
 {
+	position: fixed;
 	font-size: 8pt;
-	padding: 0 0 5 0;
+	padding: 5 8 4 8;
+	background-color: white;
+	top: 0px;
+	left: 0px;
+	width: 98%;
+	border-bottom: 1px solid #DDD;
+	z-index: 1000;
+
 }
 #menu .left, #menu .right
 {
