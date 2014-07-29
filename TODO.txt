@@ -26,3 +26,5 @@
 	- Remove the floating text after a period of time. Having to click it away might be seen as counterintuitive.
 	- Possibly disable all background elements while a floating text is active. To prevent accidentally clicking twice on the remove button.
 	- Fix loadingtrail appearing in the wrong location after an item was removed from the list
+
+- Change the forced recheck at every update to possibly only major ones or just stop doing it all together as it can be done manually now.
