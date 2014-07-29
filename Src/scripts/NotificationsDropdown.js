@@ -355,7 +355,6 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		  	}
 		} // End of create divs
 	} // End of if prepend statement
-
 	// If error then increase errorCount
 	if (error) {
 	  //console.log("Increased errorcount");
@@ -377,6 +376,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		note[0] = "old"
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
+	//console.log("idCountr: "+idCounter)
+	//console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
+	//console.log("errorCount: "+errorCount)
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
 	if (idCounter == JSON.parse(localStorage["n_array_names"]).length - errorCount) {
 		notesDone(pend);
@@ -662,6 +664,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 function updateNotes(reCache) {
 	idCounter		= 0;
 	idCounterTemp 	= 0;
+	errorCount 		= 0;
 
 	$('div#notes').remove();
 	//$('div.noteDiv').remove();

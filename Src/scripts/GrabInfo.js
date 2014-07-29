@@ -86,28 +86,13 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				var imgSample	= imgCover.replace(/\/\d\d\d\./, function(n) {
 					var quantMax = Math.floor(quant - quant / 2 / 2)
 					var quantMin = quant - quantMax;
-					var quantMul;
-
-					if (quant <= 9) {
-						quantMul = 10;
-					} else if (quant <= 99) {
-						quantMul = 100;
-					} else if (quant <= 999) {
-						quantMul = 1000;
-					} else if (quant <= 9999) {
-						quantMul = 10000;
-					}
 
 					do {
-						n = Math.round((Math.random() * quantMul / Math.round(quant / 10)));
+						n = Math.round((Math.random() * (quantMax - quantMin) + quantMin));
 					} while (n < 4 || n < quantMin || n > quantMax);
-
-					if (n.toString().length < 3) {
-						n = "0" + n;
-						if (n.toString().length <= 2) {
-							n = "0" + n;
-						}
-					}
+					
+					while (n.toString().length < 3) n = '0' + n;
+					
 					n = "/" + n + ".";
 					return n;
 				});
