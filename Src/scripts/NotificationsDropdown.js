@@ -353,12 +353,15 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		  		$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').html("<a>Not Specified</a>");
 		  		$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
 		  	}
-		} else {
-			//console.log("Increased errorcount");
-			errorCount++
 		} // End of create divs
 	} // End of if prepend statement
 
+	// If error then increase errorCount
+	if (error) {
+	  //console.log("Increased errorcount");
+		errorCount++
+	}
+	
 	// Run function that will attach Event Listeners to page
 	if (!error) {
 		attachEventListeners(idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray);
@@ -375,7 +378,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
-	if (idCounter+1 == JSON.parse(localStorage["n_array_names"]).length) {
+	if (idCounter == JSON.parse(localStorage["n_array_names"]).length - errorCount) {
 		notesDone(pend);
 		//console.log("notesDone triggered");
 	}
@@ -540,7 +543,7 @@ function notesDone(pend) {
 	$('div#float').attr("class", "");
 	$('div#float b').text("");
 	$('div#loading').remove();
-	console.log("loadingtrail should be gone");
+	//console.log("loadingtrail should be gone");
 
 	if (pend == "prepend") {
 		localStorage["new_note"] = "false";

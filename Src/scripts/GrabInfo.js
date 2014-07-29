@@ -169,7 +169,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				infoarray[1] = "error";
 				infoarray[2] = error.status;
 				infoarray[3] = downloadurl;
-				notificationInfo(infoarray, downloadurl);
+				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache);
 			}
 		}
 	});
