@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 var infoarray		= new Array();
 
 // Function for grabbing manga information
-function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend) {
+function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
 		var currenturl 		= "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
@@ -84,8 +84,24 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			if (imgCover) {
 			  // Calculate new random page to show as sample
 				var imgSample	= imgCover.replace(/\/\d\d\d\./, function(n) {
-					var quantN = quant - quant / 2 / 2;
-					n = Math.floor((Math.random() * quantN) + 4)
+					var quantMax = Math.floor(quant - quant / 2 / 2)
+					var quantMin = quant - quantMax;
+					var quantMul;
+
+					if (quant <= 9) {
+						quantMul = 10;
+					} else if (quant <= 99) {
+						quantMul = 100;
+					} else if (quant <= 999) {
+						quantMul = 1000;
+					} else if (quant <= 9999) {
+						quantMul = 10000;
+					}
+
+					do {
+						n = Math.round((Math.random() * quantMul / Math.round(quant / 10)));
+					} while (n < 4 || n < quantMin || n > quantMax);
+
 					if (n.toString().length < 3) {
 						n = "0" + n;
 						if (n.toString().length <= 2) {
@@ -129,7 +145,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			}
 
 			if (notifications) {
-				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend);
+				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache);
 				//console.log("notifications Grabinfo triggered");
 			} else {
 				msgDocReadyInfo(ndownload);

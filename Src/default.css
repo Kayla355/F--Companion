@@ -94,7 +94,7 @@ div
 	height: 96px;
 	width: 70px;
 }
-.noteDiv
+.noteDiv .noteDiv-matched
 {
 	margin-bottom: 5px;
 	margin-right: 2px;
@@ -113,14 +113,37 @@ div
 	-webkit-border-radius: 0 6px 6px 0;
 	display: none;
 }
+.noteDiv-filtered
+{
+	margin-bottom: 5px;
+	margin-right: 2px;
+	background: #FFEFEF;
+	box-shadow: inset 0 0 1px #FF6F6F;
+	-moz-border-radius: 0 6px 6px;
+	-webkit-border-radius: 0 6px 6px 0;
+	display: none;
+}
 .content-name 
 {
 	width: 96%;
 }
+#notes
+{
+	padding-top: 25px;
+	overflow: hidden;
+}
 #menu
 {
+	position: fixed;
 	font-size: 8pt;
-	padding: 0 0 5 0;
+	padding: 5 8 5 8;
+	background-color: white;
+	top: 0px;
+	left: 0px;
+	width: 98%;
+	border-bottom: 1px solid #DDD;
+	z-index: 1000;
+
 }
 #menu .left, #menu .right
 {
@@ -131,6 +154,15 @@ div
 {
 	display: inline-block;
 	text-align: right;
+}
+#filterInput
+{
+	position: fixed;
+	margin-right: 5px;
+	height: 19px;
+	width: 120px;
+	right: 37px;
+	top: 2;
 }
 #float
 {
