@@ -94,7 +94,7 @@ div
 	height: 96px;
 	width: 70px;
 }
-.noteDiv .noteDiv-matched
+.noteDiv ,.noteDiv-matched
 {
 	margin-bottom: 5px;
 	margin-right: 2px;
