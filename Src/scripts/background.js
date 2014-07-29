@@ -142,7 +142,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 // Timer to check for notifications
 if (localStorage["fakku_notes"] == "true") {
-	//notificationCheck();
+	notificationCheck();
 } else {
 	badgeClear(true);
 }
