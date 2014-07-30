@@ -84,12 +84,10 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			if (imgCover) {
 			  // Calculate new random page to show as sample
 				var imgSample	= imgCover.replace(/\/\d\d\d\./, function(n) {
-					var quantMax = Math.floor(quant - quant / 2 / 2)
+					var quantMax = Math.floor(quant - (quant / 2 / 2))
 					var quantMin = quant - quantMax;
 
-					do {
-						n = Math.round((Math.random() * (quantMax - quantMin) + quantMin));
-					} while (n < 4 || n < quantMin || n > quantMax);
+					n = Math.round((Math.random() * (quantMax - quantMin) + quantMin));;
 					
 					while (n.toString().length < 3) n = '0' + n;
 					

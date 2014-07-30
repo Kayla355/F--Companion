@@ -149,7 +149,11 @@ function checkCookies(reCache) {
 			$('div#loading').remove();
 			$('div#menu').hide();
 			$('html').css("height", "20px");
+			$('html').css("width", "200px");
 			$('body').css("height", "20px");
+			$('body').css("width", "200px");
+			$('div#content').css("width", "200px");
+		  	$('div#content').css("height", "20px");
 			$('div#content').append("<center><b></b></center>");
 			$('div#content center').css("width", "200px");
 			$('div#content center').css("height", "20px");
@@ -162,7 +166,7 @@ function checkCookies(reCache) {
 
 		  // Gather and create notifications 
 		  	$('div#content').css("width", "545px");
-		  	$('div#content').css("height", "600px")
+		  	$('div#content').css("height", "600px");
 		  	if (reCache || localStorage["new_note"] == "true") {
 		  		$('body').css("opacity", "0.6");
 				$('div#float').show();
