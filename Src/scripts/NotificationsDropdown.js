@@ -87,7 +87,7 @@ function filter(event) {
 			var i = input.length;
 		  // Grab tags
 			$(div).find('div#right div.row-left-full a').each(function (i, val) { tagArray.push($(val).text()) });
-		  // For each tag match & if matched then increase match count until the match count.
+		  // For each tag match & if matched then increase match count until the match count is the same as input length.
 		  // If the matched count and the input length is the same hide other divs
 			input.forEach(function (value) {
 				if (tagArray.toString().match(value)) {
@@ -161,7 +161,17 @@ function checkCookies(reCache) {
 		} else {
 		  // Check if version saved in localStorage matches current version. Also force recache if html_content does not exist.
 			if (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"] || !localStorage["html_content"]) {
-				reCache = true;
+				if (!localStorage["app_version"] || !localStorage["html_content"]) {
+					reCache = true;
+				} else {
+					var currentVersion 	= chrome.app.getDetails().version.replace(/\./g, "");
+					var oldVersion		= localStorage["app_version"].replace(/\./g, "");
+					var diff 			= currentVersion.slice(1, 2) - oldVersion.slice(1, 2);
+
+					if (diff >= 1) {
+						reCache = true;
+					}
+				}
 			}
 
 		  // Gather and create notifications 
@@ -181,14 +191,20 @@ function checkCookies(reCache) {
 			function loadNote(name, bypass) {
 				if (JSON.parse(localStorage[name])[0] == "old" && !reCache || bypass) {
 					var self = this, doBind = function() {
-						var nInfo = JSON.parse(localStorage[name]);
-						//console.log(nInfo);
+						var nNote = JSON.parse(localStorage[name]);
+						var nInfo;
+						if (localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]) {
+							nInfo = JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]); 
+						}
+						//console.log(nNote);
 					  // Check if manga exists and reCache is false
-						if (localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"] && !reCache) {
-							notificationInfo(JSON.parse(localStorage[nInfo[2].replace("http://www.fakku.net", "") + "--info"]), nInfo[2], nInfo[3], nInfo[0], nInfo[5], "append", reCache);
+						if (nInfo && !reCache && nNote[0] == "old") {
+							notificationInfo(JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache);
+							//console.log("Manga exists in localStorage");
 						} else {
-							grabInfo(nInfo[2], true, false, nInfo[3], nInfo[0], nInfo[5], "prepend", reCache);
-							//console.log(nInfo[2]);
+							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache);
+							//console.log("Manga does not exists in localStorage");
+							//console.log(nNote[2]);
 						  // Update the app_version localStorage to current version
 							if (nArrayNames[nArrayNames.length - 1] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
 								setNewVersion = true;
@@ -223,7 +239,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	var translatorArray	= new Array();
 	var error 			= false;
 
-	if (infodata[1] == "error") { idCounter--; error = true; console.log("Error Parsing: " + infodata[3]); console.log("Error Message: " + infodata[2]); };
+	if (infodata[1] == "error") { idCounter--; error = true; console.log("Error Parsing: " + infodata[3]); console.log("Error Number: " + infodata[2]); console.log("Error Message: " + infodata[4]); };
 	if (infodata[3]) { var seriesLink 	= infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
 	if (infodata[5]) { var languageLink = infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
 	if (infodata[7]) { tagArray 		= infodata[7].split(", "); };

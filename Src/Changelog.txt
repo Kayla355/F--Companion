@@ -44,4 +44,4 @@
 - Started storing the generated html page in localstorage which means it will now load close to instantanious as it will no longer have to generate new entries from stored data at every load.
 - The menu will now always be shown at the top even when scrolling.
 - Added filtering the notifications.(Currently only works for tags)
-- Fixed an issue where the loadingtrial would stick around when an error loading a manga occured. (Hopefully for good this time...)
+- Fixed an issue where the loadingtrail would stick around when an error loading a manga occured. (Hopefully for good this time...)

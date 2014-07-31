@@ -142,16 +142,16 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				//console.log("Error: " + error);
 			}
 			if (error.status == "410") {
-				if (nseen == "new") {
-					var note = JSON.parse(localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"]);
-					note[0] = "old"
-					localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
-				}
+				var note = JSON.parse(localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"]);
+				note[0] = "old"
+				localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 			}
 			if (notifications) {
+				infoarray[0] = "infoarray"
 				infoarray[1] = "error";
 				infoarray[2] = error.status;
 				infoarray[3] = downloadurl;
+				infoarray[4] = error.statusText;
 				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache);
 			}
 		}
