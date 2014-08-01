@@ -10,11 +10,12 @@
 	var filterTimer;
 
   // Variables mapping what characters translates into what
-  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|\s&\s|\s+\s|\ |\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\☆|\★|\α|\×/gi;
+  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\☆|\★|\α|\×/gi;
 	var eMapped = {
 		" & ":"-",
 		" + ":"-",
 		" ":"-",
+		"&":"",
 		".":"",
 		"!":"",
 		"@":"",
