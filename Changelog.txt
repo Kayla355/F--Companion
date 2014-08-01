@@ -37,7 +37,10 @@
 - Renamed extension to F! Companion
 - Minor fixes to when a manga did not exist.
 
-// Version 0.3.4 (Un-released)
+// Verson 0.3.4
+- Quick fix to notifications not loading when certain characters where not filtered properly.
+
+// Version 0.3.5 (Un-released)
 - The icon will now say "DL or "Link", depending on what option you have set, when it is the action that will be taken when pressed.
 - Fixed an issue with removed(actually hidden...) items causing issues when loading in newer items at the top.
 - Added "endless" scrolling to the notifications, which means that it will now load older entries as you reach the bottom of the page.
