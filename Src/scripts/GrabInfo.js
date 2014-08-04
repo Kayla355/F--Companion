@@ -77,9 +77,13 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			var language 	= $(html).find(qLanguage).text();
 			var quant 		= $(html).find(qQuant).text().replace(" pages", "");
 			var description = $(html).find(qDesc).html();
-			var tags	 	= $(html).find('div#right div.wrap div:last-child div.right').text().slice(0, -2).replace(/ /g, ", ");
-
+			var	tags	 	= $(html).find('div#right div.wrap div:last-child div.right').text().slice(0, -2).replace(/ /g, ", ");
 			var imgCover 	= $(html).find('div#left div.wrap div.images a img.cover').attr('src');
+
+			var rTagsMapped = /dark, skin| monster, girl/gi;
+			var eTagsMapped = { "dark, skin":"dark skin", "monster, girl":"monster girl"  }
+
+			tags = tags.replace(rTagsMapped, function(matched) { return eTagsMapped[matched]; });
 
 			if (imgCover) {
 			  // Calculate new random page to show as sample

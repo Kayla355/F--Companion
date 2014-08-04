@@ -38,39 +38,13 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 		checkForValidUrl(tabId, tab);
 	});
 });
-	
-// Listen for any changes to the URL of any tab.
-chrome.tabs.onUpdated.addListener(function(tabId, tab, changeInfo) {
-	if (changeInfo.status === "complete") {
-		checkForValidUrl(tabId, changeInfo, tab);
-	}
-});
-
 
 // Called when the url of a tab changes.
 function checkForValidUrl(tabId, tab, changeInfo) {
-  // Get current tab info as well for comparisson incase a new tab was created and not selected
-	chrome.tabs.getSelected(function(currentTab) {
-	  // If the url is one of the following...
-		if (tab.url.match(/http:\/\/www.fakku.net\/(manga|doujinshi)\/.*/) && currentTab.id == tabId) {
-			// Temporary solution to excludes not working properly
-			if (tab.url.match(/http:\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
-				// Change browserAction to Notifications
-				if (localStorage["fakku_notes"] == "true") {
-					badgeUpdate("notes");
-					chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
-					chrome.browserAction.enable();
-				} else {
-					badgeUpdate("disabled");
-					chrome.browserAction.disable();
-				}
-			} else {
-				// Change browserAction to Download
-				badgeUpdate("download");
-				chrome.browserAction.setPopup({popup: "Dropdown.html"});
-				chrome.browserAction.enable();
-			}
-		} else {
+  // If the url is one of the following...
+	if (tab.url.match(/http:\/\/www.fakku.net\/(manga|doujinshi)\/.*/)) {
+		// Temporary solution to excludes not working properly
+		if (tab.url.match(/http:\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
 			// Change browserAction to Notifications
 			if (localStorage["fakku_notes"] == "true") {
 				badgeUpdate("notes");
@@ -80,8 +54,23 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 				badgeUpdate("disabled");
 				chrome.browserAction.disable();
 			}
+		} else {
+			// Change browserAction to Download
+			badgeUpdate("download");
+			chrome.browserAction.setPopup({popup: "Dropdown.html"});
+			chrome.browserAction.enable();
 		}
-	});
+	} else {
+		// Change browserAction to Notifications
+		if (localStorage["fakku_notes"] == "true") {
+			badgeUpdate("notes");
+			chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
+			chrome.browserAction.enable();
+		} else {
+			badgeUpdate("disabled");
+			chrome.browserAction.disable();
+		}
+	}
 };
 
 
