@@ -40,7 +40,7 @@
 // Version 0.3.4
 - Quick fix to notifications not loading when certain characters where not filtered properly.
 
-// Version 0.3.5 (Un-released)
+// Version 0.4.0 (Un-released)
 - The icon will now say "DL or "Link", depending on what option you have set, when it is the action that will be taken when pressed.
 - Fixed an issue with removed(actually hidden...) items causing issues when loading in newer items at the top.
 - Added "endless" scrolling to the notifications, which means that it will now load older entries as you reach the bottom of the page.
@@ -51,3 +51,5 @@
 - Fixed the "dark skin" and "monster girl" tags not appearing properly nor linking properly
 - The popups from clicking things like download or remove will now go away after a period of time rather than only when clicking somewhere else.
 - Added tooltips to tags. (Might redo these using something like jqueryui as it would give me more control over the styling.)
+- Updated to make use of the Fakku API for most things, making the loading of new mangas quite a bit faster.
+- Time will now be updated internally for when a manga was uploaded.

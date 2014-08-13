@@ -130,7 +130,7 @@ function fInput_rem () {
 function filter(event) {
 	clearTimeout(filterTimer)
 	filterTimer = setTimeout(function (event) {
-		var input = $('input#filterInput').val().split(/, | /);
+		var input = $('input#filterInput').val().toLowerCase().split(/, | /);
 
 		$('div.noteDiv-matched').attr('class', 'noteDiv');
 		$('div.noteDiv-filtered').attr('class', 'noteDiv');
@@ -141,7 +141,7 @@ function filter(event) {
 			var matched = 0;
 			var i = input.length;
 		  // Grab tags
-			$(div).find('div#right div.row-left-full a').each(function (i, val) { tagArray.push($(val).text()) });
+			$(div).find('div#right div.row-left-full a').each(function (i, val) { tagArray.push($(val).text().toLowerCase()) });
 		  // For each tag match & if matched then increase match count until the match count is the same as input length.
 		  // If the matched count and the input length is the same hide other divs
 			input.forEach(function (value) {
@@ -235,6 +235,7 @@ function checkCookies(reCache) {
 		  	if (reCache || localStorage["new_note"] == "true") {
 		  		$('body').css("opacity", "0.6");
 				$('div#float').show();
+				$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
 		  	};
 
 			var nArrayNames = JSON.parse(localStorage["n_array_names"]);
@@ -292,14 +293,16 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	var tagArray 		= new Array();
 	var artistArray		= new Array();
 	var translatorArray	= new Array();
+	var seriesArray		= new Array();
 	var error 			= false;
 
-	if (infodata[1] == "error") { idCounter--; error = true; console.log("Error Parsing: " + infodata[3]); console.log("Error Number: " + infodata[2]); console.log("Error Message: " + infodata[4]); };
-	if (infodata[3]) { var seriesLink 	= infodata[3].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
-	if (infodata[5]) { var languageLink = infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
-	if (infodata[7]) { tagArray 		= infodata[7].split(", "); };
-	if (infodata[4]) { artistArray 		= infodata[4].split(", "); };
-	if (infodata[6]) { translatorArray 	= infodata[6].split(", "); };
+	if (infodata[1]  == "error") { idCounter--; error = true; console.log("Error Parsing: " + infodata[3]); console.log("Error Number: " + infodata[2]); console.log("Error Message: " + infodata[4]); };
+	if (infodata[3]  && !error) { var seriesLink 	= infodata[3][0].attribute.replace(rMapped, function(matched) { return eMapped[matched]; }).toString().toLowerCase(); };
+	if (infodata[5]  && !error) { var languageLink = infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
+	if (infodata[7]  && !error) { tagArray 		= infodata[7] };
+	if (infodata[4]  && !error) { artistArray 		= infodata[4] };
+	if (infodata[6]  && !error) { translatorArray 	= infodata[6] };
+	if (infodata[3]  && !error) { seriesArray 		= infodata[3] };
 
   // Check if the stored html should be appended
 	if (idCounter == 0 && !reCache) {
@@ -307,6 +310,33 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		$('div#notes').append(JSON.parse(localStorage["html_content"]));
 	} 
 	idCounter++
+
+  // Update time
+	if (infodata[11] && !error) {
+		var nDate 		= Math.round(new Date().getTime()/1000);
+		var mDate 		= infodata[11];
+		var hoursDiff	= nDate - mDate;
+		var days		= Math.floor(hoursDiff / 86400);
+		var hours 		= Math.floor(hoursDiff / 3600);
+		var minutes 	= Math.ceil(hoursDiff / 60);
+		var timeSince	= [ {days: days, hours: hours, minutes: minutes} ]
+		var endText;
+
+		if (timeSince[0].days >= 1) {
+			nold = timeSince[0].days;
+			if (timeSince[0].days == 1) { endText = " day ago" } else { endText = " days ago" };
+		} else if (timeSince[0].hours >= 1) {
+			nold = timeSince[0].hours;
+			if (timeSince[0].days == 1) { endText = " hour ago" } else { endText = " hours ago" };
+		} else {
+			nold = timeSince[0].minutes;
+			if (timeSince[0].days <= 1) { endText = " minute ago" } else { endText = " minutes ago" };
+		}
+		nold = nold + endText;
+		if (pend == "append") {
+			$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-small div.right i').text(nold);
+		}
+	}
 
 	if (pend == "prepend" || reCache) {	
 
@@ -346,7 +376,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='content-name'></div>");
 				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
 				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + infodata[3] + "</a></div>");
+				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + seriesArray[0].attribute + "</a></div>");
 
 				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
 
@@ -362,47 +392,48 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 
 			// For each in array do...
 			  // Create Tags Link
+			  var tagCounter = 1;
 				tagArray.forEach(function(e) {
 				  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
-					var er = e.replace(rMapped, function(matched) {
+					var er = e.attribute.replace(rMapped, function(matched) {
 						return eMapped[matched];
 					}).toLowerCase()
-
+					tagCounter++
 				  // If last in array do not use ", "
 					if (tagArray[tagArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>");
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child a').attr("title", $('<div/>').html(e.replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-child('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
 					} else {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child a').attr("title", $('<div/>').html(e.replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-child('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
 					}
 				});
 			  // Create Artists Link"
 				artistArray.forEach(function(e) {
 				  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
-					var er = e.replace(rMapped, function(matched) {
+					var er = e.attribute.replace(rMapped, function(matched) {
 						return eMapped[matched];
 					}).toLowerCase()
 
 				  // If last in array do not use ", "
 					if (artistArray[artistArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>");
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
 					} else {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
 					}
 				});
 			  // Create Translators Link"
 				translatorArray.forEach(function(e) {
 				  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
-					var er = e.replace(rMapped, function(matched) {
+					var er = e.attribute.replace(rMapped, function(matched) {
 						return eMapped[matched];
 					}).toLowerCase()
 
 				  // If last in array do not use ", "
 					if (translatorArray[translatorArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>");
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
 					} else {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e + "</a>, ");
+						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
 					}
 				});
 			  // Description dropdown
@@ -440,7 +471,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	
 	// Run function that will attach Event Listeners to page
 	if (!error) {
-		attachEventListeners(idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray);
+		attachEventListeners(idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray);
 	}
 
   // If div position was set to prepend
@@ -463,10 +494,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	}
 };
 
-function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray) {
+function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray) {
   // Div actions
   	newTabLink(idCounter, href, "read-online");
-	newTabLink(idCounter, "series", seriesLink);
+	newTabLink(idCounter, "series", seriesLink, seriesArray[0].attribute_link);
 	newTabLink(idCounter, "", languageLink);
   // Mousedown Action
 	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
@@ -541,49 +572,49 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
   // Create Tags Link
 	tagArray.forEach(function(e) {
 	  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
-		var er = e.replace(rMapped, function(matched) {
+		var er = e.attribute.replace(rMapped, function(matched) {
 			return eMapped[matched];
 		}).toLowerCase()
 
 	  // If last in array do not use ", "
 		if (tagArray[tagArray.length - 1] == e) {
-			newTabLink(idCounter, "tags", er);
+			newTabLink(idCounter, "tags", er, e.attribute_link);
 		} else {
-			newTabLink(idCounter, "tags", er);
+			newTabLink(idCounter, "tags", er, e.attribute_link);
 		}
 	});
   // Create Artists Link"
 	artistArray.forEach(function(e) {
 	  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
-		var er = e.replace(rMapped, function(matched) {
+		var er = e.attribute.replace(rMapped, function(matched) {
 			return eMapped[matched];
 		}).toLowerCase()
 
 	  // If last in array do not use ", "
 		if (artistArray[artistArray.length - 1] == e) {
-			newTabLink(idCounter, "artists", er);
+			newTabLink(idCounter, "artists", er, e.attribute_link);
 		} else {
-			newTabLink(idCounter, "artists", er);
+			newTabLink(idCounter, "artists", er, e.attribute_link);
 		}
 	});
   // Create Translators Link"
 	translatorArray.forEach(function(e) {
 	  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
-		var er = e.replace(rMapped, function(matched) {
+		var er = e.attribute.replace(rMapped, function(matched) {
 			return eMapped[matched];
 		}).toLowerCase()
 
 	  // If last in array do not use ", "
 		if (translatorArray[translatorArray.length - 1] == e) {
-			newTabLink(idCounter, "translators", er);
+			newTabLink(idCounter, "translators", er, e.attribute_link);
 		} else {
-			newTabLink(idCounter, "translators", er);
+			newTabLink(idCounter, "translators", er, e.attribute_link);
 		}
 	});
 }
 
 // New Tab Link click action
-function newTabLink(idCounter, e, er) {
+function newTabLink(idCounter, e, er, link) {
 	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') a#' + er).click(function(event) {
 		if (event.button != 2) {
 			event.preventDefault();
@@ -604,7 +635,7 @@ function newTabLink(idCounter, e, er) {
 			if (e == "") {
 				openTab("http://www.fakku.net/" + er);
 			} else {
-				openTab("http://www.fakku.net/" + e + "/" + er);
+				openTab("http://www.fakku.net" + link);
 			}
 			
 		}
@@ -761,7 +792,6 @@ function updateNotes(reCache) {
 	//$('div.noteDiv-hidden').remove();
 	$('div#content').append('<div id="notes"></div>');
 	$('div#float').attr("class", "float-load");
-	$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
 	preCheckCookies(reCache);
 }
 

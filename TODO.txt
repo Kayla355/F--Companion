@@ -18,14 +18,13 @@
 	- Possibly add some way of telling when you have already downloaded/read a manga
 	- Add an internal timer to entries so they still update after they are no longer on the notifications page.
 	- Look into gathering info and such in the background to speed up pageloads(Had issues in the past). Maybe even pass it into the localstorage variable through the background script.
+	- Since the addition of the Fakku API possibly change to only use one script for downloading instead of two since all the extra information seems to be on the /read page as well.
 
 - Download series/artist
 	- Download everything when searching/browsing an artist
 
 - Clicked/Floating Text
-	- Remove the floating text after a period of time. Having to click it away might be seen as counterintuitive.
 	- Possibly disable all background elements while a floating text is active. To prevent accidentally clicking twice on the remove button.
-	- Fix loadingtrail appearing in the wrong location after an item was removed from the list
 
 - Filtering
 	- Possibly only match whole words.

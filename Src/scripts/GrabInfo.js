@@ -13,94 +13,56 @@ var infoarray		= new Array();
 function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl 		= "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
+		var currenturl 		= "http://api.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabInfo triggered from DropdownNotes");
-		var currenturl 		= downloadurl;
+		var currenturl 		= downloadurl.replace("www", "api");
 	} else {
-		var currenturl 		= "http://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
+		var currenturl 		= "http://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	}
 
 	$.ajax({     
 		type: "GET",		
 		url: currenturl,
-		dataType: "html",
+		dataType: "JSON",
 		async: false,
-		success: function(html) {
-		  // Fix for some issues when the domain is not included in the src link.
-			html.match(/.*src="\/.*">/g).forEach(function(m) {
-				mSecond = m.replace(/src="\//, 'http:\/\/www\.fakku\.net\/')
-				html = html.replace(m, mSecond);
-			});
+		success: function(data) {
+			var error;
+			var errorMessage;
+			var storedError;
 
-			//console.log("Grab Info Success");
-			//console.log(currenturl);
-
-			var qQuant
-			var qSeries
-			var qAuthorname
-			var qLanguage
-			var qTranslator
-			var qDesc
-
-			for (var i = 2; i <= 9; i++) {
-				switch ($(html).find('div#right div.wrap div:nth-child('+ i +') div.left').text()) {
-					case "Series":
-						qSeries 	= 'div#right div.wrap div:nth-child('+ i +') div.right';
-						break;
-					case "Artist":
-						qAuthorname = 'div#right div.wrap div:nth-child('+ i +') div.right';
-						break;
-					case "Translator":
-						qTranslator = 'div#right div.wrap div:nth-child('+ i +') div.right';
-						break;
-					case "Language":
-						qLanguage 	= 'div#right div.wrap div:nth-child('+ i +') div.right';
-						break;
-					case "Pages":
-						qQuant 		= 'div#right div.wrap div:nth-child('+ i +') div.right';
-						break;
-					case "Description":
-						qDesc 	= 'div#right div.wrap div:nth-child('+ i +') div.right';
-						break;
-				}
-			}
-
-			var error 		= $(html).find('div#error.message h3').text();
-			var manganame 	= $(html).find('div#right div.wrap div.content-name h1').text();
-
-			var series		= $(html).find(qSeries).text();
-			var authorname 	= $(html).find(qAuthorname).text();
-			var translator 	= $(html).find(qTranslator).text();
-			var language 	= $(html).find(qLanguage).text();
-			var quant 		= $(html).find(qQuant).text().replace(" pages", "");
-			var description = $(html).find(qDesc).html();
-			var	tags	 	= $(html).find('div#right div.wrap div:last-child div.right').text().slice(0, -2).replace(/ /g, ", ");
-			var imgCover 	= $(html).find('div#left div.wrap div.images a img.cover').attr('src');
-
-			var rTagsMapped = /dark, skin| monster, girl/gi;
-			var eTagsMapped = { "dark, skin":"dark skin", "monster, girl":"monster girl"  }
-
-			tags = tags.replace(rTagsMapped, function(matched) { return eTagsMapped[matched]; });
-
-			if (imgCover) {
-			  // Calculate new random page to show as sample
-				var imgSample	= imgCover.replace(/\/\d\d\d\./, function(n) {
-					var quantMax = Math.floor(quant - (quant / 2 / 2))
-					var quantMin = quant - quantMax;
-
-					n = Math.round((Math.random() * (quantMax - quantMin) + quantMin));;
-					
-					while (n.toString().length < 3) n = '0' + n;
-					
-					n = "/" + n + ".";
-					return n;
+			if (data.content == "") {
+				error = true;
+				$.ajax({     
+					type: "GET",		
+					url: currenturl.replace("api.", "www."),
+					dataType: "html",
+					async: false,
+					success: function(html) { 
+						errorMessage = $(html).find('div#error.message h3').text();
+						console.log("error message added");
+					},
+					error: function(error) {
+						storedError = error;
+					}
 				});
 			}
 
-			//if (description) { description = description.replace("<b>Description:</b>", "") };
+			if (!error) {
+				var manganame 	= data.content.content_name;
+				var series		= data.content.content_series;				//Array
+				var authorname 	= data.content.content_artists;				//Array
+				var translator 	= data.content.content_translators;			//Array
+				var language 	= data.content.content_language;
+				var quant 		= data.content.content_pages;
+				var description = data.content.content_description;
+				var	tags	 	= data.content.content_tags;				//Array
+				var imgCover 	= data.content.content_images.cover;
+				var imgSample	= data.content.content_images.sample;
+				var date 		= data.content.content_date;
+			}
 			
 			// console.log("pages: " + quant);
 			// console.log("name: " + manganame);
@@ -124,11 +86,17 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			infoarray[8] 	= description;
 			infoarray[9] 	= imgCover;
 			infoarray[10] 	= imgSample;
+			infoarray[11]	= date;
 
 			if (error) {
-				infoarray[1] = "error";
-				infoarray[2] = error;
-				infoarray[3] = downloadurl;
+				if (storedError) {
+					errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, storedError);
+					return;
+				} else {
+					infoarray[1] = "error";
+					infoarray[2] = errorMessage;
+					infoarray[3] = downloadurl;
+				}
 			}
 
 			if (notifications) {
@@ -141,26 +109,30 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 						
 		},
 		error: function(error) {
-			if (!notifications) {
-				msgError(error);
-				//console.log("Error: " + error);
-			}
-			if (error.status == "410") {
-				var note = JSON.parse(localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"]);
-				note[0] = "old"
-				localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
-			}
-			if (notifications) {
-				infoarray[0] = "infoarray"
-				infoarray[1] = "error";
-				infoarray[2] = error.status;
-				infoarray[3] = downloadurl;
-				infoarray[4] = error.statusText;
-				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache);
-			}
+			errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, error);
 		}
 	});
 };
+
+function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, error) {
+	if (!notifications) {
+		msgError(error);
+		//console.log("Error: " + error);
+	}
+	if (error.status == "410") {
+		var note = JSON.parse(localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"]);
+		note[0] = "old"
+		localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
+	}
+	if (notifications) {
+		infoarray[0] = "infoarray"
+		infoarray[1] = "error";
+		infoarray[2] = error.status;
+		infoarray[3] = downloadurl;
+		infoarray[4] = error.statusText;
+		notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache);
+	}
+}
 
 // Sends a message stating that the link information have been grabbed properly.
 function msgDocReadyInfo(ndownload) {
