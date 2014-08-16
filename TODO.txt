@@ -19,6 +19,7 @@
 	- Add an internal timer to entries so they still update after they are no longer on the notifications page.
 	- Look into gathering info and such in the background to speed up pageloads(Had issues in the past). Maybe even pass it into the localstorage variable through the background script.
 	- Since the addition of the Fakku API possibly change to only use one script for downloading instead of two since all the extra information seems to be on the /read page as well.
+	- Update the tag tooltips once fakku has added descriptions to the newer ones.
 
 - Download series/artist
 	- Download everything when searching/browsing an artist

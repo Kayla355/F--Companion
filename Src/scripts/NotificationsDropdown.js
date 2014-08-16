@@ -334,7 +334,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		}
 		nold = nold + endText;
 		if (pend == "append") {
-			$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-small div.right i').text(nold);
+			$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-small div.right i').text(nold);
 		}
 	}
 
@@ -355,40 +355,40 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 					$('div#content div#notes').prepend("<div class='noteDiv'></div>");
 				}
 				// Left Div Content
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') ').append("<div id='left'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left').append("<div class='wrap'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap').append("<div class='images'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') ').append("<div id='left'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left').append("<div class='wrap'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap').append("<div class='images'></div>");
 				
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[9] + "' itemprop='image'>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[10] + "' itemprop='image'>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[9] + "' itemprop='image'>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[10] + "' itemprop='image'>");
 
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap').append("<ul></ul>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul').append("<li></li>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul li:nth-child(1)').append("<a id='read-online' href='#'>Read Online</a>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap').append("<ul></ul>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul').append("<li></li>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul li:nth-of-type(1)').append("<a id='read-online' href='#'>Read Online</a>");
 					
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul').append("<li></li>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap ul li:nth-child(2)').append("<a id='download' href='#'>Download</a>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul').append("<li></li>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul li:nth-of-type(2)').append("<a id='download' href='#'>Download</a>");
 			
 			// Right Div Content
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') ').append("<div id='right'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right').append("<div class='wrap'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div id='hidediv'><button title='Remove' class='close'>Close</button></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='content-name'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + seriesArray[0].attribute + "</a></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') ').append("<div id='right'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right').append("<div class='wrap'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div id='hidediv'><button title='Remove' class='close'>Close</button></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='content-name'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + seriesArray[0].attribute + "</a></div>");
 
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
 
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row-small'></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='hr></div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div id='description' class='row-left-full' itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row-small'></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='hr></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div id='description' class='row-left-full' itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
 
 			// For each in array do...
 			  // Create Tags Link
@@ -401,11 +401,11 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 					tagCounter++
 				  // If last in array do not use ", "
 					if (tagArray[tagArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-child('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-of-type('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
 					} else {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-child('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-of-type('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
 					}
 				});
 			  // Create Artists Link"
@@ -417,9 +417,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 
 				  // If last in array do not use ", "
 					if (artistArray[artistArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
 					} else {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
 					}
 				});
 			  // Create Translators Link"
@@ -431,35 +431,35 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 
 				  // If last in array do not use ", "
 					if (translatorArray[translatorArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
 					} else {
-						$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
 					}
 				});
 			  // Description dropdown
-				if ($('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full').height() > 32) {
+				if ($('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full').height() > 32) {
 
 				  // Create dropdown button
-				  	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full').css("height", "32px")
-				  	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
-				  	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
-				  	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
+				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full').css("height", "32px")
+				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
+				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
+				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
 
 					}
 			  // Fix left div height
-					$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images').css("height", $('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right').height() - 60);
-					$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#left div.wrap div.images img').css("height", "100%");
+					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images').css("height", $('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right').height() - 60);
+					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images img').css("height", "100%");
 
 			// End of create 
 
 		  // Change class to hidden if true
 			if (nshown == "hidden") {
-				$('div#content div#notes div.noteDiv:nth-child('+ idCounter +')').attr("class", "noteDiv-hidden");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +')').attr("class", "noteDiv-hidden");
 			}
 		  // Remove unused Divs
-		  	if ($('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').text() == "") {
-		  		$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').html("<a>Not Specified</a>");
-		  		$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div.row:nth-child(4) div.right span').attr("class", "japanese");
+		  	if ($('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').text() == "") {
+		  		$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').html("<a>Not Specified</a>");
+		  		$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').attr("class", "japanese");
 		  	}
 		} // End of create divs
 	} // End of if prepend statement
@@ -500,7 +500,7 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 	newTabLink(idCounter, "series", seriesLink, seriesArray[0].attribute_link);
 	newTabLink(idCounter, "", languageLink);
   // Mousedown Action
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
 		if ($(event.target.parentNode).height() > 32) {
 		  // Hide dropdown
 			$(event.target.parentNode).css("height", "32");
@@ -528,7 +528,7 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 
 // Download click action
   // Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') a#download').mousedown(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mousedown(function(event) {
 		event.preventDefault();
 		var x=event.clientX; 
 		var y=event.clientY;
@@ -543,12 +543,12 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 		$('div#float').css("top", y + offsetY - 10);
 		popupDL("downloadClicked");
 	});
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') a#download').mouseup(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mouseup(function(event) {
 		event.preventDefault();
 		requestDownload(href);
 	});
   // Hide/Remove div click action
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') button.close').mousedown(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') button.close').mousedown(function(event) {
 		event.preventDefault();
 		var x=event.clientX; 
 		var y=event.clientY;
@@ -564,7 +564,7 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 		$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
 		popupDL("removeClicked")
 																});
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') button.close').mouseup(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') button.close').mouseup(function(event) {
 			event.preventDefault();
 		});
 
@@ -615,17 +615,17 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 
 // New Tab Link click action
 function newTabLink(idCounter, e, er, link) {
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') a#' + er).click(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#' + er).click(function(event) {
 		if (event.button != 2) {
 			event.preventDefault();
 		}
 	});
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') a#' + er).mousedown(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#' + er).mousedown(function(event) {
 		if (event.button != 2) {
 			event.preventDefault();
 		}
 	});
-	$('div#content div#notes div.noteDiv:nth-child('+ idCounter +') a#' + er).mouseup(function(event) {
+	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#' + er).mouseup(function(event) {
 		if (event.button != 2) {
 			event.preventDefault();
 			if (er == "read-online") {
