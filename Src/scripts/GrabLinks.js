@@ -57,9 +57,7 @@ function grabLinks(downloadurl, notifications, ndownload) {
 
 // Sends a message stating that the links have been grabbed properly.
 function msgDocReadyLink(ndownload) {
-	chrome.runtime.sendMessage({msg: "docReadyLink", data: linkarray}, function(response) {
-	//console.log("Message Sent: DocReadyLink");
-	});
+	chrome.runtime.sendMessage({msg: "docReadyLink", data: linkarray});
 	if (ndownload) {
 		nDocReadyLink(linkarray);
 	}
@@ -68,7 +66,5 @@ function msgDocReadyLink(ndownload) {
 // Sends a message stating that there was an error when grabbing the links.
 // This is used by GrabInfo as well.
 function msgError(error) {
-	chrome.runtime.sendMessage({msg: "Error", errorMessage: error}, function(response) {
-	//console.log("Message Sent: Error");
-	});
+	chrome.runtime.sendMessage({msg: "Error", errorMessage: error});
 }

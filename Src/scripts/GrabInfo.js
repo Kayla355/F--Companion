@@ -136,9 +136,7 @@ function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nsho
 
 // Sends a message stating that the link information have been grabbed properly.
 function msgDocReadyInfo(ndownload) {
-		chrome.runtime.sendMessage({msg: "docReadyInfo", data: infoarray}, function(response) {
-		//console.log("Message Sent: DocReadyInfo");
-		});
+		chrome.runtime.sendMessage({msg: "docReadyInfo", data: infoarray});
 		if (ndownload) {
 			nDocReadyInfo(infoarray);
 		}

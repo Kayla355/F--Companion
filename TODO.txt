@@ -1,4 +1,4 @@
-- Saving manga information to text file.(Pretty sure this can't be done :( )
+- Saving manga information to text file.(Status: Might be doable )
 	- Could potentially grab the manga information for mangas downloaded this session and generate an html page that can be saved manually.
 	- Actually might be able to make the html page save automatically with each download. Revived!
 

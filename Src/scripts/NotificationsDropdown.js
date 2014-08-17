@@ -201,17 +201,15 @@ $.queue = {
 function checkCookies(reCache) {
 	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results) {
-			$('div#loading').remove();
 			$('div#menu').hide();
+			$('div#notes').hide();
 			$('html').css("height", "20px");
-			$('html').css("width", "200px");
+			$('html').css("width", "220px");
 			$('body').css("height", "20px");
-			$('body').css("width", "200px");
+			$('body').css("width", "220px");
 			$('div#content').css("width", "200px");
 		  	$('div#content').css("height", "20px");
-			$('div#content').append("<center><b></b></center>");
-			$('div#content center').css("width", "200px");
-			$('div#content center').css("height", "20px");
+			$('div#content').append("<center style='width: 200px; height:20px'><b></b></center>");
 			$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
 		} else {
 		  // Check if version saved in localStorage matches current version. Also force recache if html_content does not exist.
@@ -296,7 +294,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	var seriesArray		= new Array();
 	var error 			= false;
 
-	if (infodata[1]  == "error") { idCounter--; error = true; console.log("Error Parsing: " + infodata[3]); console.log("Error Number: " + infodata[2]); console.log("Error Message: " + infodata[4]); };
+	if (infodata[1]  == "error") { idCounter--; error = true; console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); console.log("%cError Number: %c" + infodata[2], "color: red;", "color: black;"); console.log("%cError Message: %c" + infodata[4], "color: red;", "color: black;"); };
 	if (infodata[3]  && !error) { var seriesLink 	= infodata[3][0].attribute.replace(rMapped, function(matched) { return eMapped[matched]; }).toString().toLowerCase(); };
 	if (infodata[5]  && !error) { var languageLink = infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
 	if (infodata[7]  && !error) { tagArray 		= infodata[7] };
@@ -761,9 +759,7 @@ function refreshNotes() {
 	$('div#float').show();
 
   // Message that prompts the grabNotes to start. 
-	chrome.runtime.sendMessage({msg: "GrabNotes", from: "nDropdown"}, function(response) {
-		//console.log("Message Sent: GrabNotes ");
-	});
+	chrome.runtime.sendMessage({msg: "GrabNotes", from: "nDropdown"});
 	
 }
 // Listen for message that says refresh complete

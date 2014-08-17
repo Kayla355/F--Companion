@@ -6,84 +6,111 @@
 	</head>
 <body>
 	<div id="content">
-		<div id="left">
-			<div class="mainDiv">
-				Incognito Downloads:
-			</div>
-			<div class="mainDiv">
-				Fakku Notifications:
-			</div>
-			<div class="mainDiv">
-				Update Interval:
-			</div>
-			<div class="mainDiv">
-				Icon Interaction:
-			</div>
-			<div class="mainDiv">
-				File Conflicts:
-			</div>
-			<div class="mainDiv">
-				Folder Name:
-			</div>
-			<div class="mainDiv">
-				Filename Structure:
+		<div class="tabs">
+			<ul class="tab-links">
+				<li class="active"><a href="#general">General</a></li>
+				<li><a href="#fakku">Fakku Specific</a></li>
+				<li><a href="#changelog">Changelog</a></li>
+			</ul>
+
+
+			<div class="tab-content">
+			  <!-- General Options -->
+				<div id="general" class="tab active">
+					<div id="left">
+						<div class="mainDiv">
+							Incognito Downloads:
+						</div>
+						<div class="mainDiv">
+							Icon Interaction:
+						</div>
+						<div class="mainDiv">
+							File Conflicts:
+						</div>
+						<div class="mainDiv">
+							Folder Name:
+						</div>
+						<div class="mainDiv">
+							Filename Structure:
+						</div>
+					</div>
+					<div id="right">
+						<div class="checkbox">
+							<input title="Removes the downloaded file from the Download History upon completion. Recommended as the download history will be spammed otherwise" type="checkbox" id="incognitomode" value="incognitomode">
+						</div>
+						<div class="dropdown">
+							<select title="What happens when the button is clicked." id="buttonaction">
+								<option value="download">Download</option>
+								<option value="links">Show Links</option>
+							</select>
+						</div>
+						<div class="dropdown">
+							<select title="What should be the default action when a file already exists." id="conflictaction">
+								<option value="uniquify">Rename</option>
+								<option value="overwrite">Overwrite</option>
+							<!--
+								<option value="prompt">Ask me</option>
+								<option value="skip">Skip</option>
+							-->
+							</select>
+						</div>
+						<div class="dropdown">
+							<select title="Name of the folder that is created." id="foldername">
+								<option value="manganame">Manga Name</option>
+								<option value="series">Series Name</option>
+								<option value="authorname">Author Name</option>
+								<option value="translator">Translator</option>
+							</select>
+						</div>
+						<div class="dropdown">
+							<select title="How to construct the filename out of the information gathered." id="filedivtype">
+								<option value="manganame">Manga Name</option>
+								<option value="series">Series Name</option>
+								<option value="authorname">Author Name</option>
+								<option value="language">Language</option>
+								<option value="translator">Translator</option>
+								<option value="pagenumber">Page Number</option>
+								<option value="tags">Tags</option>
+							</select>
+							<button id="addFileDiv">Add</button>
+							<div id="removeColumn"></div>
+						</div>
+					</div>
+					
+					<div id="fileColumns"></div>
+					<div id="fileName"></div>
+				</div>
+
+			  <!-- Fakku Specific Options -->
+				<div id="fakku" class="tab">
+					<div id="left">
+						<div class="mainDiv">
+							Fakku Notifications:
+						</div>
+						<div class="mainDiv">
+							Update Interval:
+						</div>
+					</div>
+					<div id="right">
+						<div class="checkbox">
+							<input title="Notifies you when a new upload has a tag that you subscribe to and shows infromation about the upload to you when the icon is clicked. (Requires cookies be enabled)" type="checkbox" id="fakkunotes"><i style="font-size: 11px; position: relative; bottom: 2px;">(Requires Cookies)</i>
+						</div>
+						<div class="textbox">
+							<input title="Time between checking for updates in Minutes" type="number" id="updateinterval"><i style="font-size: 13px; position: relative;"> Minutes</i>
+						</div>
+					</div>
+				</div>
+
+			  <!-- Changelog -->
+				<div id="changelog" class="tab">
+					<div id="changelog-content"></div>
+				</div>
 			</div>
 		</div>
-		<div id="right">
-			<div class="checkbox">
-				<input title="Removes the downloaded file from the Download History upon completion. Recommended as the download history will be spammed otherwise" type="checkbox" id="incognitomode" value="incognitomode">
-			</div>
-			<div class="checkbox">
-				<input title="Notifies you when a new upload has a tag that you subscribe to and shows infromation about the upload to you when the icon is clicked. (Requires cookies be enabled)" type="checkbox" id="fakkunotes"><i style="font-size: 11px; position: relative; bottom: 2px;">(Requires Cookies)</i>
-			</div>
-			<div class="textbox">
-				<input title="Time between checking for updates in Minutes" type="number" id="updateinterval"><i style="font-size: 13px; position: relative;"> Minutes</i>
-			</div>
-			<div class="dropdown">
-				<select title="What happens when the button is clicked." id="buttonaction">
-					<option value="download">Download</option>
-					<option value="links">Show Links</option>
-				</select>
-			</div>
-			<div class="dropdown">
-				<select title="What should be the default action when a file already exists." id="conflictaction">
-					<option value="uniquify">Rename</option>
-					<option value="overwrite">Overwrite</option>
-				<!--
-					<option value="prompt">Ask me</option>
-					<option value="skip">Skip</option>
-				-->
-				</select>
-			</div>
-			<div class="dropdown">
-				<select title="Name of the folder that is created." id="foldername">
-					<option value="manganame">Manga Name</option>
-					<option value="series">Series Name</option>
-					<option value="authorname">Author Name</option>
-					<option value="translator">Translator</option>
-				</select>
-			</div>
-			<div class="dropdown">
-				<select title="How to construct the filename out of the information gathered." id="filedivtype">
-					<option value="manganame">Manga Name</option>
-					<option value="series">Series Name</option>
-					<option value="authorname">Author Name</option>
-					<option value="language">Language</option>
-					<option value="translator">Translator</option>
-					<option value="pagenumber">Page Number</option>
-					<option value="tags">Tags</option>
-				</select>
-				<button id="addFileDiv">Add</button>
-				<div id="removeColumn"></div>
-			</div>
-		</div>
-		
-		<div id="fileColumns"></div>
-		<div id="fileName"></div>
+
 		<div id="status" class="save"></div>
 		<div>
 			<button id="save" class="save">Save</button>
-			<a id="changelog" href="changelog.txt">Change Log</a>
 		</div>
 	</div>
 </body>

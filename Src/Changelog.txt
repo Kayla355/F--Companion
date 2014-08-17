@@ -53,3 +53,4 @@
 - Added tooltips to tags. (Might redo these using something like jqueryui as it would give me more control over the styling.)
 - Updated to make use of the Fakku API for most things, making the loading of new mangas quite a bit faster.
 - Time will now be updated internally for when a manga was uploaded.
+- Updated the look of the options page.
