@@ -54,3 +54,4 @@
 - Updated to make use of the Fakku API for most things, making the loading of new mangas quite a bit faster.
 - Time will now be updated internally for when a manga was uploaded.
 - Updated the look of the options page.
+- There will now be a popup asking if you would like to force a recache when a major version change has been detected.

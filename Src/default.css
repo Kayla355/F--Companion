@@ -181,7 +181,22 @@ div
 	height: 28px;
 	top: 50%;
 	left: 45%;
-	padding: 10px;
+	padding: 10px !important;
+}
+.float-recache
+{
+	width: 315px;
+	top: 6%;
+	left: 2%;
+	padding: 10px !important;
+}
+.float-recache a
+{
+	padding: 0px 3px 0px 7px;
+}
+.float-recache #options
+{
+	padding-top: 5px;
 }
 #hidediv
 {

@@ -2,7 +2,7 @@
 function save_options() {
 // Global Variables
 var fileChild = $('div#fileColumns').children().length;
-var alertCheck = new Boolean();
+var alertCheck;
 	// Check if there is atleast one Page Number in File Structure else alert popup.
 	for (var i = 1; i <= fileChild; i++) {
 		if($('div#fileColumns div:nth-child('+ i +')').text() == "Page Number") {

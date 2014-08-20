@@ -3,6 +3,7 @@
 	var docReadyLink	= false;
 	var docReadyInfo	= false;
 	var errorReport		= false;
+	var askRecache		= false;
 	var errorMsg 		= null;
 	var idCounter		= 0;
 	var idCounterTemp	= 0;
@@ -221,8 +222,9 @@ function checkCookies(reCache) {
 					var oldVersion		= localStorage["app_version"].replace(/\./g, "");
 					var diff 			= currentVersion.slice(1, 2) - oldVersion.slice(1, 2);
 
-					if (diff >= 1) {
-						reCache = true;
+					if (diff >= 1 || diff <= -1) {
+						//reCache = true;
+						askRecache = true;
 					}
 				}
 			}
@@ -232,6 +234,7 @@ function checkCookies(reCache) {
 		  	$('div#content').css("height", "600px");
 		  	if (reCache || localStorage["new_note"] == "true") {
 		  		$('body').css("opacity", "0.6");
+		  		$('div#float').empty();
 				$('div#float').show();
 				$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
 		  	};
@@ -252,17 +255,17 @@ function checkCookies(reCache) {
 						}
 						//console.log(nNote);
 					  // Check if manga exists and reCache is false
-						if (nInfo && !reCache && nNote[0] == "old") {
+						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(Content does not exist.|404|410)/)) {
 							notificationInfo(JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache);
 							//console.log("Manga exists in localStorage");
 						} else {
 							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache);
 							//console.log("Manga does not exists in localStorage");
 							//console.log(nNote[2]);
-						  // Update the app_version localStorage to current version
-							if (nArrayNames[nArrayNames.length - 1] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
-								setNewVersion = true;
-							}
+						}
+					  // Update the app_version localStorage to current version
+						if (nArrayNames[nArrayNames.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
+							setNewVersion = true;
 						}
 			        };
 			        $.queue.add(doBind, this);
@@ -279,6 +282,7 @@ function checkCookies(reCache) {
 
 function preCheckCookies (reCache) {
 	$('body').css("opacity", "0.6");
+	$('div#float').empty();
 	$('div#float').show();
 	//checkCookies(reCache);
 	setTimeout(function () {checkCookies(reCache)}, 20); // Workaround to get the loadingtrail to appear instead of nothing
@@ -317,7 +321,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		var days		= Math.floor(hoursDiff / 86400);
 		var hours 		= Math.floor(hoursDiff / 3600);
 		var minutes 	= Math.ceil(hoursDiff / 60);
-		var timeSince	= [ {days: days, hours: hours, minutes: minutes} ]
+		var timeSince	= [ {days: days, hours: hours, minutes: minutes} ];
 		var endText;
 
 		if (timeSince[0].days >= 1) {
@@ -534,12 +538,13 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 		//console.log(x + ", " + y);
 		//console.log($(document).scrollTop());
 		$('body').css("opacity", "0.6");
+		$('div#float').empty();
 		$('div#float').show();
 		$('div#float').prepend("<div id='loading' class='loadingtrail'></div>");
-		$('div#float b').text("Preparing Download");
+		$('div#float').append("<b>Preparing Download</b>");
 		$('div#float').css("left", x + 15);
 		$('div#float').css("top", y + offsetY - 10);
-		popupDL("downloadClicked");
+		popup("downloadClicked");
 	});
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mouseup(function(event) {
 		event.preventDefault();
@@ -554,13 +559,14 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 		//console.log(x + ", " + y);
 		//console.log($(document).scrollTop());
 		$('body').css("opacity", "0.6");
+		$('div#float').empty();
 		$('div#float').show();
-		$('div#float b').text("Removed");
+		$('div#float').append("<b>Removed</b>");
 		$('div#float').css("left", x - 90);
 		$('div#float').css("top", y + offsetY);
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = localStorage[href.replace("http://www.fakku.net", "") + "--note"].replace("shown", "hidden");
 		$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
-		popupDL("removeClicked")
+		popup("removeClicked")
 																});
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') button.close').mouseup(function(event) {
 			event.preventDefault();
@@ -649,8 +655,8 @@ function notesDone(pend) {
 	$('body').css("opacity", "1");
 	$('div#float').hide();
 	$('div#float').attr("class", "");
-	$('div#float b').text("");
-	$('div#loading').remove();
+
+	$('div#float').empty();
 	//console.log("loadingtrail should be gone");
 
 	if (pend == "prepend") {
@@ -664,7 +670,30 @@ function notesDone(pend) {
 	if (localStorage["new_note"] == "false") {
 		storeContent();
 	}
-	
+
+  // Recommend Recache Float
+  	if (askRecache) {
+  		askRecache = false;
+  		//localStorage["app_version"] = chrome.app.getDetails().version;
+
+  		$('div#float').empty();
+		$('div#float').prepend("<div id='askRecache'></div>");
+		$('div#float div#askRecache').append('<div id="text"><b>A Major change in versions have been detected!</b><br> It is recommended that you perform a recache to avoid problems. <br><br>Do you wish to perform this action now?</div>');
+		$('div#float div#askRecache').append('<div id="options" class="option"><a id="yes" href="#">Yes</a><a id="no" href="#">No</a></div>');
+
+		$('div#float').attr("class", "float-recache");
+
+		$('div#content').css("width", "545px");
+	  	$('body').css("opacity", "0.6");
+		$('div#float').show();
+
+		$('div#float div#askRecache div#options #yes').on('click', function(event) {
+			event.preventDefault();
+			updateNotes(true);
+		});
+
+		popup("askRecache");
+  	}
 
   // Workaround for scrollbar not showing
 	// setTimeout(function() {
@@ -682,14 +711,17 @@ function storeContent() {
 }
 
 // Function for removing the popup download box
-function popupDL(from) {
-	if (from != "downloadClicked") {
+function popup(from) {
+
+	var avoidID = ["download", "hidediv", "askRecache", "float", "loadingtrial", "loadingtrailnotes", "yes"];
+
+	if (from != "downloadClicked" && from != "askRecache") {
 		var popup = setTimeout(removePopup, 750);
 	}
 
 	$(document).on("click", function(event) {
 		event.preventDefault();
-		if(event.target.id != 'download' && event.target.id != 'hidediv') {
+		if($.inArray(event.target.id, avoidID) === -1 && $.inArray(event.target.parentNode.id, avoidID) === -1) {
 			removePopup();
 		}
 	});
@@ -697,9 +729,9 @@ function popupDL(from) {
 	function removePopup() {
 		$('body').css("opacity", "1");
 		$('div#float').hide();
+		$('div#float').empty();
 		$('div#float').css("left", null);
 		$('div#float').css("top", null);
-		$('div#float b').text("");
 		$(document).off("click");
 		clearTimeout(popup);
 
@@ -749,6 +781,8 @@ function msgError(error) {
 
 // Function to check for new notifications
 function refreshNotes() {
+	$('div#float').empty();
+
 	$('div#float').attr("class", "float-load");
 	$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
 
@@ -768,8 +802,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		$('body').css("opacity", "1");
 		$('div#float').hide();
 		$('div#float').attr("class", "");
-		$('div#float b').text("");
-		$('div#loading').remove();
+
+		$('div#float').empty();
 		var t = JSON.parse(localStorage["n_array_names"]); t = JSON.parse(localStorage[t[0]]);
 		if (t[0] == "new") {
 			updateNotes(false);
@@ -808,8 +842,8 @@ function startDownload() {
 		errorReport = false;
 		//console.log("Error message recieved from the server");
 		//console.log(errorMsg.status + ": " + errorMsg.statusText);
-		$('div#loading').remove();
-		$('div#float b').text("Error recieved from server, try again.");
+		$('div#float').empty();
+		$('div#float').append("<b>Error recieved from server, try again.</b>");
 		$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
 		return;
 
@@ -820,9 +854,9 @@ function startDownload() {
 		docReadyLink = false;
 		docReadyInfo = false;
 		//console.log("sent message to background");
-		$('div#loading').remove();
-		$('div#float b').text("Success! Downloading Now.");
-		popupDL("downloading");
+		$('div#float').empty();
+		$('div#float').append("<b>Success! Downloading Now.</b>");
+		popup("downloading");
 
 		return;
 	}

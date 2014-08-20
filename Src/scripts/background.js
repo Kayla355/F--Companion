@@ -78,10 +78,10 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 
 
 var optionsArray 	= new Array();
-var incognitoMode 	= new Boolean();
 var linkarray 		= new Array();
 var infoarray 		= new Array();
-var nDropdown		= new Boolean();
+var incognitoMode;
+var nDropdown;
 var checkNotes;
 
 // Fetch request for options array.
@@ -196,6 +196,7 @@ function notificationCheck() {
 
 								  // Checks if the info stored has an unknown error and if true recache the note.
 									if (iExists[1] == "error" && !iExists[2].toString().match(/(Content does not exist.|404|410)/)) {
+										console.log("item Removed");
 										nExists = ""; 
 										iExists = "";
 										localStorage.removeItem(localStorage[nStorage + "--note"]);
