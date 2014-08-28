@@ -4,6 +4,7 @@
 	var docReadyInfo	= false;
 	var errorReport		= false;
 	var askRecache		= false;
+	var userRefresh		= false;
 	var errorMsg 		= null;
 	var idCounter		= 0;
 	var idCounterTemp	= 0;
@@ -307,7 +308,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	if (infodata[3]  && !error) { seriesArray 		= infodata[3] };
 
   // Check if the stored html should be appended
-	if (idCounter == 0 && !reCache) {
+	if (idCounter == 0 && !reCache && !userRefresh) {
 	  // Append content to body
 		$('div#notes').append(JSON.parse(localStorage["html_content"]));
 	} 
@@ -380,8 +381,12 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + seriesArray[0].attribute + "</a></div>");
 
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='" + infodata[5] + "'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
-
+				if (infodata[5] == "english") {
+					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='english'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
+				} else {
+					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='non-english'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
+				}
+				
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
@@ -472,7 +477,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	}
 	
 	// Run function that will attach Event Listeners to page
-	if (!error) {
+	if (!error && !userRefresh || !error && pend == "prepend") {
 		attachEventListeners(idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray);
 	}
 
@@ -486,9 +491,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		note[0] = "old"
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
-	//console.log("idCountr: "+idCounter)
-	//console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
-	//console.log("errorCount: "+errorCount)
+	// console.log("idCountr: "+idCounter)
+	// console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
+	// console.log("errorCount: "+errorCount)
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
 	if (idCounter == JSON.parse(localStorage["n_array_names"]).length - errorCount) {
 		notesDone(pend);
@@ -703,6 +708,8 @@ function notesDone(pend) {
 
 // Function that saves the content of the notes div in localstorage
 function storeContent() {
+  // To avoid problems if I need to call this function manually for debugging.
+	localStorage["new_note"] = "false";
   // Store content in localStorage
 	var htmlContent = $('div#notes').html(); 
 	htmlContent = htmlContent.replace("	", "")
@@ -792,6 +799,8 @@ function refreshNotes() {
   	$('div#float').css("left", "45%");
 	$('div#float').show();
 
+	userRefresh = true;
+
   // Message that prompts the grabNotes to start. 
 	chrome.runtime.sendMessage({msg: "GrabNotes", from: "nDropdown"});
 	
@@ -817,7 +826,7 @@ function updateNotes(reCache) {
 	idCounterTemp 	= 0;
 	errorCount 		= 0;
 
-	$('div#notes').remove();
+	if (!userRefresh) { $('div#notes').remove(); }
 	//$('div.noteDiv').remove();
 	//$('div.noteDiv-hidden').remove();
 	$('div#content').append('<div id="notes"></div>');
