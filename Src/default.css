@@ -279,13 +279,13 @@ a:hover
 	color: #009F07;
 	font-weight: 700;
 }
-.japanese a 
+.non-english a, .japanese a /* Remove japanese for release version  */
 {
 	color: #9D0A0A;
 	font-weight: 700;
 }
 
-// Loading Animation
+/* Loading Animation */
 
 div .loadingtrail, 
 div .loadingtrailnotes {
