@@ -94,7 +94,8 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					return;
 				} else {
 					infoarray[1] = "error";
-					infoarray[2] = errorMessage;
+					infoarray[2] = "411";
+					infoarray[4] = errorMessage;
 					infoarray[3] = downloadurl;
 				}
 			}

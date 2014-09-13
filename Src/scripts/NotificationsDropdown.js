@@ -12,7 +12,7 @@
 	var filterTimer;
 
   // Variables mapping what characters translates into what
-  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|dark\sskin|monster\sskin|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\☆|\★|\α|\×/gi;
+  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|dark\sskin|monster\sskin|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\/|\[|\]|\☆|\★|\α|\×/gi;
 	var eMapped = {
 		" & ":"-",
 		" + ":"-",
@@ -29,6 +29,9 @@
 		"%":"",
 		"?":"",
 		":":"",
+		"/":"",
+		"[":"",
+		"]":"",
 	  // Specials
 		"☆":"byb",
 		"★":"bzb",
@@ -191,6 +194,7 @@ $.queue = {
             return 0;
         }
         next[0].call(next[1] || window);
+        //console.log("Left of Queue: " + $.queue._queue.length);
         return next[2];
     },
     clear: function() {
@@ -256,7 +260,7 @@ function checkCookies(reCache) {
 						}
 						//console.log(nNote);
 					  // Check if manga exists and reCache is false
-						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(Content does not exist.|404|410)/)) {
+						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
 							notificationInfo(JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache);
 							//console.log("Manga exists in localStorage");
 						} else {
@@ -343,13 +347,14 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 
 	if (pend == "prepend" || reCache) {	
 
+		idCounterTemp = idCounter;
+
 	  // Adds "--info" to the end of the href string to match the name in localStorage
 		localStorage[href.replace("http://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
 			
 	  // Create divs
 		if (infodata[2] && !error) {
 			//idCounter++
-			idCounterTemp = idCounter;
 				// Main Div
 				if (idCounter == 1 || pend == "append") {
 					$('div#content div#notes').append("<div class='noteDiv'></div>");
@@ -491,7 +496,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		note[0] = "old"
 		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
-	// console.log("idCountr: "+idCounter)
+	// console.log("idCounter: "+idCounter)
 	// console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
 	// console.log("errorCount: "+errorCount)
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)

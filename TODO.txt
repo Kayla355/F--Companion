@@ -29,3 +29,7 @@
 
 - Filtering
 	- Possibly only match whole words.
+
+- Other
+	- Remove older mangas causing errors, because of removal, from the arraylist.
+	- Look into why generating links is slow, if it's checking the server for no reason on errors or some other issue is causing it. (not sure if fixed from fixing related issue)

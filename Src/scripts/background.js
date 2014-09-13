@@ -195,8 +195,8 @@ function notificationCheck() {
 									var iExists = JSON.parse(localStorage[nStorage + "--info"]);
 
 								  // Checks if the info stored has an unknown error and if true recache the note.
-									if (iExists[1] == "error" && !iExists[2].toString().match(/(Content does not exist.|404|410)/)) {
-										console.log("item Removed");
+									if (iExists[1] == "error" && !iExists[2].toString().match(/(404|410|411)/)) {
+										console.log("Item containing Unknown error removed & re-checking.");
 										nExists = ""; 
 										iExists = "";
 										localStorage.removeItem(localStorage[nStorage + "--note"]);
