@@ -118,6 +118,7 @@ function fInput_add () {
 		event.preventDefault();
 		$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
 		$('div#menu div.right').on("keyup", function() { filter() })
+
 		fInput_rem();
 	});
 }
@@ -128,6 +129,10 @@ function fInput_rem () {
 		event.preventDefault();
 		$('input#filterInput').remove();
 		$('div#menu div.right').off("keyup")
+
+		$('div.noteDiv-matched').attr('class', 'noteDiv');
+		$('div.noteDiv-filtered').attr('class', 'noteDiv');
+
 		fInput_add();
 	});
 }
@@ -141,26 +146,28 @@ function filter(event) {
 		$('div.noteDiv-filtered').attr('class', 'noteDiv');
 
 	  // For each noteDiv
-		$('div.noteDiv').each(function (index, div) {
-			var tagArray = new Array();
-			var matched = 0;
-			var i = input.length;
-		  // Grab tags
-			$(div).find('div#right div.row-left-full a').each(function (i, val) { tagArray.push($(val).text().toLowerCase()) });
-		  // For each tag match & if matched then increase match count until the match count is the same as input length.
-		  // If the matched count and the input length is the same hide other divs
-			input.forEach(function (value) {
-				if (tagArray.toString().match(value)) {
-					matched++
-					if (matched == i) {
-						$(div).attr('class', 'noteDiv-matched');
-					}
-				};
-			})
-			matched = 0;
-		});
-	  // Hide the divs that were not matched
-		$('div.noteDiv').attr('class', 'noteDiv-filtered');
+		if (input[0] != "") {
+			$('div.noteDiv').each(function (index, div) {
+				var tagArray = new Array();
+				var matched = 0;
+				var i = input.length;
+			  // Grab tags
+				$(div).find('div#right div.row-left-full a').each(function (i, val) { tagArray.push($(val).text().toLowerCase()) });
+			  // For each tag match & if matched then increase match count until the match count is the same as input length.
+			  // If the matched count and the input length is the same hide other divs
+				input.forEach(function (value) {
+					if (tagArray.toString().match(value)) {
+						matched++
+						if (matched == i) {
+							$(div).attr('class', 'noteDiv-matched');
+						}
+					};
+				})
+				matched = 0;
+			});
+		  // Hide the divs that were not matched
+			$('div.noteDiv').attr('class', 'noteDiv-filtered');
+		}
 	}, 50)
 }
 
@@ -715,6 +722,11 @@ function notesDone(pend) {
 function storeContent() {
   // To avoid problems if I need to call this function manually for debugging.
 	localStorage["new_note"] = "false";
+
+  // Make sure no Divs are being filtered, as it would cause issues when loading the stored content.
+	$('div.noteDiv-matched').attr('class', 'noteDiv');
+	$('div.noteDiv-filtered').attr('class', 'noteDiv');
+
   // Store content in localStorage
 	var htmlContent = $('div#notes').html(); 
 	htmlContent = htmlContent.replace("	", "")
@@ -803,6 +815,15 @@ function refreshNotes() {
   	$('div#float').css("top", "50%");
   	$('div#float').css("left", "45%");
 	$('div#float').show();
+
+  // Make sure no Divs are being filtered, as it would cause issues when loading in new notes.
+  // Check if filter input box exists, if yes simulate click to remove it.
+  	if ($('input#filterInput')) {
+		$('input#filterInput').val("");
+
+		$('div.noteDiv-matched').attr('class', 'noteDiv');
+		$('div.noteDiv-filtered').attr('class', 'noteDiv');
+  	};
 
 	userRefresh = true;
 

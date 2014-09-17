@@ -42,7 +42,6 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					async: false,
 					success: function(html) { 
 						errorMessage = $(html).find('div#error.message h3').text();
-						console.log("error message added");
 					},
 					error: function(error) {
 						storedError = error;
