@@ -133,7 +133,7 @@ if (localStorage["fakku_notes"] == "true") {
 function notificationCheck() {
 	if (localStorage["fakku_notes"] == "true") {
 	  // Clear Console
-	  console.clear();
+	  //console.clear();
 	  // Check if Login cookie has expired.
 		chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 			if (!results) {
@@ -153,28 +153,28 @@ function notificationCheck() {
 
 					// Keep track of the names of the arrays
 						var nArrayNames = new Array();
-						var nLength = $(html).find("div.right-content.notifications div.notification").length;
-
+						var nLength = $(html).find("div.notification").length;
+						
 					// Find each notification
-						$(html).find("div.right-content.notifications div.notification").each(function(e) {
+						$(html).find("div.notification").each(function(e) {
 							e++;
 
 							var nTagName = new Array();
 							var nTagHref = new Array();
 						// Find each <a> under the current notification
-							$(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a").each(function(n) {
+							$(html).find("div.notification:nth-child(" + e + ") a").each(function(n) {
 								n++;
 								
-								var tagCheck = $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").attr("href");
+								var tagCheck = $(html).find("div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").attr("href");
 							// If the <a> is a tag link add it to the tag array
 								if (tagCheck.match(/\/tags\/.*/)) {
-									nTagName.push($(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").text());
+									nTagName.push($(html).find("div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").text());
 								}
 							});
 
-							var nName 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").text();
-							var nHref 	= "http://www.fakku.net" + $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
-							var nOld	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") i").text();
+							var nName 	= $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").text();
+							var nHref 	= "http://www.fakku.net" + $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
+							var nOld	= $(html).find("div.notification:nth-child(" + e + ") i").text();
 
 							// console.log("Checked Notifications");
 							// console.log("Name: " + nName);
@@ -184,7 +184,7 @@ function notificationCheck() {
 							// console.log("Tag Link: " + JSON.stringify(nTagHref));
 
 							var noteArray 	= new Array();
-							var nStorage 	= $(html).find("div.right-content.notifications div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
+							var nStorage 	= $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
 
 						// Assigning states for old/new & hidden/shown
 						  // Check if localStorage entry exists
