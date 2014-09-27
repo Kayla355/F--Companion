@@ -22,6 +22,14 @@ var alertCheck;
 				var select = document.getElementById("updateinterval");
 				localStorage["update_interval"] = select.value;
 
+			// Entries loaded per page
+				var select = document.getElementById("entryamount");
+				var entryamount = select.children[select.selectedIndex].value;
+				if (entryamount != localStorage["entry_amount"]) {
+					localStorage["html_content"] = "";
+				}
+				localStorage["entry_amount"] = entryamount;
+
 			// What happens when the icon is pressed
 				var select = document.getElementById("buttonaction");
 				var buttonaction = select.children[select.selectedIndex].value;
@@ -102,6 +110,20 @@ var fileChild = fileSArray.length - 1;
 	}
 	var select = document.getElementById("updateinterval");
 		select.value = updateinterval;
+
+// Restore Entires per page
+	var entryamount = localStorage["entry_amount"];
+	if (!entryamount) {
+		return;
+	}
+	var select = document.getElementById("entryamount");
+	for (var i = 0; i < select.children.length; i++) {
+		var child = select.children[i];
+		if (child.value == entryamount) {
+			child.selected = "true";
+			break;
+		}
+	}
 
 // Restore Button Action Status
 	var buttonaction = localStorage["button_action"];

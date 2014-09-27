@@ -183,6 +183,15 @@ div
 	left: 45%;
 	padding: 10px !important;
 }
+.float-loadmore
+{
+	width: 28px;
+	height: 28px;
+	bottom: 50%;
+	left: 45%;
+	padding: 10px !important;
+	position: fixed !important;
+}
 .float-recache
 {
 	width: 315px;
@@ -197,6 +206,15 @@ div
 .float-recache #options
 {
 	padding-top: 5px;
+}
+#load-more
+{
+	display: none;
+	position: relative;
+	margin-right: auto;
+	margin-left: auto;
+	width: 50%;
+	text-align: center;
 }
 #hidediv
 {

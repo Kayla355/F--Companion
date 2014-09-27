@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 var infoarray		= new Array();
 
 // Function for grabbing manga information
-function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache) {
+function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
 		var currenturl 		= "http://api.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
@@ -89,7 +89,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 
 			if (error) {
 				if (storedError) {
-					errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, storedError);
+					errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, storedError);
 					return;
 				} else {
 					infoarray[1] = "error";
@@ -100,7 +100,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			}
 
 			if (notifications) {
-				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache);
+				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore);
 				//console.log("notifications Grabinfo triggered");
 			} else {
 				msgDocReadyInfo(ndownload);
@@ -109,12 +109,12 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 						
 		},
 		error: function(error) {
-			errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, error);
+			errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, error);
 		}
 	});
 };
 
-function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, error) {
+function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, error) {
 	if (!notifications) {
 		msgError(error);
 		//console.log("Error: " + error);
@@ -130,7 +130,7 @@ function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nsho
 		infoarray[2] = error.status;
 		infoarray[3] = downloadurl;
 		infoarray[4] = error.statusText;
-		notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache);
+		notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore);
 	}
 }
 

@@ -9,7 +9,10 @@
 	var idCounter		= 0;
 	var idCounterTemp	= 0;
 	var errorCount		= 0;
+	var perPage 		= localStorage["entry_amount"];
+	var perPageMore 	= 1;
 	var filterTimer;
+
 
   // Variables mapping what characters translates into what
   	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|dark\sskin|monster\sskin|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\/|\[|\]|\☆|\★|\α|\×/gi;
@@ -102,6 +105,9 @@ $('a#refresh').mouseup(function(event) { event.preventDefault(); });
 
 $('a#recache').mousedown(function(event) { event.preventDefault(); updateNotes(true); });
 $('a#recache').mouseup(function(event) { event.preventDefault(); });
+
+$('a#loadmore').mousedown(function(event) { event.preventDefault(); loadMore(); });
+$('a#loadmore').mouseup(function(event) { event.preventDefault(); });
 
 $('a#filter').on("mousedown", function(event) {
 	event.preventDefault();
@@ -211,7 +217,7 @@ $.queue = {
 };
 
 // Check if Login cookie has expired.
-function checkCookies(reCache) {
+function checkCookies(reCache, loadmore) {
 	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results) {
 			$('div#menu').hide();
@@ -243,18 +249,34 @@ function checkCookies(reCache) {
 
 		  // Gather and create notifications 
 		  	$('div#content').css("width", "545px");
-		  	$('div#content').css("height", "600px");
-		  	if (reCache || localStorage["new_note"] == "true") {
+		  	//$('div#content').css("height", "600px");
+		  	if (reCache || localStorage["new_note"] == "true" || loadmore) {
 		  		$('body').css("opacity", "0.6");
 		  		$('div#float').empty();
 				$('div#float').show();
 				$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
 		  	};
 
-			var nArrayNames = JSON.parse(localStorage["n_array_names"]);
+		  	var nArrayNames = JSON.parse(localStorage["n_array_names"]);
+		  	var doArray 	= new Array();
+
+		  	if (perPage == "all") {
+		  		doArray = nArrayNames;
+		  	} else {
+		  		parsePerPage = parseInt(perPage) - 1;
+		  		var perPageMax 	= perPageMore + parsePerPage;
+
+		  		while (perPageMore <= perPageMax) {
+			  		var ni = perPageMore - 1;
+			  		doArray.push(nArrayNames[ni]);
+			  		perPageMore++
+		  		}
+		  	}
+			localStorage["notes_done_amount"] = doArray.length;
+
 			var new_nArrayNames = new Array();
 		  // For each arrayname in localstorage
-			nArrayNames.forEach(function(name) {
+			doArray.forEach(function(name) {
 				loadNote(name, false);
 			});
 			function loadNote(name, bypass) {
@@ -268,10 +290,10 @@ function checkCookies(reCache) {
 						//console.log(nNote);
 					  // Check if manga exists and reCache is false
 						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
-							notificationInfo(JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache);
+							notificationInfo(JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore);
 							//console.log("Manga exists in localStorage");
 						} else {
-							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache);
+							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore);
 							//console.log("Manga does not exists in localStorage");
 							//console.log(nNote[2]);
 						}
@@ -292,16 +314,16 @@ function checkCookies(reCache) {
 	});
 }
 
-function preCheckCookies (reCache) {
+function preCheckCookies (reCache, loadmore) {
 	$('body').css("opacity", "0.6");
 	$('div#float').empty();
 	$('div#float').show();
 	//checkCookies(reCache);
-	setTimeout(function () {checkCookies(reCache)}, 20); // Workaround to get the loadingtrail to appear instead of nothing
+	setTimeout(function () {checkCookies(reCache, loadmore)}, 20); // Workaround to get the loadingtrail to appear instead of nothing
 }
 
 // Function waiting for the information from GrabInfo
-function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
+function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, loadmore) {
 
   // Variables
 	var tagArray 		= new Array();
@@ -352,7 +374,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 		}
 	}
 
-	if (pend == "prepend" || reCache) {	
+	if (pend == "prepend" || reCache || loadmore) {	
 
 		idCounterTemp = idCounter;
 
@@ -507,8 +529,13 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache) {
 	// console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
 	// console.log("errorCount: "+errorCount)
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
-	if (idCounter == JSON.parse(localStorage["n_array_names"]).length - errorCount) {
-		notesDone(pend);
+  	var extra = 0;
+  	if (loadmore) {
+  		extra = perPageMore - parseInt(localStorage["notes_done_amount"]) - 1;
+  	}
+
+	if (idCounter == parseInt(localStorage["notes_done_amount"]) - errorCount + extra) {
+		notesDone(pend, loadmore, errorCount);
 		//console.log("notesDone triggered");
 	}
 };
@@ -664,12 +691,17 @@ function newTabLink(idCounter, e, er, link) {
 }
 
 // Function that is run when all notes have been created
-function notesDone(pend) {
+function notesDone(pend, loadmore, errorCount) {
 	chrome.browserAction.setBadgeText({text: ""});
 	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
 	localStorage["badge_number"] = 0;
+
+	while ($('div.noteDiv').length  > perPage - errorCount && !loadmore) {
+		$('div.noteDiv:nth-of-type('+ $('div.noteDiv').length +')').remove()
+	}
 	
 	$('body').css("opacity", "1");
+	$('div#load-more').show();
 	$('div#float').hide();
 	$('div#float').attr("class", "");
 
@@ -684,7 +716,7 @@ function notesDone(pend) {
 		localStorage["app_version"] = chrome.app.getDetails().version;
 	}
 
-	if (localStorage["new_note"] == "false") {
+	if (localStorage["new_note"] == "false" && !loadmore) {
 		storeContent();
 	}
 
@@ -851,6 +883,7 @@ function updateNotes(reCache) {
 	idCounter		= 0;
 	idCounterTemp 	= 0;
 	errorCount 		= 0;
+	perPageMore 	= 1;
 
 	if (!userRefresh) { $('div#notes').remove(); }
 	//$('div.noteDiv').remove();
@@ -858,6 +891,11 @@ function updateNotes(reCache) {
 	$('div#content').append('<div id="notes"></div>');
 	$('div#float').attr("class", "float-load");
 	preCheckCookies(reCache);
+}
+
+function loadMore() {
+	$('div#float').attr("class", "float-loadmore");
+	preCheckCookies(false, true);
 }
 
 // Function that requests the download links from the other scripts
