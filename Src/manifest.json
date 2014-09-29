@@ -3,7 +3,7 @@
 
   "name": "F! Companion Dev",
   "description": "F! Companion lets you download all pages of a manga at once or just view the links to them.",
-  "version": "0.4.0.10",
+  "version": "0.4.0.11",
   "icons": { "256": "images/icon-256.png"},
   "options_page": "Options.html",
   "background": { "scripts": ["scripts/background.js", "scripts/jquery-2.0.3.min.js"] },

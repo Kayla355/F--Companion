@@ -433,20 +433,19 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 
 			// For each in array do...
 			  // Create Tags Link
-			  var tagCounter = 1;
 				tagArray.forEach(function(e) {
 				  // Replaces certain characters defined in "eMapped" and creates a lowercase string out of it
 					var er = e.attribute.replace(rMapped, function(matched) {
 						return eMapped[matched];
 					}).toLowerCase()
-					tagCounter++
+
 				  // If last in array do not use ", "
 					if (tagArray[tagArray.length - 1] == e) {
 						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-of-type('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:last-child').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
 					} else {
 						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:nth-of-type('+ tagCounter +')').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
+						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:last-child').attr("title", $('<div/>').html(e.attribute.toLowerCase().replace(rTagDescMapped, function(matched) { return eTagDescMapped[matched] })).text());
 					}
 				});
 			  // Create Artists Link"
