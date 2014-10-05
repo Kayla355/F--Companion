@@ -73,7 +73,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			// console.log("description: " + description);
 			// console.log("cover: " + imgCover);
 			// console.log("sample: " + imgSample);
-			
+
 			infoarray[0] 	= "infoarray";
 			infoarray[1] 	= quant;
 			infoarray[2] 	= manganame;

@@ -329,16 +329,18 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	var tagArray 		= new Array();
 	var artistArray		= new Array();
 	var translatorArray	= new Array();
-	var seriesArray		= new Array();
+	var seriesArray = [{attribute: "Not Specified", attribute_link: "/none"}]
 	var error 			= false;
 
-	if (infodata[1]  == "error") { idCounter--; error = true; console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); console.log("%cError Number: %c" + infodata[2], "color: red;", "color: black;"); console.log("%cError Message: %c" + infodata[4], "color: red;", "color: black;"); };
-	if (infodata[3]  && !error) { var seriesLink 	= infodata[3][0].attribute.replace(rMapped, function(matched) { return eMapped[matched]; }).toString().toLowerCase(); };
-	if (infodata[5]  && !error) { var languageLink = infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
-	if (infodata[7]  && !error) { tagArray 		= infodata[7] };
-	if (infodata[4]  && !error) { artistArray 		= infodata[4] };
-	if (infodata[6]  && !error) { translatorArray 	= infodata[6] };
-	if (infodata[3]  && !error) { seriesArray 		= infodata[3] };
+	if (infodata[1] == "error") { idCounter--; error = true; console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); console.log("%cError Number: %c" + infodata[2], "color: red;", "color: black;"); console.log("%cError Message: %c" + infodata[4], "color: red;", "color: black;"); };
+	if (infodata[3] && !error)  { seriesArray = infodata[3] };
+	if (infodata[5] && !error)  { var languageLink = infodata[5].replace(rMapped, function(matched) { return eMapped[matched]; }).toLowerCase(); };
+	if (infodata[7] && !error)  { tagArray 			= infodata[7] };
+	if (infodata[4] && !error)  { artistArray 		= infodata[4] };
+	if (infodata[6] && !error)  { translatorArray 	= infodata[6] };
+
+	var seriesName = seriesArray[0].attribute;
+	var seriesLink = seriesArray[0].attribute.replace(rMapped, function(matched) { return eMapped[matched]; }).toString().toLowerCase(); 
 
   // Check if the stored html should be appended
 	if (idCounter == 0 && !reCache && !userRefresh) {
@@ -352,21 +354,22 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 		var nDate 		= Math.round(new Date().getTime()/1000);
 		var mDate 		= infodata[11];
 		var hoursDiff	= nDate - mDate;
-		var days		= Math.floor(hoursDiff / 86400);
-		var hours 		= Math.floor(hoursDiff / 3600);
-		var minutes 	= Math.ceil(hoursDiff / 60);
-		var timeSince	= [ {days: days, hours: hours, minutes: minutes} ];
+		var timeSince	= {
+				days: Math.floor(hoursDiff / 86400),
+				hours: Math.floor(hoursDiff / 3600),
+				minutes: Math.ceil(hoursDiff / 60)
+			};
 		var endText;
 
-		if (timeSince[0].days >= 1) {
-			nold = timeSince[0].days;
-			if (timeSince[0].days == 1) { endText = " day ago" } else { endText = " days ago" };
-		} else if (timeSince[0].hours >= 1) {
-			nold = timeSince[0].hours;
-			if (timeSince[0].days == 1) { endText = " hour ago" } else { endText = " hours ago" };
+		if (timeSince.days >= 1) {
+			nold = timeSince.days;
+			if (timeSince.days == 1) { endText = " day ago" } else { endText = " days ago" };
+		} else if (timeSince.hours >= 1) {
+			nold = timeSince.hours;
+			if (timeSince.days == 1) { endText = " hour ago" } else { endText = " hours ago" };
 		} else {
-			nold = timeSince[0].minutes;
-			if (timeSince[0].days <= 1) { endText = " minute ago" } else { endText = " minutes ago" };
+			nold = timeSince.minutes;
+			if (timeSince.days <= 1) { endText = " minute ago" } else { endText = " minutes ago" };
 		}
 		nold = nold + endText;
 		if (pend == "append") {
@@ -413,7 +416,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='content-name'></div>");
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
 				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + seriesArray[0].attribute + "</a></div>");
+				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + seriesName + "</a></div>");
 
 				if (infodata[5] == "english") {
 					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='english'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
