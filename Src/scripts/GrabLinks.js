@@ -13,38 +13,30 @@ var linkarray 		= new Array();
 function grabLinks(downloadurl, notifications, ndownload) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl = "https://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
+		var currenturl = "https://api.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabLinks triggered from DropdownNotes");
-		var currenturl = downloadurl + "/read";
+		var currenturl = downloadurl.replace("www", "api") + "/read";
 	} else {
-		var currenturl = "https://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
+		var currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	}
 
 	$.ajax({     
 		type: "GET",
 		url: currenturl,
-		dataType: "html",
+		dataType: "JSON",
 		async: false,
-		success: function(html) {
+		success: function(data) {
 		//console.log("GrabLinks Success");
-			var ext 	= html.match(/:\/\/t.fakku.net\/.*\/images\/.*/).toString().slice(-6).slice(0, -2);
-			var imgURL 	= "https" + html.match(/:\/\/t.fakku.net\/.*\/images\//) + "001" + ext;
 
-			var quant = parseInt(JSON.parse(html.match(/window\.params\.thumbs = \[.*\];/).toString().replace("window.params.thumbs = ", "").replace(";","")).length, 10);
-			
-
+			linkarray = [];
 			linkarray[0] = "linkarray";
-			linkarray[quant + 1] = ext;
-			for (var i = 1; i <= quant; i++) {
-				var str = '' + i;
-				while (str.length < 3) str = '0' + str;
-				var copypasta = ((imgURL.replace("001", str)));
-				linkarray[i] = copypasta;
-
-			}
+			$.each(data.pages, function(i, data) {
+				linkarray.push(data.image);
+			});
+			linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4));
 
 			msgDocReadyLink(ndownload);
 		},

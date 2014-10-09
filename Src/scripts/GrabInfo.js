@@ -61,8 +61,14 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				var imgCover 	= data.content.content_images.cover;
 				var imgSample	= data.content.content_images.sample;
 				var date 		= data.content.content_date;
+
+			  // Check if http:// or https:// is included in the link. Newer links don't have them included while older ones do.
+				if (!imgCover.match(/http/)) {
+					imgCover = "https:" + imgCover;
+					imgSample = "https:" + imgSample;
+				}
 			}
-			
+
 			// console.log("pages: " + quant);
 			// console.log("name: " + manganame);
 			// console.log("series: " + series);

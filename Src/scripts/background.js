@@ -33,6 +33,9 @@
 	if (localStorage["badge_number"] == undefined) {
 		localStorage["badge_number"] = 0;
 	}
+	if (localStorage["http_to_https"] == undefined) {
+		localStorage["http_to_https"] = "true";
+	}
 
 // Listen for change of active tab.
 chrome.tabs.onActivated.addListener(function(activeInfo) {
@@ -273,7 +276,20 @@ function notificationCheck() {
 							//console.log(i + " : " + name);
 							if ($.inArray(name, new_nArrayNames) === -1) new_nArrayNames.push(name);
 						});
-						
+
+					  // If conversion of localstorage links from http to https has not been done.
+					  // This is done because Fakku has changed all links from http to https and the localstorage links still have http in them.
+						if (localStorage["http_to_https"] == "true") {
+							$.each(new_nArrayNames, function(i, data) {
+								var http = JSON.parse(localStorage[data]);
+								if (http[2].match(/http:/)) {
+									http[2] = http[2].replace("http:", "https:");
+								}
+								localStorage[data] = JSON.stringify(http);
+							});
+							localStorage["http_to_https"] = "false";
+						}
+
 						localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
 						//console.log(localStorage["n_array_names"]);
 
