@@ -45,9 +45,9 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 // Called when the url of a tab changes.
 function checkForValidUrl(tabId, tab, changeInfo) {
   // If the url is one of the following...
-	if (tab.url.match(/http:\/\/www.fakku.net\/(manga|doujinshi)\/.*/)) {
+	if (tab.url.match(/https:\/\/www.fakku.net\/(manga|doujinshi)\/.*/)) {
 		// Temporary solution to excludes not working properly
-		if (tab.url.match(/http:\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
+		if (tab.url.match(/https:\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
 			// Change browserAction to Notifications
 			if (localStorage["fakku_notes"] == "true") {
 				badgeUpdate("notes");
@@ -138,7 +138,7 @@ function notificationCheck() {
 	  // Clear Console
 	  //console.clear();
 	  // Check if Login cookie has expired.
-		chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
+		chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
 			if (!results) {
 				badgeUpdate("error");
 				recursiveNote(1000);
@@ -149,7 +149,7 @@ function notificationCheck() {
 			  // Ajax Function to get the subscriptions
 				$.ajax({
 					type: "GET",
-					url: "http://www.fakku.net/subscriptions",
+					url: "https://www.fakku.net/subscriptions",
 					dataType: "html",
 					async: false,
 					success: function(html) {
@@ -176,7 +176,7 @@ function notificationCheck() {
 							});
 
 							var nName 	= $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").text();
-							var nHref 	= "http://www.fakku.net" + $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
+							var nHref 	= "https://www.fakku.net" + $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
 							var nOld	= $(html).find("div.notification:nth-child(" + e + ") i").text();
 
 							// console.log("Checked Notifications");

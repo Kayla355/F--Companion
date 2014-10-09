@@ -3,7 +3,7 @@
 
   "name": "F! Companion Dev",
   "description": "F! Companion lets you download all pages of a manga at once or just view the links to them.",
-  "version": "0.4.0.12",
+  "version": "0.4.0.13",
   "icons": { "256": "images/icon-256.png"},
   "options_page": "Options.html",
   "background": { "scripts": ["scripts/background.js", "scripts/jquery-2.0.3.min.js"] },
@@ -13,7 +13,7 @@
 	"tabs", 
   "downloads", 
   "cookies", 
-  "http://www.fakku.net/*"
+  "https://www.fakku.net/*"
   ],
 
   "browser_action": {
@@ -22,7 +22,7 @@
   },
   "content_scripts": [
 		{
-			"matches": ["http://www.fakku.net/doujinshi/*", "http://www.fakku.net/manga/*"],
+			"matches": ["https://www.fakku.net/doujinshi/*", "https://www.fakku.net/manga/*"],
 			"js": ["scripts/jquery-2.0.3.min.js", "scripts/GrabLinks.js", "scripts/GrabInfo.js"]
 		}
 	]

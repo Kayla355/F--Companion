@@ -13,13 +13,13 @@ var infoarray		= new Array();
 function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl 		= "http://api.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
+		var currenturl 		= "https://api.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabInfo triggered from DropdownNotes");
 		var currenturl 		= downloadurl.replace("www", "api");
 	} else {
-		var currenturl 		= "http://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
+		var currenturl 		= "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	}
 
@@ -120,9 +120,9 @@ function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nsho
 		//console.log("Error: " + error);
 	}
 	if (error.status == "410") {
-		var note = JSON.parse(localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"]);
+		var note = JSON.parse(localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"]);
 		note[0] = "old"
-		localStorage[downloadurl.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
+		localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
 	if (notifications) {
 		infoarray[0] = "infoarray"

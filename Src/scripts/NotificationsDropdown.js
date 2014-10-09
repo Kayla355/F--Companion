@@ -100,14 +100,11 @@
 	}
 
 // Create clickable menu
-$('a#refresh').mousedown(function(event) { event.preventDefault(); refreshNotes(); });
-$('a#refresh').mouseup(function(event) { event.preventDefault(); });
+$('a#refresh').on("click", function(event) { event.preventDefault(); refreshNotes(); });
 
-$('a#recache').mousedown(function(event) { event.preventDefault(); updateNotes(true); });
-$('a#recache').mouseup(function(event) { event.preventDefault(); });
+$('a#recache').on("click", function(event) { event.preventDefault(); updateNotes(true); });
 
-$('a#loadmore').mousedown(function(event) { event.preventDefault(); loadMore(); });
-$('a#loadmore').mouseup(function(event) { event.preventDefault(); });
+$('a#loadmore').on("click", function(event) { event.preventDefault(); loadMore(); });
 
 $('a#filter').on("mousedown", function(event) {
 	event.preventDefault();
@@ -218,7 +215,7 @@ $.queue = {
 
 // Check if Login cookie has expired.
 function checkCookies(reCache, loadmore) {
-	chrome.cookies.get({url: "http://www.fakku.net", name: "fakku_sid"}, function(results) {
+	chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results) {
 			$('div#menu').hide();
 			$('div#notes').hide();
@@ -229,7 +226,7 @@ function checkCookies(reCache, loadmore) {
 			$('div#content').css("width", "200px");
 		  	$('div#content').css("height", "20px");
 			$('div#content').append("<center style='width: 200px; height:20px'><b></b></center>");
-			$('div#content center b').html("Cookie expired, please <a href='http://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
+			$('div#content center b').html("Cookie expired, please <a href='https://www.fakku.net/login' style='text-decoration: underline; color: blue;' target='_blank'>Login</a>");
 		} else {
 		  // Check if version saved in localStorage matches current version. Also force recache if html_content does not exist.
 			if (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"] || !localStorage["html_content"]) {
@@ -284,13 +281,13 @@ function checkCookies(reCache, loadmore) {
 					var self = this, doBind = function() {
 						var nNote = JSON.parse(localStorage[name]);
 						var nInfo;
-						if (localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]) {
-							nInfo = JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]); 
+						if (localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]) {
+							nInfo = JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]); 
 						}
 						//console.log(nNote);
 					  // Check if manga exists and reCache is false
 						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
-							notificationInfo(JSON.parse(localStorage[nNote[2].replace("http://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore);
+							notificationInfo(JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore);
 							//console.log("Manga exists in localStorage");
 						} else {
 							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore);
@@ -382,7 +379,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 		idCounterTemp = idCounter;
 
 	  // Adds "--info" to the end of the href string to match the name in localStorage
-		localStorage[href.replace("http://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
+		localStorage[href.replace("https://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
 			
 	  // Create divs
 		if (infodata[2] && !error) {
@@ -523,9 +520,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
   	}
   // If new change to old to indicate that the entry has been seen
 	if (nseen == "new") {
-		var note = JSON.parse(localStorage[href.replace("http://www.fakku.net", "") + "--note"]);
+		var note = JSON.parse(localStorage[href.replace("https://www.fakku.net", "") + "--note"]);
 		note[0] = "old"
-		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = JSON.stringify(note);
+		localStorage[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
 	// console.log("idCounter: "+idCounter)
 	// console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
@@ -610,7 +607,7 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 		$('div#float').append("<b>Removed</b>");
 		$('div#float').css("left", x - 90);
 		$('div#float').css("top", y + offsetY);
-		localStorage[href.replace("http://www.fakku.net", "") + "--note"] = localStorage[href.replace("http://www.fakku.net", "") + "--note"].replace("shown", "hidden");
+		localStorage[href.replace("https://www.fakku.net", "") + "--note"] = localStorage[href.replace("https://www.fakku.net", "") + "--note"].replace("shown", "hidden");
 		$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
 		popup("removeClicked")
 																});
@@ -679,13 +676,13 @@ function newTabLink(idCounter, e, er, link) {
 		if (event.button != 2) {
 			event.preventDefault();
 			if (er == "read-online") {
-				er = e.replace("http://www.fakku.net/", "");;
+				er = e.replace("https://www.fakku.net/", "");;
 				e  = "";
 			}
 			if (e == "") {
-				openTab("http://www.fakku.net/" + er);
+				openTab("https://www.fakku.net/" + er);
 			} else {
-				openTab("http://www.fakku.net" + link);
+				openTab("https://www.fakku.net" + link);
 			}
 			
 		}

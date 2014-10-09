@@ -13,13 +13,13 @@ var linkarray 		= new Array();
 function grabLinks(downloadurl, notifications, ndownload) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl = "http://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
+		var currenturl = "https://www.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabLinks triggered from DropdownNotes");
 		var currenturl = downloadurl + "/read";
 	} else {
-		var currenturl = "http://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
+		var currenturl = "https://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	}
 
@@ -31,7 +31,7 @@ function grabLinks(downloadurl, notifications, ndownload) {
 		success: function(html) {
 		//console.log("GrabLinks Success");
 			var ext 	= html.match(/:\/\/t.fakku.net\/.*\/images\/.*/).toString().slice(-6).slice(0, -2);
-			var imgURL 	= "http" + html.match(/:\/\/t.fakku.net\/.*\/images\//) + "001" + ext;
+			var imgURL 	= "https" + html.match(/:\/\/t.fakku.net\/.*\/images\//) + "001" + ext;
 
 			var quant = parseInt(JSON.parse(html.match(/window\.params\.thumbs = \[.*\];/).toString().replace("window.params.thumbs = ", "").replace(";","")).length, 10);
 			
