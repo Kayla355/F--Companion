@@ -15,7 +15,7 @@
 
 
   // Variables mapping what characters translates into what
-  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|dark\sskin|monster\sskin|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\/|\[|\]|\☆|\★|\α|\×/gi;
+  	var rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|dark\sskin|monster\sskin|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\;|\/|\[|\]|\☆|\★|\α|\×|\Ω/gi;
 	var eMapped = {
 		" & ":"-",
 		" + ":"-",
@@ -32,6 +32,7 @@
 		"%":"",
 		"?":"",
 		":":"",
+		";":"",
 		"/":"",
 		"[":"",
 		"]":"",
@@ -40,6 +41,7 @@
 		"★":"bzb",
 		"α":"bab",
 		"×":"b-b",
+		"Ω":"937",
 	  // Special cases (hate inconsistencies...)
 	  	"The iDOLM@STER":"the-idolmaster",
 	  	"The iDOLM@STER Cinderella Girls":"the-idolmster-cinderella-girls",
@@ -174,7 +176,7 @@ function filter(event) {
 	}, 50)
 }
 
-checkCookies(); // Run checkCookies function
+checkCookies(false, false); // Run checkCookies function
 
 // Queue function
 // Thanks to debuggable for this. (http://bit.ly/dBugQFunc)
@@ -309,14 +311,6 @@ function checkCookies(reCache, loadmore) {
 			});
 		}
 	});
-}
-
-function preCheckCookies (reCache, loadmore) {
-	$('body').css("opacity", "0.6");
-	$('div#float').empty();
-	$('div#float').show();
-	//checkCookies(reCache);
-	setTimeout(function () {checkCookies(reCache, loadmore)}, 20); // Workaround to get the loadingtrail to appear instead of nothing
 }
 
 // Function waiting for the information from GrabInfo
@@ -873,28 +867,31 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		var t = JSON.parse(localStorage["n_array_names"]); t = JSON.parse(localStorage[t[0]]);
 		if (t[0] == "new") {
 			updateNotes(false);
+		} else {
+			userRefresh = false;
 		}
 	}
 });
 
 // Function to recache notifications
 function updateNotes(reCache) {
+
+	if (!userRefresh) { $('div#notes').remove(); }
+	$('div#content').append('<div id="notes"></div>');
+	$('div#float').attr("class", "float-load");
+
 	idCounter		= 0;
 	idCounterTemp 	= 0;
 	errorCount 		= 0;
 	perPageMore 	= 1;
+	userRefresh		= false;
 
-	if (!userRefresh) { $('div#notes').remove(); }
-	//$('div.noteDiv').remove();
-	//$('div.noteDiv-hidden').remove();
-	$('div#content').append('<div id="notes"></div>');
-	$('div#float').attr("class", "float-load");
-	preCheckCookies(reCache);
+	checkCookies(reCache);
 }
 
 function loadMore() {
 	$('div#float').attr("class", "float-loadmore");
-	preCheckCookies(false, true);
+	checkCookies(false, true);
 }
 
 // Function that requests the download links from the other scripts

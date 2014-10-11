@@ -130,7 +130,7 @@ function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nsho
 		note[0] = "old"
 		localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
-	if (notifications) {
+	if (notifications && error.status != 0) {
 		infoarray[0] = "infoarray"
 		infoarray[1] = "error";
 		infoarray[2] = error.status;
