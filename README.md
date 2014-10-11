@@ -17,7 +17,7 @@ This was and still is the main point of the extension, but version 0.4 and up ha
 ## Usage
 ### For Chrome Users
 1. Download one of the above versions.
-2. Extract it to an new empty folder. (Can be named anything, doesn't really matter)
+2. Extract it to a new empty folder. (Use [7-zip](http://www.7-zip.org/) if you can't extract)
 3. Navigate to your extension page(chrome://extensions) and check the "Developer mode" box
 4. Click the "Load unpacked extension..." button and navigate to the project folder, then select the folder you created in step #2 and hit ok.
 5. The extension should now be loaded.  
