@@ -56,3 +56,4 @@
 - Updated the look of the options page.
 - There will now be a popup asking if you would like to force a recache when a major version change has been detected.
 - Added "endless-scrolling", meaning that you can load more items when you reach the bottom of the page. Amount can be changed in options.
+- Middle-clicking links will no longer close the dropdown window.

@@ -10,7 +10,6 @@
 
 - Download subscriptions
 	- possibly add a system that will grab the latest mangas and notify you when a new one is added (might be that subscriptions is enough)
-	- fix links located in a description closing the popup even when they are ctrl/middle-clicked(This already works in Opera by default)
 	- option to only show mangas in english/japanese, possibly even other options(which would make it more into a filter system)(Works but currently only for tags)
 	- remove old localStorage notification data(Working but disabled for now)
 	or

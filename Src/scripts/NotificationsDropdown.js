@@ -543,35 +543,27 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
   	newTabLink(idCounter, href, "read-online");
 	newTabLink(idCounter, "series", seriesLink, seriesArray[0].attribute_link);
 	newTabLink(idCounter, "", languageLink);
-  // Mousedown Action
+
+  // Description Dropdown click action
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
 		if ($(event.target.parentNode).height() > 32) {
 		  // Hide dropdown
 			$(event.target.parentNode).css("height", "32");
 			$(event.target).html("\&#9658\;Description: ");
-
-		  // Rescale Image
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "");
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "");
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0]).css("height", $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[1]).height() - 60);
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "100%");
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "100%");
 		} else {
 		  // Show dropdown
 		  	$(event.target.parentNode).css("height", "");
 		  	$(event.target).html("\&#9660\;Description: ");
-		 
-		  // Rescale Image
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "");
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "");
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0]).css("height", $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[1]).height() - 60);
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0]).css("height", "100%");
-			// $(event.target.parentNode.parentNode.parentNode.parentNode.childNodes[0].childNodes[0].childNodes[0].childNodes[1]).css("height", "100%");
 		}
 	});
+	  // Description links click action
+  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full a').on('click', function(event) {
+		event.preventDefault();
+		openTab(event.currentTarget.href)
+	})
 
-// Download click action
-  // Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
+  // Download click action
+	// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mousedown(function(event) {
 		event.preventDefault();
 		var x=event.clientX; 
