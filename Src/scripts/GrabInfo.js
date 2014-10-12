@@ -106,11 +106,11 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			}
 
 			if (notifications) {
-				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore);
 				//console.log("notifications Grabinfo triggered");
+				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore);
 			} else {
-				msgDocReadyInfo(ndownload);
 				//console.log("Download Grabinfo triggered");
+				msgDocReadyInfo(ndownload);
 			}
 						
 		},

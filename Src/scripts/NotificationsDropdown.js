@@ -287,14 +287,18 @@ function checkCookies(reCache, loadmore) {
 							nInfo = JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]); 
 						}
 						//console.log(nNote);
+						//console.log(nInfo);
 					  // Check if manga exists and reCache is false
 						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
-							notificationInfo(JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore);
 							//console.log("Manga exists in localStorage");
+
+							notificationInfo(JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore);
+							
 						} else {
-							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore);
 							//console.log("Manga does not exists in localStorage");
 							//console.log(nNote[2]);
+
+							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore);	
 						}
 					  // Update the app_version localStorage to current version
 						if (nArrayNames[nArrayNames.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
@@ -320,7 +324,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	var tagArray 		= new Array();
 	var artistArray		= new Array();
 	var translatorArray	= new Array();
-	var seriesArray = [{attribute: "Not Specified", attribute_link: "/none"}]
+	var seriesArray 	= [{attribute: "Not Specified", attribute_link: "/none"}]
 	var error 			= false;
 
 	if (infodata[1] == "error") { idCounter--; error = true; console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); console.log("%cError Number: %c" + infodata[2], "color: red;", "color: black;"); console.log("%cError Message: %c" + infodata[4], "color: red;", "color: black;"); };
@@ -528,8 +532,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
   	}
 
 	if (idCounter == parseInt(localStorage["notes_done_amount"]) - errorCount + extra) {
-		notesDone(pend, loadmore, errorCount);
 		//console.log("notesDone triggered");
+		notesDone(pend, loadmore, errorCount);
+		
 	}
 };
 
@@ -689,8 +694,11 @@ function notesDone(pend, loadmore, errorCount) {
 	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
 	localStorage["badge_number"] = 0;
 
+	userRefresh = false;
+
+  // While divs are more than perPage specified in options remove last div
 	while ($('div.noteDiv').length  > perPage - errorCount && !loadmore) {
-		$('div.noteDiv:nth-of-type('+ $('div.noteDiv').length +')').remove()
+		$('div.noteDiv:nth-of-type('+ $('div.noteDiv').length +')').remove();
 	}
 	
 	$('body').css("opacity", "1");
@@ -737,10 +745,6 @@ function notesDone(pend, loadmore, errorCount) {
 		popup("askRecache");
   	}
 
-  // Workaround for scrollbar not showing
-	// setTimeout(function() {
-	// 	$('body').css("overflow", "scroll");
-	// }, 10);
 }
 
 // Function that saves the content of the notes div in localstorage
@@ -864,7 +868,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		$('div#float').attr("class", "");
 
 		$('div#float').empty();
-		var t = JSON.parse(localStorage["n_array_names"]); t = JSON.parse(localStorage[t[0]]);
+
+		var t = JSON.parse(localStorage["n_array_names"]);
+		t = JSON.parse(localStorage[t[0]]);
+		
 		if (t[0] == "new") {
 			updateNotes(false);
 		} else {
@@ -876,17 +883,18 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // Function to recache notifications
 function updateNotes(reCache) {
 
-	if (!userRefresh) { $('div#notes').remove(); }
-	$('div#content').append('<div id="notes"></div>');
+	if (!userRefresh) {
+		$('div#notes').remove();
+		$('div#content').append('<div id="notes"></div>');
+	}	
 	$('div#float').attr("class", "float-load");
 
 	idCounter		= 0;
 	idCounterTemp 	= 0;
 	errorCount 		= 0;
 	perPageMore 	= 1;
-	userRefresh		= false;
 
-	checkCookies(reCache);
+	checkCookies(reCache, false);
 }
 
 function loadMore() {

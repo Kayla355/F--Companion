@@ -238,15 +238,6 @@ function notificationCheck() {
 
 								noteArray[5] = "shown";
 							}
-						  // If last notification then set first_time to false if it was previously true
-							if (e == nLength) {
-								if (nDropdown == true) {
-									chrome.extension.sendMessage({msg: "nDropdownDone"})
-								}
-								if (localStorage["first_time"] == "true") {
-									localStorage["first_time"] = "false";
-								}
-							}
 
 							noteArray[1] = nName;
 							noteArray[2] = nHref;
@@ -292,6 +283,15 @@ function notificationCheck() {
 
 						localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
 						//console.log(localStorage["n_array_names"]);
+
+					  // If last notification then set first_time to false if it was previously true
+					  // Also if request was sent from nDropdown send done message
+						if (nDropdown == true) {
+							chrome.extension.sendMessage({msg: "nDropdownDone"})
+						}
+						if (localStorage["first_time"] == "true") {
+							localStorage["first_time"] = "false";
+						}
 
 					  // Remove Old localStorage data
 					  // Works, but disabled for now because I would rather make more notes appear when scrolling to the bottom. Which would also make the extension faster to load the first time.
