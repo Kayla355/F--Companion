@@ -192,6 +192,15 @@ div
 	padding: 10px !important;
 	position: fixed !important;
 }
+.float-loadmore-not
+{
+	width: 135px;
+	height: 1em;
+	bottom: 5%;
+	left: 35%;
+	padding: 10px !important;
+	position: fixed !important;
+}
 .float-recache
 {
 	width: 315px;

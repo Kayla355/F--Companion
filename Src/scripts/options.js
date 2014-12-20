@@ -194,9 +194,8 @@ $(document).ready(function() {
 	 	  // Load Changelog from textfile
 			$.get('changelog.txt', function(data) {
 
-				data = data.replace(/\/\//, "<p>");
-				data = data.replace(/\n\/\/ /g, "</p><p>");
-				data = data + "</p>";
+				data = data.replace(/\/\//, "<p>").replace(/\n\/\/ /g, "</p><p>");
+				data += "</p>";
 				data = data.replace(/\n/g, "<br>");
 
 			  // Stylize version text

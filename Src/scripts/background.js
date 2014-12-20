@@ -40,17 +40,26 @@
 // Listen for change of active tab.
 chrome.tabs.onActivated.addListener(function(activeInfo) {
 	chrome.tabs.get(activeInfo.tabId, function(tab) {
-		var tabId = activeInfo.tabId
+		var tabId = activeInfo.tabId;
 		checkForValidUrl(tabId, tab);
+	});
+});
+
+chrome.tabs.onUpdated.addListener(function(updatedTab) {
+	chrome.tabs.get(updatedTab, function(tab) {
+		if(tab.active) {
+			var tabId = updatedTab;
+			checkForValidUrl(tabId, tab);
+		}
 	});
 });
 
 // Called when the url of a tab changes.
 function checkForValidUrl(tabId, tab, changeInfo) {
   // If the url is one of the following...
-	if (tab.url.match(/https:\/\/www.fakku.net\/(manga|doujinshi)\/.*/)) {
+	if (tab.url.match(/.*\/\/www.fakku.net\/(manga|doujinshi)\/.*/)) {
 		// Temporary solution to excludes not working properly
-		if (tab.url.match(/https:\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
+		if (tab.url.match(/.*\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
 			// Change browserAction to Notifications
 			if (localStorage["fakku_notes"] == "true") {
 				badgeUpdate("notes");
@@ -433,7 +442,6 @@ function downloadLinks() {
 	}
 
 // Remove "." if it's the last character
-	folderStructure = folderStructure + '\/:*?"<>|';
 	while (folderStructure.match("[.]$")) {
 		folderStructure = folderStructure.replace(".", "");
 	}
