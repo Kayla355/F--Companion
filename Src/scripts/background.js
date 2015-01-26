@@ -64,26 +64,23 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 			if (localStorage["fakku_notes"] == "true") {
 				badgeUpdate("notes");
 				chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
-				chrome.browserAction.enable();
 			} else {
 				badgeUpdate("disabled");
-				chrome.browserAction.disable();
+				chrome.browserAction.setPopup({popup: ""});
 			}
 		} else {
 			// Change browserAction to Download
 			badgeUpdate("download");
 			chrome.browserAction.setPopup({popup: "Dropdown.html"});
-			chrome.browserAction.enable();
 		}
 	} else {
 		// Change browserAction to Notifications
 		if (localStorage["fakku_notes"] == "true") {
 			badgeUpdate("notes");
 			chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
-			chrome.browserAction.enable();
 		} else {
 			badgeUpdate("disabled");
-			chrome.browserAction.disable();
+			chrome.browserAction.setPopup({popup: ""});
 		}
 	}
 };

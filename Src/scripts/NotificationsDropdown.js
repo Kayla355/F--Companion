@@ -196,18 +196,18 @@ function filter(event) {
 
 // Turning the lights on/off
 function lightsOff() {
-	// $('#blackWrapper').on('click', function() {
+	// $('#whiteWrapper').on('click', function() {
 	// 	lightsOn();
 	// });
-	$('#blackWrapper').css("opacity", "0.4").show();
-	// $('#blackWrapper').fadeTo(300, 0.6);
+	$('#whiteWrapper').css("opacity", "0.6").show();
+	// $('#whiteWrapper').fadeTo(300, 0.6);
 }
 
 function lightsOn() {
 	// $('#float').fadeOut(100).hide();
-	// $('#blackWrapper').fadeOut(300);
-	$('#blackWrapper').hide();
-	$('#blackWrapper').off();
+	// $('#whiteWrapper').fadeOut(300);
+	$('#whiteWrapper').hide();
+	$('#whiteWrapper').off();
 }
 
 // Function for removing the popup download box
@@ -219,7 +219,7 @@ function popup(from) {
 		var popup = setTimeout(removePopup, 750);
 	}
 
-	$(document, '#blackWrapper').on("click", function(event) {
+	$(document, '#whiteWrapper').on("click", function(event) {
 		event.preventDefault();
 		if($.inArray(event.target.id, avoidID) === -1 && $.inArray(event.target.parentNode.id, avoidID) === -1) {
 			removePopup();
