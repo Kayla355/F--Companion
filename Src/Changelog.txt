@@ -58,4 +58,5 @@
 - Added "endless-scrolling", meaning that you can load more items when you reach the bottom of the page. Amount can be changed in options.
 - Middle-clicking links will no longer close the dropdown window.
 - Updated JQuery to 2.1.3
+- The extension will now check for a new version on github and present a notification if it finds one.
 

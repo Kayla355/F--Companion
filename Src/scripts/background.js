@@ -85,6 +85,19 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 	}
 };
 
+function createCORSRequest(method, url) {
+	var xhr = new XMLHttpRequest();
+	if ("withCredentials" in xhr) {
+		xhr.open(method, url, true);
+	} else if(typeof XDomainRequest != "undefined") {
+		xhr = new XDomainRequest();
+		xhr.open(method, url);
+	} else {
+		xhr = null;
+	}
+	return xhr;
+}
+
 
 
 
@@ -133,6 +146,33 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 		sendResponse({msg: "done"});
 	}
 });
+
+// Check for new extension version on github
+if (Math.floor(Math.round(((new Date()).getTime() - (new Date(localStorage["github_lastchecked"])).getTime()) / 1000) / 86400) >= 1) {
+	var github_version;
+	var github_update;
+	console.log("test");
+
+	var xhr = createCORSRequest("GET", "https://raw.githubusercontent.com/Kayla355/F--Companion/master/Src/manifest.json");
+	xhr.onload = function() {
+		github_version = xhr.responseText.match(/"version": ".*?(?=")/)[0].replace('"version": "', "").replace(/\./g, "");
+
+		if(parseInt(github_version) < parseInt(chrome.app.getDetails().version.replace(/\./g, ""))) {
+			github_update = "true";
+			if(github_version != localStorage["github_version"]) {
+				localStorage["github_notified"] = "false";
+			}
+		} else {
+			github_update = "false";
+		}
+
+
+		localStorage["github_version"] 		= github_version;
+		localStorage["github_update"] 		= github_update;
+		localStorage["github_lastchecked"] 	= new Date();
+	}
+	xhr.send();
+}
 
 // Timer to check for notifications
 if (localStorage["fakku_notes"] == "true") {

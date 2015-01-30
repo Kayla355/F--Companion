@@ -387,7 +387,7 @@ function checkCookies(reCache, loadmore) {
 							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore);	
 						}
 					  // Update the app_version localStorage to current version
-						if (nArrayNames[nArrayNames.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
+						if (doArray[doArray.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
 							setNewVersion = true;
 						}
 			        };
@@ -803,6 +803,27 @@ function notesDone(pend, loadmore, errorCount) {
 		});
 
 		popup("askRecache");
+  	} else if(localStorage["github_update"] == "true" && localStorage["github_notified"] != "true") {
+  // 		localStorage["github_notified"] = "true";
+  // 		//localStorage["app_version"] = chrome.app.getDetails().version;
+
+  // 		$('div#float').empty();
+		// $('div#float').prepend("<div id='askRecache'></div>");
+		// $('div#float div#askRecache').append('<div id="text"><b>An updated version has been found on Github!</b><br> If you wish to update you will have to do so manually. Sorry :(<br><br>Do you wish to perform this action now?</div>');
+		// $('div#float div#askRecache').append('<div id="options" class="option"><a id="yes" href="#">Yes</a><a id="no" href="#">No</a></div>');
+
+		// $('div#float').attr("class", "float-recache");
+
+		// $('div#content').css("width", "545px");
+	 //  	lightsOff();
+		// $('div#float').show();
+
+		// $('div#float div#askRecache div#options #yes').on('click', function(event) {
+		// 	event.preventDefault();
+		// 	openTab("https://github.com/Kayla355/F--Companion");
+		// });
+
+		// popup("askRecache");
   	}
 
 }
