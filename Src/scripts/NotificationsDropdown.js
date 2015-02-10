@@ -642,43 +642,50 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
   // Download click action
 	// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mousedown(function(event) {
-		event.preventDefault();
-		var x=event.clientX; 
-		var y=event.clientY;
-		var offsetY=$(document).scrollTop();
-		//console.log(x + ", " + y);
-		//console.log($(document).scrollTop());
-		lightsOff();
-		$('div#float').empty();
-		$('div#float').show();
-		$('div#float').prepend("<div id='loading' class='loadingtrail'></div>");
-		$('div#float').append("<b>Preparing Download</b>");
-		$('div#float').css("left", x + 15);
-		$('div#float').css("top", y + offsetY - 10);
-		popup("downloadClicked");
+	  // If left mouse button clicked, trigger download event
+		if(event.button == 0) {
+			event.preventDefault();
+			var x=event.clientX; 
+			var y=event.clientY;
+			var offsetY=$(document).scrollTop();
+			//console.log(x + ", " + y);
+			//console.log($(document).scrollTop());
+			//lightsOff();
+			$('div#float').empty();
+			$('div#float').show();
+			$('div#float').prepend("<div id='loading' class='loadingtrail'></div>");
+			$('div#float').append("<b>Preparing Download</b>");
+			$('div#float').css("left", x + 15);
+			$('div#float').css("top", y + offsetY - 10);
+			popup("downloadClicked");
+		}
 	});
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mouseup(function(event) {
-		event.preventDefault();
-		requestDownload(href);
+		if(event.button == 0) {
+			event.preventDefault();
+			requestDownload(href);
+		}
 	});
   // Hide/Remove div click action
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') button.close').mousedown(function(event) {
-		event.preventDefault();
-		var x=event.clientX; 
-		var y=event.clientY;
-		var offsetY=$(document).scrollTop();
-		//console.log(x + ", " + y);
-		//console.log($(document).scrollTop());
-		lightsOff();
-		$('div#float').empty();
-		$('div#float').show();
-		$('div#float').append("<b>Removed</b>");
-		$('div#float').css("left", x - 90);
-		$('div#float').css("top", y + offsetY);
-		localStorage[href.replace("https://www.fakku.net", "") + "--note"] = localStorage[href.replace("https://www.fakku.net", "") + "--note"].replace("shown", "hidden");
-		$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
-		popup("removeClicked")
-																});
+		if(event.button == 0) {
+			event.preventDefault();
+			var x=event.clientX; 
+			var y=event.clientY;
+			var offsetY=$(document).scrollTop();
+			//console.log(x + ", " + y);
+			//console.log($(document).scrollTop());
+			lightsOff();
+			$('div#float').empty();
+			$('div#float').show();
+			$('div#float').append("<b>Removed</b>");
+			$('div#float').css("left", x - 90);
+			$('div#float').css("top", y + offsetY);
+			localStorage[href.replace("https://www.fakku.net", "") + "--note"] = localStorage[href.replace("https://www.fakku.net", "") + "--note"].replace("shown", "hidden");
+			$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
+			popup("removeClicked")
+		}
+	});
 	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') button.close').mouseup(function(event) {
 			event.preventDefault();
 		});
