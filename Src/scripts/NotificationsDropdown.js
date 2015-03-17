@@ -13,6 +13,7 @@
 	var perPageMore 	= 1;
 	var filterTimer;
 	var start;
+	var notesToUpdate 	= {};
 
 
 String.prototype.mReplace = function(type) {
@@ -253,7 +254,7 @@ function popup(from) {
 	}
 }
 
-checkCookies(false, false); // Run checkCookies function
+checkLoggedIn(false, false); // Run checkLoggedIn function
 
 // Queue function
 // Thanks to debuggable for this. (http://bit.ly/dBugQFunc)
@@ -293,7 +294,7 @@ $.queue = {
 };
 
 // Check if Login cookie has expired.
-function checkCookies(reCache, loadmore) {
+function checkLoggedIn(reCache, loadmore) {
 	start = new Date().getTime();
 	
 	chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
@@ -597,7 +598,8 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	if (nseen == "new") {
 		var note = JSON.parse(localStorage[href.replace("https://www.fakku.net", "") + "--note"]);
 		note[0] = "old"
-		localStorage[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
+		notesToUpdate[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note)
+		//localStorage[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
 	// console.log("idCounter: "+idCounter)
 	// console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
@@ -766,6 +768,12 @@ function notesDone(pend, loadmore, errorCount) {
   // While divs are more than perPage specified in options remove last div
 	while ($('div.noteDiv').length  > perPage - errorCount && !loadmore) {
 		$('div.noteDiv:nth-of-type('+ $('div.noteDiv').length +')').remove();
+	}
+
+	if(notesToUpdate.length != 0) {
+		for(var note in notesToUpdate) {
+			localStorage[note] = notesToUpdate[note];
+		}
 	}
 	
 	lightsOn();
@@ -955,13 +963,13 @@ function recacheNotes(reCache) {
 	errorCount 		= 0;
 	perPageMore 	= 1;
 
-	checkCookies(reCache, false);
+	checkLoggedIn(reCache, false);
 }
 
 function loadMore() {
 	if(JSON.parse(localStorage['n_array_names']).length > perPage) {
 		$('div#float').attr("class", "float-loadmore");
-		checkCookies(false, true);
+		checkLoggedIn(false, true);
 	} else {
 		$('div#float').attr("class", "float-loadmore-not");
 		lightsOff();

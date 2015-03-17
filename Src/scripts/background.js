@@ -190,7 +190,7 @@ function notificationCheck() {
 		chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
 			if (!results) {
 				badgeUpdate("error");
-				recursiveNote(1000);
+				recursiveNote(5000);
 				console.log("Failed to find login cookie for Fakku.net");
 			} else {
 			  // Clear badge_number
