@@ -462,6 +462,8 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	if (pend == "prepend" || reCache || loadmore) {	
 
 		idCounterTemp = idCounter;
+	  // Make sure items get appended if action is loadmore
+	  	if(loadmore) { pend = "append" }
 
 	  // Adds "--info" to the end of the href string to match the name in localStorage
 		localStorage[href.replace("https://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
@@ -967,7 +969,7 @@ function recacheNotes(reCache) {
 }
 
 function loadMore() {
-	if(JSON.parse(localStorage['n_array_names']).length > perPage) {
+	if(JSON.parse(localStorage['n_array_names']).length > ($('div#notes').children().length + errorCount)) {
 		$('div#float').attr("class", "float-loadmore");
 		checkLoggedIn(false, true);
 	} else {
