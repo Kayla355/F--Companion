@@ -54,34 +54,41 @@ chrome.tabs.onUpdated.addListener(function(updatedTab) {
 	});
 });
 
+checkForValidUrl();
+
 // Called when the url of a tab changes.
 function checkForValidUrl(tabId, tab, changeInfo) {
-  // If the url is one of the following...
-	if (tab.url.match(/.*\/\/www.fakku.net\/(manga|doujinshi)\/.*/)) {
-		// Temporary solution to excludes not working properly
-		if (tab.url.match(/.*\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
-			// Change browserAction to Notifications
-			if (localStorage["fakku_notes"] == "true") {
-				badgeUpdate("notes");
-				chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
+	if(tab && tab != null) {
+	  // If the url is one of the following...
+		if (tab.url.match(/.*\/\/www.fakku.net\/(manga|doujinshi)\/.*/)) {
+			// Temporary solution to excludes not working properly
+			if (tab.url.match(/.*\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
+				// Change browserAction to Notifications
+				if (localStorage["fakku_notes"] == "true") {
+					badgeUpdate("notes");
+					chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
+					return;
+				} else {
+					badgeUpdate("disabled");
+					chrome.browserAction.setPopup({popup: ""});
+					return;
+				}
 			} else {
-				badgeUpdate("disabled");
-				chrome.browserAction.setPopup({popup: ""});
+				// Change browserAction to Download
+				badgeUpdate("download");
+				chrome.browserAction.setPopup({popup: "Dropdown.html"});
+				return;
 			}
-		} else {
-			// Change browserAction to Download
-			badgeUpdate("download");
-			chrome.browserAction.setPopup({popup: "Dropdown.html"});
 		}
+	}
+
+  // Change browserAction to Notifications
+	if (localStorage["fakku_notes"] == "true") {
+		badgeUpdate("notes");
+		chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
 	} else {
-		// Change browserAction to Notifications
-		if (localStorage["fakku_notes"] == "true") {
-			badgeUpdate("notes");
-			chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
-		} else {
-			badgeUpdate("disabled");
-			chrome.browserAction.setPopup({popup: ""});
-		}
+		badgeUpdate("disabled");
+		chrome.browserAction.setPopup({popup: ""});
 	}
 };
 
@@ -151,7 +158,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 if (Math.floor(Math.round(((new Date()).getTime() - (new Date(localStorage["github_lastchecked"])).getTime()) / 1000) / 86400) >= 1) {
 	var github_version;
 	var github_update;
-	console.log("test");
 
 	var xhr = createCORSRequest("GET", "https://raw.githubusercontent.com/Kayla355/F--Companion/master/Src/manifest.json");
 	xhr.onload = function() {
@@ -200,7 +206,7 @@ function notificationCheck() {
 					type: "GET",
 					url: "https://www.fakku.net/subscriptions",
 					dataType: "html",
-					async: false,
+					async: true,
 					success: function(html) {
 
 					// Keep track of the names of the arrays
@@ -330,7 +336,7 @@ function notificationCheck() {
 						localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
 						//console.log(localStorage["n_array_names"]);
 
-					  // If last notification then set first_time to false if it was previously true
+					  // If last notification; then set first_time to false; if it was previously true
 					  // Also if request was sent from nDropdown send done message
 						if (nDropdown == true) {
 							chrome.extension.sendMessage({msg: "nDropdownDone"})
