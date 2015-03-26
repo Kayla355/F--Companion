@@ -206,7 +206,7 @@ function notificationCheck() {
 					type: "GET",
 					url: "https://www.fakku.net/subscriptions",
 					dataType: "html",
-					async: true,
+					async: false,
 					success: function(html) {
 
 					// Keep track of the names of the arrays

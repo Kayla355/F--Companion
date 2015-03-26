@@ -13,7 +13,7 @@ var linkarray 		= new Array();
 function grabLinks(downloadurl, notifications, ndownload) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl = "https://api.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href') + "/read";
+		var currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabLinks triggered from DropdownNotes");

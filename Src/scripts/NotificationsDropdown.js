@@ -371,7 +371,7 @@ function checkLoggedIn(reCache, loadmore) {
 						var nNote = JSON.parse(localStorage[name]);
 						var nInfo;
 						if (localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]) {
-							nInfo = JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]); 
+							nInfo = JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]);
 						}
 						//console.log(nNote);
 						//console.log(nInfo);

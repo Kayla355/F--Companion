@@ -7,19 +7,19 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 });
 
-var infoarray		= new Array();
+var infoarray = new Array();
 
 // Function for grabbing manga information
 function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl 		= "https://api.fakku.net" + $('div#content div.chapter div.left a.a-series-title.manga-title').attr('href');
+		var currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabInfo triggered from DropdownNotes");
-		var currenturl 		= downloadurl.replace("www", "api");
+		var currenturl = downloadurl.replace("www", "api");
 	} else {
-		var currenturl 		= "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
+		var currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	}
 
