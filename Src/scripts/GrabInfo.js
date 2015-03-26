@@ -32,6 +32,12 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			var error;
 			var errorMessage;
 			var storedError;
+			try { 
+				var notes = JSON.parse(localStorage["notes"]);
+			} catch(e) {
+				var notes = {};
+			}
+			console.log(notes);
 
 			if (data.content == "") {
 				error = true;
@@ -48,7 +54,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					}
 				});
 			}
-
+			console.log(data.content);
 			if (!error) {
 				var manganame 	= data.content.content_name;
 				var series		= data.content.content_series;				//Array
@@ -61,12 +67,31 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				var imgCover 	= data.content.content_images.cover;
 				var imgSample	= data.content.content_images.sample;
 				var date 		= data.content.content_date;
+				var type 		= data.content.content_category;
 
 			  // Check if http:// or https:// is included in the link. Newer links don't have them included while older ones do.
 				if (!imgCover.match(/http/)) {
 					imgCover = "https:" + imgCover;
 					imgSample = "https:" + imgSample;
 				}
+
+			  // Create note object and update localStorage
+				notes['['+type+'] '+manganame].data = {
+					name: 			manganame,
+					series: 		series,
+					author: 		authorname,
+					translator: 	translator,
+					language: 		language,
+					pages: 			quant,
+					description: 	description,
+					tags: 			tags,
+					date: 			date,
+					images: {
+						cover: 		imgCover,
+						sample: 	imgSample
+					}
+				}
+				//localStorage["notes"] = JSON.stringify(notes);
 			}
 
 			// console.log("pages: " + quant);

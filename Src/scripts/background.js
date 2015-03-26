@@ -180,6 +180,11 @@ if (Math.floor(Math.round(((new Date()).getTime() - (new Date(localStorage["gith
 	xhr.send();
 }
 
+// Check if old array storage of notes exist; if yes, run convert function
+if(localStorage["n_array_names"] !== undefined) {
+	//convertNotesToObject();
+}
+
 // Timer to check for notifications
 if (localStorage["fakku_notes"] == "true") {
 	notificationCheck();
@@ -211,14 +216,18 @@ function notificationCheck() {
 
 					// Keep track of the names of the arrays
 						var nArrayNames = new Array();
+						try { 
+							var notes = JSON.parse(localStorage["notes"]);
+						} catch(e) {
+							var notes = {};
+						}
 						var nLength = $(html).find("div.notification").length;
 						
 					// Find each notification
 						$(html).find("div.notification").each(function(e) {
 							e++;
 
-							var nTagName = new Array();
-							var nTagHref = new Array();
+							var nTags = new Array();
 						// Find each <a> under the current notification
 							$(html).find("div.notification:nth-child(" + e + ") a").each(function(n) {
 								n++;
@@ -226,20 +235,22 @@ function notificationCheck() {
 								var tagCheck = $(html).find("div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").attr("href");
 							// If the <a> is a tag link add it to the tag array
 								if (tagCheck.match(/\/tags\/.*/)) {
-									nTagName.push($(html).find("div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").text());
+									nTags.push($(html).find("div.notification:nth-child(" + e + ") a:nth-child(" + n + ")").text());
 								}
 							});
 
 							var nName 	= $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").text();
 							var nHref 	= "https://www.fakku.net" + $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
 							var nOld	= $(html).find("div.notification:nth-child(" + e + ") i").text();
+							var type 	= nHref.match(/(doujinshi|manga)/)[0];
+							var nNew;
+							var nStatus;
 
 							// console.log("Checked Notifications");
 							// console.log("Name: " + nName);
 							// console.log("Link: " + nHref);
 							// console.log("Uploaded: " + nOld);
-							// console.log("Under Tags: " + JSON.stringify(nTagName));
-							// console.log("Tag Link: " + JSON.stringify(nTagHref));
+							// console.log("Under Tags: " + JSON.stringify(nTags));
 
 							var noteArray 	= new Array();
 							var nStorage 	= $(html).find("div.notification:nth-child(" + e + ") a:nth-last-of-type(1)").attr("href");
@@ -265,8 +276,10 @@ function notificationCheck() {
 							  // Checks if old or new
 								if (nExists[0] == "old") {
 									noteArray[0] = "old";
+									nNew = false;
 								} else {
 									noteArray[0] = "new";
+									nNew = true;
 									var i = localStorage["badge_number"];
 									i++
 									localStorage["badge_number"] = i;
@@ -274,33 +287,50 @@ function notificationCheck() {
 							  // Checks if hidden or shown
 								if (nExists[5] == "hidden") {
 									noteArray[5] = "hidden";
+									nStatus = "hidden";
 								} else {
 									noteArray[5] = "shown";
+									nStatus = "shown";
 								}
 						  // If it does not exist
 							} else {
 								if (localStorage["first_time"] == "true") {
 									noteArray[0] = "old";
+									nNew = false;
 								} else {
 									noteArray[0] = "new";
+									nNew = true;
 									var i = localStorage["badge_number"];
 									i++
 									localStorage["badge_number"] = i;
 								}
 
 								noteArray[5] = "shown";
+								nStatus = "shown";
 							}
 
 							noteArray[1] = nName;
 							noteArray[2] = nHref;
 							noteArray[3] = nOld;
-							noteArray[4] = JSON.stringify(nTagName);
+							noteArray[4] = JSON.stringify(nTags);
+
+							notes['['+type+'] '+nName] = {
+								info: {
+									name: 		nName,
+									href: 		nHref,
+									age: 		nOld,
+									tags: 		JSON.stringify(nTags),
+									status: 	nStatus,
+									newNote: 	nNew,
+								},
+								data: {},
+							}
 
 							localStorage[nStorage + "--note"] = JSON.stringify(noteArray)
 
 							nArrayNames.push(nStorage + "--note");
 
-							console.log(noteArray); // Leave uncommented
+							//console.log(noteArray); // Leave uncommented
 							//console.log(nStorage);
 							//console.log(localStorage[nStorage + "--note"]);
 
@@ -334,6 +364,8 @@ function notificationCheck() {
 						}
 
 						localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
+						//localStorage["notes"] = JSON.stringify(notes);
+						//console.log(notes);
 						//console.log(localStorage["n_array_names"]);
 
 					  // If last notification; then set first_time to false; if it was previously true
@@ -344,19 +376,6 @@ function notificationCheck() {
 						if (localStorage["first_time"] == "true") {
 							localStorage["first_time"] = "false";
 						}
-
-					  // Remove Old localStorage data
-					  // Works, but disabled for now because I would rather make more notes appear when scrolling to the bottom. Which would also make the extension faster to load the first time.
-					  	// var key;
-					  	// for (var i = 0, len = localStorage.length; i < len; i++) {
-					  	// 	key = localStorage.key(i);
-					  	// 	if ((/\/(manga|doujinshi)\/.*--(note)/).test(key)) {
-					  	// 		if ($.inArray(key, nArrayNames) == -1) {
-					  	// 			localStorage.removeItem(key)
-					  	// 			localStorage.removeItem(key.replace("note", "info"))
-					  	// 		}
-					  	// 	}
-					  	// }
 
 					},
 					error: function(error) {
@@ -375,6 +394,103 @@ function notificationCheck() {
 	}
 }
 
+// Convert non-object notes to object
+function convertNotesToObject() {
+	var notes = JSON.parse(localStorage["notes"]);
+	var noteNames = JSON.parse(localStorage["n_array_names"]);
+
+	noteNames.forEach(function(name) {
+		var dName = name.replace("--note", "--info")
+
+	  // Variables containing information about notes
+		var note 	= JSON.parse(localStorage[name]);
+		var type 	= name.match(/(doujinshi|manga)/)[0];
+		var nName 	= note[1];
+		var nHref 	= note[2];
+		var nOld	= note[3];
+		var nTags 	= note[4];
+		var nStatus = note[5];
+		var nNew;
+
+		if(note[0] === "old") {
+			nNew = false;
+		} else {
+			nNew = true;
+		}
+
+	  // Variables containg data of notes
+	  	var dNote = JSON.parse(localStorage[dName]);
+
+	  	var quant 		= dNote[1];
+		var manganame 	= dNote[2];
+		var series 		= dNote[3];
+		var authorname 	= dNote[4];
+		var language 	= dNote[5];
+		var translator 	= dNote[6];
+		var tags 		= dNote[7];
+		var description = dNote[8];
+		var imgCover 	= dNote[9];
+		var imgSample 	= dNote[10];
+		var date 		= dNote[11];
+
+	  // Add the new note to notes object
+		notes['['+type+'] '+nName] = {
+			info: {
+				name: nName,
+				href: nHref,
+				age: nOld,
+				tags: nTags,
+				status: nStatus,
+				newNote: nNew
+			},
+			data: {
+				name: 			manganame,
+				series: 		series,
+				author: 		authorname,
+				translator: 	translator,
+				language: 		language,
+				pages: 			quant,
+				description: 	description,
+				tags: 			tags,
+				date: 			date,
+				images: {
+					cover: 		imgCover,
+					sample: 	imgSample
+				}
+			}
+		};
+
+	  // Remove old localStorage data
+		localStorage.removeItem(name)
+		localStorage.removeItem(dName)
+	});
+
+  // Update localstorage & remove old list of array names
+	localStorage["notes"] = JSON.stringify(notes);
+	localStorage.removeItem("n_array_names");
+}
+
+// Function that cleans up the localstorage to avoid exceeding the storage limit
+function cleanStorage() {
+	var nDate 	= Math.round(new Date().getTime()/1000); 	// seconds
+	var limit 	= localStorage["storage_time"]*86400; 		// seconds
+	var notes 	= JSON.parse(localStorage["notes"]);
+
+	for(var note in notes) {
+		if(notes.hasOwnProperty(note)) {
+			var obj = notes[note];
+			var age = nDate - obj.data.date;
+			if(age >= limit) {
+				delete notes[note.toString()];
+				console.log("Should remove note: "+note.toString());
+			}
+		}
+	}
+  // Update localstorage
+	localStorage["notes"] = JSON.stringify(notes);
+}
+
+// Update badge text
 function badgeUpdate(status) {
   // When updateBadge is triggered from the notificationCheck
 	if (status == "update") {
@@ -418,11 +534,14 @@ function badgeUpdate(status) {
   		badgeRed(localStorage["badge_number"]);
   	}
 }
+
+// Update badgetext with red coloring
 function badgeRed (text) {
 	chrome.browserAction.setBadgeText({text: text});
 	chrome.browserAction.setBadgeBackgroundColor({color: [200, 0, 0, 255]});
 }
 
+// Update badgetext to nothing
 function badgeClear(clear) {
 	chrome.browserAction.setBadgeText({text: ""});
 	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]});
@@ -431,6 +550,7 @@ function badgeClear(clear) {
 	}
 }
 
+// Recursive function to check for new notes
 function recursiveNote(updateInterval) {
 	// Resursive function to check for updates
 	clearTimeout(checkNotes);
