@@ -11,7 +11,8 @@ This was and still is the main point of the extension, but version 0.4 and up ha
 ![F! Companion Screenshot](http://imgur.com/VmFErMs.jpg "F! Companion Dropdown Screenshot")
 
 ## Download
-* Latest Release Version: [F! Companion -release.crx](https://github.com/Kayla355/F--Companion/blob/master/F!%20Companion%20-release.crx?raw=true)  
+* Latest Release Version: ~~[F! Companion -release.crx](https://github.com/Kayla355/F--Companion/blob/master/F!%20Companion%20-release.crx?raw=true)~~
+* *Release version is currently not working, use the dev version if any.*
 * Latest Dev Version: [F! Companion -dev.crx](https://github.com/Kayla355/F--Companion/blob/master/F!%20Companion%20-dev.crx?raw=true)
 
 ## Usage
