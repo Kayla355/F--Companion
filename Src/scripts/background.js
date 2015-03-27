@@ -219,7 +219,10 @@ function notificationCheck() {
 						try { 
 							var notes = JSON.parse(localStorage["notes"]);
 						} catch(e) {
-							var notes = {};
+							var notes = {
+								info: {},
+								data: {}
+							};
 						}
 						var nLength = $(html).find("div.notification").length;
 						
@@ -365,7 +368,7 @@ function notificationCheck() {
 
 						localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
 						//localStorage["notes"] = JSON.stringify(notes);
-						//console.log(notes);
+						console.log(notes);
 						//console.log(localStorage["n_array_names"]);
 
 					  // If last notification; then set first_time to false; if it was previously true

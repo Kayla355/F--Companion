@@ -32,12 +32,15 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			var error;
 			var errorMessage;
 			var storedError;
+			
 			try { 
 				var notes = JSON.parse(localStorage["notes"]);
 			} catch(e) {
-				var notes = {};
+				var notes = {
+					info: {},
+					data: {}
+				};
 			}
-			console.log(notes);
 
 			if (data.content == "") {
 				error = true;
@@ -54,7 +57,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					}
 				});
 			}
-			console.log(data.content);
+
 			if (!error) {
 				var manganame 	= data.content.content_name;
 				var series		= data.content.content_series;				//Array
@@ -76,22 +79,26 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				}
 
 			  // Create note object and update localStorage
-				notes['['+type+'] '+manganame].data = {
-					name: 			manganame,
-					series: 		series,
-					author: 		authorname,
-					translator: 	translator,
-					language: 		language,
-					pages: 			quant,
-					description: 	description,
-					tags: 			tags,
-					date: 			date,
-					images: {
-						cover: 		imgCover,
-						sample: 	imgSample
+				try {
+					notes['['+type+'] '+manganame].data = {
+						name: 			manganame,
+						series: 		series,
+						author: 		authorname,
+						translator: 	translator,
+						language: 		language,
+						pages: 			quant,
+						description: 	description,
+						tags: 			tags,
+						date: 			date,
+						images: {
+							cover: 		imgCover,
+							sample: 	imgSample
+						}
 					}
+					//localStorage["notes"] = JSON.stringify(notes);
+				} catch(e) {
+					console.log(e);
 				}
-				//localStorage["notes"] = JSON.stringify(notes);
 			}
 
 			// console.log("pages: " + quant);
