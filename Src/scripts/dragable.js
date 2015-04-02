@@ -81,7 +81,7 @@ function querySelectLoaded() {
     colsFile = document.querySelectorAll('#fileColumns .column');
   [].forEach.call(colsFile, function(colFile) {
     colFile.addEventListener('dragstart', handleDragStart, false);
-    colFile.addEventListener('dragenter', handleDragEnter, false)
+    colFile.addEventListener('dragenter', handleDragEnter, false);
     colFile.addEventListener('dragover', handleDragOver, false);
     colFile.addEventListener('dragleave', handleDragLeave, false);
     colFile.addEventListener('drop', handleDrop, false);
@@ -93,7 +93,7 @@ function querySelectLoaded() {
 function addFileRemListen() {
   remFile = document.querySelector('#removeColumn');
   
-  remFile.addEventListener('dragenter', handleDragEnter, false)
+  remFile.addEventListener('dragenter', handleDragEnter, false);
   remFile.addEventListener('dragover', handleDragOver, false);
   remFile.addEventListener('dragleave', handleDragLeave, false);
   remFile.addEventListener('drop', handleDrop, false);
@@ -111,7 +111,7 @@ function querySelect() {
 // Adds EventListeners to the new div
 function addFileListen() {
   colFile.addEventListener('dragstart', handleDragStart, false);
-  colFile.addEventListener('dragenter', handleDragEnter, false)
+  colFile.addEventListener('dragenter', handleDragEnter, false);
   colFile.addEventListener('dragover', handleDragOver, false);
   colFile.addEventListener('dragleave', handleDragLeave, false);
   colFile.addEventListener('drop', handleDrop, false);
@@ -159,7 +159,7 @@ function addFileDiv() {
 // Create the preview of the fileStructure
 function filePreview() {
 	var fileChild = $('div#fileColumns').children().length;
-	var fileSArray = new Array();
+	var fileSArray = [];
 	
 	// Create the temporary fileStructure array
 		for (var i = 1; i <= fileChild; i++) {
@@ -168,8 +168,9 @@ function filePreview() {
 		}
 		
 	// Create the filename from the fileStructure array
-		for (var i = 1; i <= fileChild; i++) {
+		for (i = 1; i <= fileChild; i++) {
 		  var languageCheck = false;
+		  var languagePrev  = false;
 		  // Checks if the selected object is Language
 			if (fileSArray[i] == "Language") {
 				languageCheck = true;
@@ -181,10 +182,10 @@ function filePreview() {
 				filename = fileSArray[i] + ".jpg";
 			} else if (languageCheck) {
 				filename = filename + "(" + fileSArray[i] + ")";
-				var languagePrev = true;
+				languagePrev = true;
 			} else if (languagePrev) {
 				filename = filename + " " + fileSArray[i];
-				var languagePrev = false;
+				languagePrev = false;
 			} else if (i == fileChild){
 				filename = filename + " - " + fileSArray[i] + ".jpg";
 			} else {

@@ -7,19 +7,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 });
 
-var infoarray = new Array();
+var infoarray = [];
+var currenturl = "";
 
 // Function for grabbing manga information
 function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href');
+		currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabInfo triggered from DropdownNotes");
-		var currenturl = downloadurl.replace("www", "api");
+		currenturl = downloadurl.replace("www", "api");
 	} else {
-		var currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
+		currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
 	}
 
@@ -36,13 +37,10 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			try { 
 				var notes = JSON.parse(localStorage["notes"]);
 			} catch(e) {
-				var notes = {
-					info: {},
-					data: {}
-				};
+				var notes = {};
 			}
 
-			if (data.content == "") {
+			if (data.content === "") {
 				error = true;
 				$.ajax({     
 					type: "GET",		
@@ -80,25 +78,30 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 
 			  // Create note object and update localStorage
 				try {
-					notes['['+type+'] '+manganame].data = {
-						name: 			manganame,
-						series: 		series,
-						author: 		authorname,
-						translator: 	translator,
-						language: 		language,
-						pages: 			quant,
-						description: 	description,
-						tags: 			tags,
-						date: 			date,
-						images: {
-							cover: 		imgCover,
-							sample: 	imgSample
-						}
-					}
-					//localStorage["notes"] = JSON.stringify(notes);
+					notes['['+type+'] '+manganame].data = {};
 				} catch(e) {
-					console.log(e);
+					notes['['+type+'] '+manganame] = {
+						info: {},
+						data: {}
+					};
 				}
+
+				notes['['+type+'] '+manganame].data = {
+					name: 			manganame,
+					series: 		series,
+					author: 		authorname,
+					translator: 	translator,
+					language: 		language,
+					pages: 			quant,
+					description: 	description,
+					tags: 			tags,
+					date: 			date,
+					images: {
+						cover: 		imgCover,
+						sample: 	imgSample
+					}
+				};
+				//localStorage["notes"] = JSON.stringify(notes);
 			}
 
 			// console.log("pages: " + quant);
@@ -150,7 +153,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, error);
 		}
 	});
-};
+}
 
 function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, error) {
 	if (!notifications) {
@@ -159,11 +162,11 @@ function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nsho
 	}
 	if (error.status == "410") {
 		var note = JSON.parse(localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"]);
-		note[0] = "old"
+		note[0] = "old";
 		localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
 	if (notifications && error.status != 0) {
-		infoarray[0] = "infoarray"
+		infoarray[0] = "infoarray";
 		infoarray[1] = "error";
 		infoarray[2] = error.status;
 		infoarray[3] = downloadurl;

@@ -7,19 +7,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 });
 
-var linkarray 		= new Array();
+var linkarray   = [];
+var currenturl  = "";
 
 // Function for grabbing links
 function grabLinks(downloadurl, notifications, ndownload) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
-		var currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href') + "/read";
+		currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
 		//console.log("GrabLinks triggered from DropdownNotes");
-		var currenturl = downloadurl.replace("www", "api") + "/read";
+		currenturl = downloadurl.replace("www", "api") + "/read";
 	} else {
-		var currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
+		currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
 		//console.log("GrabLinks URL: " + currenturl);
 	}
 
@@ -45,7 +46,7 @@ function grabLinks(downloadurl, notifications, ndownload) {
 			//console.log("Error!");
 		}
 	});
-};
+}
 
 // Sends a message stating that the links have been grabbed properly.
 function msgDocReadyLink(ndownload) {

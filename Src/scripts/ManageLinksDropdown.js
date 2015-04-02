@@ -165,7 +165,7 @@ function requestDownload() {
 	}
 
 	if (docReadyLink && docReadyInfo && !conflictCheck) {
-		chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray})
+		chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray});
 		docReadyLink = false;
 		docReadyInfo = false;
 		

@@ -6,9 +6,13 @@ var alertCheck;
 	// Check if there is atleast one Page Number in File Structure else alert popup.
 	for (var i = 1; i <= fileChild; i++) {
 		if($('div#fileColumns div:nth-child('+ i +')').text() == "Page Number") {
+			alertCheck = true;
+		} else {
 			alertCheck = false;
-			
-			// Incognito Downloads
+		}
+	}
+	if(alertCheck) {
+	    // Incognito Downloads
 				var select = document.getElementById("incognitomode");
 				localStorage["incognito_mode"] = select.checked;
 
@@ -46,9 +50,9 @@ var alertCheck;
 				localStorage["folder_name"] = foldername;
 			
 			// Save the current order of file Structure
-				var fileSArray = new Array();
+				var fileSArray = [];
 
-				for (var i = 1; i <= fileChild; i++) {
+				for (i = 1; i <= fileChild; i++) {
 					var copypasta = $('div#fileColumns div:nth-child('+ i +')').text();
 					fileSArray[i] = copypasta;	
 				}
@@ -61,11 +65,7 @@ var alertCheck;
 				setTimeout(function() {
 				status.innerHTML = "";
 				}, 1000);
-		} else {
-			alertCheck = true;
-		}
-	}
-	if (alertCheck){
+	} else {
 		//alert("You need atleast one(1) Page Number under File Structure");
 		// Update status to let user know that there was an issue with File Structure.
 			var status = document.getElementById("status");

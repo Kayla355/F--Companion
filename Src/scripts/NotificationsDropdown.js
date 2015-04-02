@@ -175,7 +175,7 @@ function fInput_rem () {
 // Function to filter notifications
 function filter(event) {
 	clearTimeout(filterTimer)
-	filterTimer = setTimeout(function (event) {
+	filterTimer = setTimeout(function(event) {
 		var input = $('input#filterInput').val().toLowerCase().split(/, | /);
 
 		$('div.noteDiv-matched').attr('class', 'noteDiv');
@@ -183,12 +183,14 @@ function filter(event) {
 
 	  // For each noteDiv
 		if (input[0] != "") {
-			$('div.noteDiv').each(function (index, div) {
+			$('div.noteDiv').each(function(index, div) {
 				var tagArray = new Array();
 				var matched = 0;
 				var i = input.length;
 			  // Grab tags
-				$(div).find('div#right div.row-left-full a').each(function (i, val) { tagArray.push($(val).text().toLowerCase()) });
+				$(div).find('div#right div.row-left-full a').each(function(i, val) {
+					tagArray.push($(val).text().toLowerCase());
+				});
 			  // For each tag match & if matched then increase match count until the match count is the same as input length.
 			  // If the matched count and the input length is the same hide other divs
 				input.forEach(function (value) {
@@ -298,7 +300,7 @@ function checkLoggedIn(reCache, loadmore) {
 	start = new Date().getTime();
 	
 	chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
-		if (!results) {
+		if (!results || localStorage["badge_number"] === "Err") {
 			$('div#menu').hide();
 			$('div#notes').hide();
 			$('html').css("height", "20px");
