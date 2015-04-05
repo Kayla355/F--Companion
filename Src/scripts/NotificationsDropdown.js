@@ -6,15 +6,19 @@
 	var askRecache		= false;
 	var userRefresh		= false;
 	var errorMsg 		= null;
-	var idCounter		= 0;
-	var idCounterTemp	= 0;
+	//var idCounter		= 0;
+	//var idCounterTemp	= 0;
 	var errorCount		= 0;
 	var perPage 		= localStorage["entry_amount"];
 	var perPageMore 	= 1;
 	var filterTimer;
 	var start;
 	var notesToUpdate 	= {};
-
+	var loadedHTML		= false;
+	var outOfNotes		= false;
+	var lastNote 		= "";
+	var all;
+	localStorage["notes_done_amount"] = 0;
 
 String.prototype.mReplace = function(type) {
 
@@ -133,19 +137,21 @@ String.prototype.mReplace = function(type) {
 }
 
 // Create clickable menu
-$('a#refresh').on("click", function(event) { event.preventDefault(); refreshNotes(); });
+$(document).ready(function() {
+	$('a#refresh').on("click", function(event) { event.preventDefault(); refreshNotes(); });
 
-$('a#recache').on("click", function(event) { event.preventDefault(); recacheNotes(true); });
+	$('a#recache').on("click", function(event) { event.preventDefault(); recacheNotes(true); });
 
-$('a#loadmore').on("click", function(event) { event.preventDefault(); loadMore(); });
+	$('a#loadmore').on("click", function(event) { event.preventDefault(); loadMore(); });
 
-$('a#filter').on("mousedown", function(event) {
-	event.preventDefault();
-	$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
-	$('div#menu div.right').on("keyup", function() { filter() })
-	fInput_rem();
-});
-$('a#filter').mouseup(function(event) { event.preventDefault(); });
+	$('a#filter').on("mousedown", function(event) {
+		event.preventDefault();
+		$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
+		$('div#menu div.right').on("keyup", function() { filter() })
+		fInput_rem();
+	});
+	$('a#filter').mouseup(function(event) { event.preventDefault(); });
+})
 
 // Create Input
 function fInput_add () {
@@ -340,34 +346,48 @@ function checkLoggedIn(reCache, loadmore) {
 
 		  	var nArrayNames = JSON.parse(localStorage["n_array_names"]);
 		  	var doArray 	= new Array();
-
+		  	//loadmore && perPage > nArrayNames.length - parseInt(localStorage['notes_done_amount'])
 		  	if (perPage == "all" || perPage > nArrayNames.length && !loadmore) {
 		  		doArray = nArrayNames;
-		  	} else if(loadmore && perPage > nArrayNames.length - parseInt(localStorage['notes_done_amount'])) {
-		  		doArray = nArrayNames.slice(parseInt(localStorage['notes_done_amount']));
-		  		console.log(nArrayNames.slice(parseInt(localStorage['notes_done_amount'])));
+		  	} else if(loadmore) {
+		  		var notesAmount = parseInt(localStorage['notes_done_amount']);
+		  		doArray = nArrayNames.slice(notesAmount, (notesAmount + parseInt(perPage)));
+		  		//console.log(nArrayNames.slice(parseInt(localStorage['notes_done_amount'])));
 		  	} else {
 		  		parsePerPage = parseInt(perPage) - 1;
 		  		var perPageMax 	= perPageMore + parsePerPage;
 
 		  		while (perPageMore <= perPageMax) {
-			  		var ni = perPageMore - 1;
-			  		doArray.push(nArrayNames[ni]);
+			  		doArray.push(nArrayNames[perPageMore - 1]);
 			  		perPageMore++
 		  		}
 		  	}
-			localStorage["notes_done_amount"] = doArray.length;
+		  	var doArrayLength = doArray.length;
+			localStorage["notes_done_amount"] = doArrayLength + parseInt(localStorage["notes_done_amount"]);
 
 			var new_nArrayNames = new Array();
+
+			if(doArrayLength === 0) {
+				outOfNotes = true;
+				loadMore();
+				return;
+			}
 		  // For each arrayname in localstorage
 			doArray.forEach(function(name) {
 				try {
-					loadNote(name, false);
+					if(name !== undefined) {
+						loadNote(name, false);
+					} else {
+						outOfNotes = true;
+						loadMore();
+						return;
+					}
 				} catch(e) {
 					console.error(e);
 				}
 			});
 			function loadNote(name, bypass) {
+				lastNote = name;
 				if (JSON.parse(localStorage[name])[0] == "old" && !reCache || bypass) {
 					var self = this, doBind = function() {
 						var nNote = JSON.parse(localStorage[name]);
@@ -381,13 +401,13 @@ function checkLoggedIn(reCache, loadmore) {
 						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
 							//console.log("Manga exists in localStorage");
 
-							notificationInfo(JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore);
+							notificationInfo(JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore, name, "nInfo");
 							
 						} else {
 							//console.log("Manga does not exists in localStorage");
 							//console.log(nNote[2]);
 
-							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore);	
+							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore, name, "gInfo");	
 						}
 					  // Update the app_version localStorage to current version
 						if (doArray[doArray.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
@@ -407,7 +427,7 @@ function checkLoggedIn(reCache, loadmore) {
 }
 
 // Function waiting for the information from GrabInfo
-function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, loadmore) {
+function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, loadmore, noteName, from) {
 
   // Variables
 	var tagArray 		= new Array();
@@ -415,8 +435,15 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	var translatorArray	= new Array();
 	var seriesArray 	= [{attribute: "Not Specified", attribute_link: "/none"}]
 	var error 			= false;
+ 
+  // Div variables
+	var divName 		= noteName.replace("--note", "").replace("/", "").replace("/", "-");
+	var divTags 		= "";
+	var divArtists 		= "";
+	var divTranslators 	= "";
+	var languageClass 	= "";
 
-	if (infodata[1] == "error") { idCounter--; error = true; console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); console.log("%cError Message: %c" + "(" + infodata[2] + ") " + infodata[4], "color: red;", "color: black;"); };
+	if (infodata[1] == "error") { error = true; console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); console.log("%cError Message: %c" + "(" + infodata[2] + ") " + infodata[4], "color: red;", "color: black;"); };
 	if (infodata[3] && !error)  { seriesArray = infodata[3] };
 	if (infodata[5] && !error)  { var languageLink = infodata[5].mReplace("char").toLowerCase();};
 	if (infodata[7] && !error)  { tagArray 			= infodata[7] };
@@ -427,11 +454,14 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	var seriesLink = seriesArray[0].attribute.mReplace("char").toString().toLowerCase(); 
 
   // Check if the stored html should be appended
-	if (idCounter == 0 && !reCache && !userRefresh) {
+	if (!loadedHTML && !reCache && !userRefresh) {
+		loadedHTML = true;
 	  // Append content to body
 		$('div#notes').append(JSON.parse(localStorage["html_content"]));
-	} 
-	idCounter++
+	} else if (reCache) {
+		loadedHTML = true;
+	}
+	////idCounter++
 
   // Update time
 	if (infodata[11] && !error) {
@@ -441,7 +471,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 		var timeSince	= {
 				days: Math.floor(hoursDiff / 86400),
 				hours: Math.floor(hoursDiff / 3600),
-				minutes: Math.ceil(hoursDiff / 60)
+				minutes: Math.round(hoursDiff / 60)
 			};
 		var endText;
 
@@ -457,13 +487,14 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 		}
 		nold = nold + endText;
 		if (pend == "append") {
-			$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-small div.right i').text(nold);
+			$('div#'+ divName +' div#right div.wrap div.row-small div.right i').text(nold);
 		}
 	}
 
 	if (pend == "prepend" || reCache || loadmore) {	
-
-		idCounterTemp = idCounter;
+		//idCounterTemp = //idCounter;
+		//idCounter = $('div#content div#notes div.noteDiv').length + 1;
+		
 	  // Make sure items get appended if action is loadmore
 	  	if(loadmore) { pend = "append" }
 
@@ -472,66 +503,17 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 			
 	  // Create divs
 		if (infodata[2] && !error) {
-			//idCounter++
-				// Main Div
-				if (idCounter == 1 || pend == "append") {
-					$('div#content div#notes').append("<div class='noteDiv'></div>");
-				} else {
-					idCounter = 1;
-					$('div#content div#notes').prepend("<div class='noteDiv'></div>");
-				}
-				// Left Div Content
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') ').append("<div id='left'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left').append("<div class='wrap'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap').append("<div class='images'></div>");
-				
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[9] + "' itemprop='image'>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images').append("<img class='cover' src='" + infodata[10] + "' itemprop='image'>");
-
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap').append("<ul></ul>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul').append("<li></li>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul li:nth-of-type(1)').append("<a id='read-online' href='#'>Read Online</a>");
-					
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul').append("<li></li>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap ul li:nth-of-type(2)').append("<a id='download' href='#'>Download</a>");
-			
-			// Right Div Content
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') ').append("<div id='right'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right').append("<div class='wrap'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div id='hidediv'><button title='Remove' class='close'>Close</button></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='content-name'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.content-name').append("<h1>" + infodata[2] + "</h1>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='left'>Series: <a id='" + seriesLink + "' href='#'>" + seriesName + "</a></div>");
-
-				if (infodata[5] == "english") {
-					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='english'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
-				} else {
-					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row').append("<div class='right'>Language: <span class='non-english'><a id='" + languageLink + "' href='#'>" + infodata[5] + "</a></span></div>");
-				}
-				
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='left'>Artist: </div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:last-child').append("<div class='right'>Translator: <span class='english'></span></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row-small'></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-small').append("<div class='left'><b>" + infodata[1] + "</b> Pages</div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-small').append("<div class='right'><i>" + nold + "</i></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='hr></div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div id='description' class='row-left-full' itemprop='description'><b>Description: </b>" + infodata[8] + "</div>");
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap').append("<div class='row-left-full' itemprop='keywords'><b>Tags: </b></div>");
+			////idCounter++;
 
 			// For each in array do...
 			  // Create Tags Link
-				tagArray.forEach(function(e) {
+				tagArray.forEach(function(e, i) {
 					var er = e.attribute.mReplace("char").toLowerCase()
-
 				  // If last in array do not use ", "
 					if (tagArray[tagArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:last-child').attr("title", $('<div/>').html(e.attribute.mReplace("desc")).text());
+						divTags += '<a id="'+ er +'" href="#" title="'+ $('<div/>').html(e.attribute.mReplace("desc")).text() +'">'+ e.attribute +'</a>';
 					} else {
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row-left-full:last-child a:last-child').attr("title", $('<div/>').html(e.attribute.mReplace("desc")).text());
+						divTags += '<a id="'+ er +'" href="#" title="'+ $('<div/>').html(e.attribute.mReplace("desc")).text() +'">'+ e.attribute +'</a>, ';
 					}
 				});
 			  // Create Artists Link"
@@ -540,9 +522,9 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 
 				  // If last in array do not use ", "
 					if (artistArray[artistArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
+						divArtists += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>'
 					} else {
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.left').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
+						divArtists += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>, '
 					}
 				});
 			  // Create Translators Link"
@@ -551,35 +533,92 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 
 				  // If last in array do not use ", "
 					if (translatorArray[translatorArray.length - 1] == e) {
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>");
+						divTranslators += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>'
 					} else {
-						$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').append("<a id='" + er + "' href='#'>" + e.attribute + "</a>, ");
+						divTranslators += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>, '
 					}
 				});
+
+			  // Main Div
+				if (pend == "append") {
+					$('div#content div#notes').append('<div id="'+ divName +'" class="noteDiv"></div>');
+				} else {
+					//idCounter = 1;
+					$('div#content div#notes').prepend('<div id="'+ divName +'" class="noteDiv"></div>');
+				}
+
+			  // Assign language class
+				if (infodata[5] == "english") {
+					languageClass = "english";
+				} else {
+					languageClass = "non-english";
+				}
+
+			  // Left Div Content
+				$('div#'+divName).append('<div id="left">'+
+					'<div class="wrap">'+
+						'<div class="images">'+
+							'<img class="cover" src="'+ infodata[9] +'" itemprop="image">'+
+							'<img class="cover" src="'+ infodata[10] +'" itemprop="image">'+
+						'</div>'+
+						'<ul>'+
+							'<li><a id="read-online" href="#">Read Online</a></li>'+
+							'<li><a id="download" href="#">Download</a></li>'+
+						'</ul>'+
+					'</div>'+
+				'</div>');
+			
+			  // Right Div Content
+				$('div#'+divName).append('<div id="right">'+
+					'<div class="wrap">'+
+						'<div id="hidediv">'+
+							'<button title="Remove" class="close">Close</button>'+
+						'</div>'+
+						'<div class="content-name">'+
+							'<h1>'+ infodata[2] +'</h1>'+
+						'</div>'+
+						'<div class="row">'+
+							'<div class="left">Series: <a id="'+ seriesLink +'" href="#">'+ seriesName +'</a></div>'+
+							'<div class="right">Language: <span class="'+ languageClass +'"><a id="'+ languageLink +'" href="#">'+ infodata[5] +'</a></span></div>'+
+						'</div>'+
+						'<div class="row">'+
+							'<div class="left">Artist: '+ divArtists +'</div>'+
+							'<div class="right">Translator: <span class="english">'+ divTranslators +'</span></div>'+
+						'</div>'+
+						'<div class="row-small">'+
+							'<div class="left"><b>'+ infodata[1] +'</b> Pages</div>'+
+							'<div class="right"><i>'+ nold +'</i></div>'+
+						'</div>'+
+						'<div class="hr"></div>'+
+						'<div id="description" class="row-left-full" itemprop="description"><b>Description: </b>'+ infodata[8] +'</div>'+
+						'<div class="row-left-full" itemprop="keywords"><b>Tags: </b>'+ divTags +'</div>'+
+					'</div>'+
+				'</div>');
+
 			  // Description dropdown
-				if ($('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full').height() > 32) {
+				if ($('div#'+ divName +' div#right div.wrap div#description.row-left-full').height() > 32) {
 
 				  // Create dropdown button
-				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full').css("height", "32px")
-				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
-				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
-				  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full').css("height", "32px")
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
 
 					}
 			  // Fix left div height
-					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images').css("height", $('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right').height() - 60);
-					$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#left div.wrap div.images img').css("height", "100%");
+					$('div#'+ divName +' div#left div.wrap div.images').css("height", $('div#'+ divName +' div#right').height() - 60);
+					$('div#'+ divName +' div#left div.wrap div.images img').css("height", "100%");
 
 			// End of create 
 
 		  // Change class to hidden if true
 			if (nshown == "hidden") {
-				$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +')').attr("class", "noteDiv-hidden");
+				$('div#'+divName).attr("class", "noteDiv-hidden");
 			}
 		  // Remove unused Divs
-		  	if ($('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').text() == "") {
-		  		$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').html("<a>Not Specified</a>");
-		  		$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div.row:nth-of-type(4) div.right span').attr("class", "japanese");
+		  	if ($('div#'+ divName +' div#right div.wrap div.row:nth-of-type(4) div.right span').text() == "") {
+		  		$('div#'+ divName +' div#right div.wrap div.row:nth-of-type(4) div.right span').html("<a>Not Specified</a>");
+		  		$('div#'+ divName +' div#right div.wrap div.row:nth-of-type(4) div.right span').attr("class", "japanese");
 		  	}
 		} // End of create divs
 	} // End of if prepend statement
@@ -591,12 +630,12 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	
 	// Run function that will attach Event Listeners to page
 	if (!error && !userRefresh || !error && pend == "prepend") {
-		attachEventListeners(idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray);
+		attachEventListeners(divName, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray);
 	}
 
   // If div position was set to prepend
   	if (pend == "prepend") {
-  		idCounter = idCounterTemp;
+  		//idCounter = //idCounterTemp;
   	}
   // If new change to old to indicate that the entry has been seen
 	if (nseen == "new") {
@@ -605,30 +644,35 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 		notesToUpdate[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note)
 		//localStorage[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
-	// console.log("idCounter: "+idCounter)
-	// console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
-	// console.log("errorCount: "+errorCount)
+
+	//console.log("//idCounter: "+//idCounter)
+	//console.log("arrayLength: "+JSON.parse(localStorage["n_array_names"]).length)
+	//console.log("errorCount: "+errorCount)
+
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
   	var extra = 0;
   	if (loadmore) {
   		extra = perPageMore - parseInt(localStorage["notes_done_amount"]) - 1;
   	}
-
-	if (idCounter == parseInt(localStorage["notes_done_amount"]) - errorCount + extra || idCounter == JSON.parse(localStorage["n_array_names"]).length - errorCount + extra) {
+		
+	// }
+  // Check if last note in list
+  	//console.log("From: "+from);
+  	//console.log("noteName: "+noteName);
+	if(noteName == lastNote) {
 		//console.log("notesDone triggered");
 		notesDone(pend, loadmore, errorCount);
-		
 	}
 };
 
-function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray) {
+function attachEventListeners (divName, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray) {
   // Div actions
-  	newTabLink(idCounter, href, "read-online");
-	newTabLink(idCounter, "series", seriesLink, seriesArray[0].attribute_link);
-	newTabLink(idCounter, "", languageLink);
+  	newTabLink(divName, href, "read-online");
+	newTabLink(divName, "series", seriesLink, seriesArray[0].attribute_link);
+	newTabLink(divName, "", languageLink);
 
   // Description Dropdown click action
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
+	$('div#'+ divName +' div#right div.wrap div#description.row-left-full b').mousedown(function(event) {
 		if ($(event.target.parentNode).height() > 32) {
 		  // Hide dropdown
 			$(event.target.parentNode).css("height", "32");
@@ -640,14 +684,14 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 		}
 	});
 	  // Description links click action
-  	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') div#right div.wrap div#description.row-left-full a').on('click', function(event) {
+  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full a').on('click', function(event) {
 		event.preventDefault();
 		openTab(event.currentTarget.href)
 	})
 
   // Download click action
 	// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mousedown(function(event) {
+	$('div#'+ divName +' a#download').mousedown(function(event) {
 	  // If left mouse button clicked, trigger download event
 		if(event.button == 0) {
 			event.preventDefault();
@@ -666,14 +710,14 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 			popup("downloadClicked");
 		}
 	});
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#download').mouseup(function(event) {
+	$('div#'+ divName +' a#download').mouseup(function(event) {
 		if(event.button == 0) {
 			event.preventDefault();
 			requestDownload(href);
 		}
 	});
   // Hide/Remove div click action
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') button.close').mousedown(function(event) {
+	$('div#'+ divName +' button.close').mousedown(function(event) {
 		if(event.button == 0) {
 			event.preventDefault();
 			var x=event.clientX; 
@@ -692,7 +736,7 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 			popup("removeClicked")
 		}
 	});
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') button.close').mouseup(function(event) {
+	$('div#'+ divName +' button.close').mouseup(function(event) {
 			event.preventDefault();
 		});
 
@@ -703,9 +747,9 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 
 	  // If last in array do not use ", "
 		if (tagArray[tagArray.length - 1] == e) {
-			newTabLink(idCounter, "tags", er, e.attribute_link);
+			newTabLink(divName, "tags", er, e.attribute_link);
 		} else {
-			newTabLink(idCounter, "tags", er, e.attribute_link);
+			newTabLink(divName, "tags", er, e.attribute_link);
 		}
 	});
   // Create Artists Link"
@@ -714,9 +758,9 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 
 	  // If last in array do not use ", "
 		if (artistArray[artistArray.length - 1] == e) {
-			newTabLink(idCounter, "artists", er, e.attribute_link);
+			newTabLink(divName, "artists", er, e.attribute_link);
 		} else {
-			newTabLink(idCounter, "artists", er, e.attribute_link);
+			newTabLink(divName, "artists", er, e.attribute_link);
 		}
 	});
   // Create Translators Link"
@@ -725,26 +769,26 @@ function attachEventListeners (idCounter, href, seriesLink, languageLink, tagArr
 
 	  // If last in array do not use ", "
 		if (translatorArray[translatorArray.length - 1] == e) {
-			newTabLink(idCounter, "translators", er, e.attribute_link);
+			newTabLink(divName, "translators", er, e.attribute_link);
 		} else {
-			newTabLink(idCounter, "translators", er, e.attribute_link);
+			newTabLink(divName, "translators", er, e.attribute_link);
 		}
 	});
 }
 
 // New Tab Link click action
-function newTabLink(idCounter, e, er, link) {
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#' + er).click(function(event) {
+function newTabLink(divName, e, er, link) {
+	$('div#'+ divName +' a#' + er).click(function(event) {
 		if (event.button != 2) {
 			event.preventDefault();
 		}
 	});
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#' + er).mousedown(function(event) {
+	$('div#'+ divName +' a#' + er).mousedown(function(event) {
 		if (event.button != 2) {
 			event.preventDefault();
 		}
 	});
-	$('div#content div#notes div.noteDiv:nth-of-type('+ idCounter +') a#' + er).mouseup(function(event) {
+	$('div#'+ divName +' a#' + er).mouseup(function(event) {
 		if (event.button != 2) {
 			event.preventDefault();
 			if (er == "read-online") {
@@ -962,20 +1006,23 @@ function recacheNotes(reCache) {
 	}	
 	$('div#float').attr("class", "float-load");
 
-	idCounter		= 0;
-	idCounterTemp 	= 0;
+	//idCounter		= 0;
+	//idCounterTemp 	= 0;
 	errorCount 		= 0;
 	perPageMore 	= 1;
+	outOfNotes		= false;
+	localStorage["notes_done_amount"] = 0;
 
 	checkLoggedIn(reCache, false);
 }
 
 function loadMore() {
-	if(JSON.parse(localStorage['n_array_names']).length > ($('div#notes').children().length + errorCount)) {
+	if(!outOfNotes) {
 		$('div#float').attr("class", "float-loadmore");
 		checkLoggedIn(false, true);
 	} else {
 		$('div#float').attr("class", "float-loadmore-not");
+		$('div#float').attr("style", "");
 		lightsOff();
 		$('div#float').empty();
 		$('div#float').show();

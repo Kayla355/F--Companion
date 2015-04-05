@@ -36,6 +36,9 @@
 	if (localStorage["http_to_https"] === undefined) {
 		localStorage["http_to_https"] = "true";
 	}
+	if(localStorage["new_note"] === undefined) {
+		localStorage["new_note"] = "true";
+	}
 
 // Listen for change of active tab.
 chrome.tabs.onActivated.addListener(function(activeInfo) {
@@ -54,6 +57,7 @@ chrome.tabs.onUpdated.addListener(function(updatedTab) {
 	});
 });
 
+// Runs function on load to avoid issues.
 checkForValidUrl();
 
 // Called when the url of a tab changes.
@@ -251,11 +255,11 @@ function notificationCheck() {
 							var nNew;
 							var nStatus;
 
-							// console.log("Checked Notifications");
-							// console.log("Name: " + nName);
-							// console.log("Link: " + nHref);
-							// console.log("Uploaded: " + nOld);
-							// console.log("Under Tags: " + JSON.stringify(nTags));
+							//console.log("Checked Notifications");
+							//console.log("Name: " + nName);
+							//console.log("Link: " + nHref);
+							//console.log("Uploaded: " + nOld);
+							//console.log("Under Tags: " + JSON.stringify(nTags));
 
 							var noteArray 	= [];
 							var nStorage 	= $(div).find("a:nth-last-of-type(1)").attr("href");
@@ -270,7 +274,7 @@ function notificationCheck() {
 
 								  // Checks if the info stored has an unknown error and if true recache the note.
 									if (iExists[1] == "error" && !iExists[2].toString().match(/(404|410|411)/)) {
-										console.log("Item containing Unknown error removed & re-checking.");
+										console.log("Item contains Unknown error removed & re-checking.");
 										nExists = ""; 
 										iExists = "";
 										localStorage.removeItem(localStorage[nStorage + "--note"]);
@@ -299,16 +303,17 @@ function notificationCheck() {
 								}
 						  // If it does not exist
 							} else {
-								if (localStorage["first_time"] == "true") {
+								if(localStorage["first_time"] == "true") {
 									noteArray[0] = "old";
 									nNew = false;
 								} else {
 									noteArray[0] = "new";
 									nNew = true;
-									i = localStorage["badge_number"];
-									i++;
-									localStorage["badge_number"] = i;
 								}
+									
+								i = localStorage["badge_number"];
+								i++;
+								localStorage["badge_number"] = i;
 
 								noteArray[5] = "shown";
 								nStatus = "shown";
@@ -540,8 +545,9 @@ function cleanStorage() {
 function badgeUpdate(status) {
   // When updateBadge is triggered from the notificationCheck
 	if (status == "update") {
-		if (localStorage["badge_number"] === 0) {
+		if (localStorage["badge_number"] == 0) {
 			badgeRed("");
+			localStorage["new_note"] = "false";
 		} else {
 			badgeRed(localStorage["badge_number"]);
 			localStorage["new_note"] = "true";
@@ -606,8 +612,8 @@ function recursiveNote(updateInterval) {
 // Function for downloading the links.
 function downloadLinks() {
 		
-	// console.log(infoarray);
-	// console.log(linkarray);
+	//console.log(infoarray);
+	//console.log(linkarray);
 	
 	var imgURL 			= linkarray[1];
 	var quant 			= parseInt(infoarray[1]);
@@ -719,8 +725,8 @@ function downloadLinks() {
 		copypasta2 = linkarray[i];
 			
 		var filename2 = filename.replace("pagenumber", str);
-		// console.log(folderStructure + "/" + filename2 + ext);
-		// console.log(copypasta2);
+		//console.log(folderStructure + "/" + filename2 + ext);
+		//console.log(copypasta2);
 
 		chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
 			

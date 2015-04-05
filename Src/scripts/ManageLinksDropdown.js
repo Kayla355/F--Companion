@@ -69,8 +69,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 
 
-
-		
+	
 // If the button option is set to "Links" then...
 if (localStorage["button_action"] == "links" ) {
 	$('div#content').append("<div id='center' style='text-align:center; display: inline-block;'></div>");

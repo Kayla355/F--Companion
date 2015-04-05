@@ -9,9 +9,10 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 var infoarray = [];
 var currenturl = "";
+var notes;
 
 // Function for grabbing manga information
-function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore) {
+function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, noteName, from) {
 
 	if (window.location.pathname.match(/.*\/read.*/)) {
 		currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href');
@@ -33,14 +34,27 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			var error;
 			var errorMessage;
 			var storedError;
+
+			var manganame 	= "";
+			var series		= [];
+			var authorname 	= [];
+			var translator 	= [];
+			var language 	= "";
+			var quant 		= 0;
+			var description = "";
+			var	tags	 	= [];
+			var imgCover 	= "";
+			var imgSample	= "";
+			var date 		= 0;
+			var type 		= "";
 			
 			try { 
-				var notes = JSON.parse(localStorage["notes"]);
+				notes = JSON.parse(localStorage["notes"]);
 			} catch(e) {
-				var notes = {};
+				notes = {};
 			}
 
-			if (data.content === "") {
+			if (data.content == "") {
 				error = true;
 				$.ajax({     
 					type: "GET",		
@@ -57,21 +71,29 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			}
 
 			if (!error) {
-				var manganame 	= data.content.content_name;
-				var series		= data.content.content_series;				//Array
-				var authorname 	= data.content.content_artists;				//Array
-				var translator 	= data.content.content_translators;			//Array
-				var language 	= data.content.content_language;
-				var quant 		= data.content.content_pages;
-				var description = data.content.content_description;
-				var	tags	 	= data.content.content_tags;				//Array
-				var imgCover 	= data.content.content_images.cover;
-				var imgSample	= data.content.content_images.sample;
-				var date 		= data.content.content_date;
-				var type 		= data.content.content_category;
+				try {
+					manganame 	= data.content.content_name;
+					series		= data.content.content_series;				//Array
+					authorname 	= data.content.content_artists;				//Array
+					translator 	= data.content.content_translators;			//Array
+					language 	= data.content.content_language;
+					quant 		= data.content.content_pages;
+					description = data.content.content_description;
+					tags	 	= data.content.content_tags;				//Array
+					try { 
+						imgCover 	= data.content.content_images.cover;
+						imgSample	= data.content.content_images.sample;
+					} catch(e) {
+						console.error(e);
+					}
+					date 		= data.content.content_date;
+					type 		= data.content.content_category;
+				} catch(e) {
+					console.log(e);
+				}
 
 			  // Check if http:// or https:// is included in the link. Newer links don't have them included while older ones do.
-				if (!imgCover.match(/http/)) {
+				if (!imgCover.match(/http/) && imgCover != "") {
 					imgCover = "https:" + imgCover;
 					imgSample = "https:" + imgSample;
 				}
@@ -130,7 +152,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 
 			if (error) {
 				if (storedError) {
-					errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, storedError);
+					errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, noteName, from, storedError);
 					return;
 				} else {
 					infoarray[1] = "error";
@@ -142,7 +164,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 
 			if (notifications) {
 				//console.log("notifications Grabinfo triggered");
-				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore);
+				notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore, noteName, from);
 			} else {
 				//console.log("Download Grabinfo triggered");
 				msgDocReadyInfo(ndownload);
@@ -150,12 +172,12 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 						
 		},
 		error: function(error) {
-			errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, error);
+			errorHandling(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, noteName, from, error);
 		}
 	});
 }
 
-function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, error) {
+function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, noteName, from, error) {
 	if (!notifications) {
 		msgError(error);
 		//console.log("Error: " + error);
@@ -171,7 +193,7 @@ function errorHandling (downloadurl, notifications, ndownload, nold, nseen, nsho
 		infoarray[2] = error.status;
 		infoarray[3] = downloadurl;
 		infoarray[4] = error.statusText;
-		notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore);
+		notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore, noteName, from);
 	}
 }
 
