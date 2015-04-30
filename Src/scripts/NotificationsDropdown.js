@@ -17,8 +17,12 @@
 	var loadedHTML		= false;
 	var outOfNotes		= false;
 	var lastNote 		= "";
-	var all;
+	var debug;
 	localStorage["notes_done_amount"] = 0;
+
+  // Debugging
+	var lengthCheckChar = true;
+	var lengthCheckDesc = true;
 
 String.prototype.mReplace = function(type) {
 
@@ -28,7 +32,7 @@ String.prototype.mReplace = function(type) {
 	switch(type) {
 		case "char":
 		  // Variables mapping what characters translates into what
-		  	rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|dark\sskin|monster\sskin|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\;|\/|\[|\]|\☆|\★|\α|\×|\Ω/gi;
+		  	rMapped = /The\siDOLM@STER\sCinderella\sGirls|the\siDOLM@STER|dark\sskin|monster\sskin|\s&\s|\s+\s|\ |\&|\.|\!|\@|\(|\)|\'|\_|\+|\%|\?|\:|\;|\/|\[|\]|\=|\☆|\★|\α|\×|\Ω|\#|\,|\*|\~|\"|\^|\$|\>|\|/gi;
 			eMapped = {
 				" & ":"-",
 				" + ":"-",
@@ -49,6 +53,17 @@ String.prototype.mReplace = function(type) {
 				"/":"",
 				"[":"",
 				"]":"",
+				"=":"",
+
+				"#":"",
+				",":"",
+				"*":"",
+				"~":"",
+				'"':"",
+				"^":"",
+				"$":"",
+				">":"",
+				"|":"",
 			  // Specials
 				"☆":"byb",
 				"★":"bzb",
@@ -63,7 +78,7 @@ String.prototype.mReplace = function(type) {
 			};
 		break;
 		case "desc":
-			rMapped = /ahegao|anal|animated|ashikoki|bakunyuu|bara|cheating|chikan|chubby|color|dark\sskin|decensored|ecchi|femdom|forced|futanari|glasses|group|harem|hentai|horror|housewife|humiliation|idol|incest|irrumatio|kemonomimi|maid|monster\sgirl|nakadashi|netorare|netori|non-h|nurse|oppai|oral|osananajimi|oshiri|paizuri|pegging|pettanko|pregnant|random|schoolgirl|shibari|shimapan|socks|stockings|swimsuit|tanlines|teacher|tentacles|tomboy|toys|trap|tsundere|vanilla|western|yandere|yaoi|yuri/;
+			rMapped = /ahegao|anal|animated|ashikoki|bakunyuu|bara|biting|cheating|chikan|chubby|color|cunnilingus|dark\sskin|decensored|ecchi|fangs|femdom|forced|futanari|glasses|group|gyaru|harem|headphones|hentai|horror|housewife|humiliation|idol|incest|irrumatio|kemonomimi|loli|maid|monster\sgirl|nakadashi|netorare|netori|non-h|nurse|oppai|oral|osananajimi|oshiri|paizuri|pegging|pettanko|pregnant|random|schoolgirl|shibari|shimapan|socks|stockings|swimsuit|tanlines|teacher|tentacles|tomboy|toys|trap|tsundere|vanilla|western|yandere|yaoi|yuri/;
 			eMapped = {
 				"ahegao":"The Ahegao (アヘ顔, which has often been interpreted as \"weird face\", ahe coming from the Japanese onomatopoeia of \"アヘアヘ(aheahe)\" describing female\'s flushed breath/moaning in sex and her sexual excitement, gao meaning \"face\") is an exploitable phenomenon taking place in pictures of close-up faces from a token character modified in order to have a kind of lust-filled, overly exaggerated orgasmic expression, the eyes usually rolled up with teardrops/sweat at times, the mouth wide open with the tongue sticking out and blushing cheeks.&#10;&#10;Related Tags: forced, humiliation, netorare",
 				"anal":"Anal sex refers to the sex act involving insertion of the penis into the anus of a sex partner. Manga with this tag will include scenes of anal sex, either with or without permission from the receiving person.&#10;&#10;Related Tags: forced, netorare, tsundere",
@@ -71,19 +86,24 @@ String.prototype.mReplace = function(type) {
 				"ashikoki":"Ashikoki (あしこき) is the Japanese term for footjob. A footjob is a sexual act where the genitalia are stimulated by someone\'s feet. Manga with this tag will include these scenes.&#10;&#10;Related Tags: oral, paizuri, stockings",
 				"bakunyuu":"This tag is reserved for the most extreme examples of big breasted women. Breasts labeled with tag are unrealistically large (almost comically) in comparison to the woman\'s body.&#10;&#10;Related Tags: paizuri, oppai, chubby",
 				"bara":"Bara (薔薇), also known as \"Men\'s Love\" (commonly abbreviated as \"ML\"), is a Japanese term for a genre of art and media that focuses on male same-sex love, usually created by gay men for a gay audience.&#10;&#10;Related Tags: anal, vanilla, yaoi",
+				"biting":"Usually refering to biting in a sensual and sexual way.",
 				"cheating":"The cheating tag is used for content where one of the characters has a relationship with someone other than their spouse. Usually we are not introduced to the spouse, or they have a very small part in the story. This tag was introduced as a more mild form of netorare.&#10;&#10;Related Tags: housewife, netorare, tsundere",
 				"chikan":"Chikan is the Japanese word for public molestation. Usually used in reference to furtive groping and sexual assaults that have become frequent on crowded public trains.&#10;&#10;Related Tags: oral, forced, tsundere",
 				"chubby":"A tag for works involving a girl with a little more flesh than your typical hentai girl. This tag can apply for girls who are just a little bigger than normal, to girls who would be considered obese.&#10;&#10;Related Tags: oshiri, oppai",
 				"color":"The color tag refers to manga and doujinshi that are entirely in color. Usually full color releases are much more elaborate and more detailed than regular releases and as a result they are much shorter.&#10;&#10;Related Tags: pettanko, stockings, uncensored",
+				"cunnilingus":"Describes the act of licking, sucking, etc... of the female partner's vagina.",
 				"dark skin":"The \"dark skin\" tag is used for hentai manga and doujinshi that focus on or contain females with dark/tan skin.&#10;&#10;Related Tags: oppai, schoolgirl, tanlines",
 				"decensored":"All hentai produced in Japan is censored by law. The law discourages showing genitals in hentai and all other forms of pornography. This is why most hentai will make use of black bars, mosaics, or a blur effect to hide genitalia. That said, you will find hentai with this tag completely uncensored. This is accomplished by having artists go in afterward, remove the censorship, and redraw the missing parts.&#10;&#10;Related Tags: color, ecchi",
 				"ecchi":"Ecchi describes a genre of manga and anime which is seen as a softer variant of hentai. For the most part it does not show sexual intercourse, but can show: panty shots, nudity, and perverted situations. Most of the time we use this tag for anything that does not contain any hentai.&#10;&#10;Related Tags: mizugi, shimapan, vanilla",
+				"fangs":"Usually describing characters with sharp teeth.",
 				"femdom":"Femdom, the shortened term for female dominance, irefers to relationships or sexual scenes where the dominant partner is female. This is frequently associated with BDSM or S&M, a type of roleplay between two or more individuals derived from the terms bondage and discipline. Manga with this tag will contain females character that are assertive and dominant over the other partner.&#10;&#10;Related Tags: futanari, yandere, yuri",
 				"forced":"\"Forced\" is a more elegant way of saying rape. Manga with this tag will contain heavy elements of rape. This includes forced sexual intercourse (mainly by men on women) using either physical strength, threat, or surprise. This theme is very common and accepted in Japan.&#10;&#10;Related Tags: chikan, netorare",
 				"futanari":"Futanari (二成, 二形; ふたなり) is a genre of Japanese anime and manga featuring hermaphrodite women; women with male genitalia. Due to the way it is executed, futanari is most closely related to the yuri genre, both generally feature women as the main characters.&#10;&#10;Related Tags: kemonomimi, tentacles, yuri",
 				"glasses":"Megane is the Japanese term for glasses. Hentai with this tag will contain characters that wear glasses.&#10;&#10;Related Tags: harem, mizugi, shimapan",
 				"group":"The group tag is used for manga that include threesomes and beyond. Most often this will include multiple male partners on a single female, but it also includes group situations where multiple couples are performing at the same time and in the same vicinity.&#10;&#10;Related Tags: harem, oral, schoolgirl",
+				"gyaru":"A girl with a tan, natural or otherwise, and dyed/bleached blonde hair, usually combined with excessive use of make-up and jewelry. &#10;&#10; Synonyms: Ganguro, ガングロ, Yamanba, ヤマンバ, Manba, マンバ, Kogyaru, コギャル",
 				"harem":"Harem is a subgenre of anime and manga characterized by a protagonist surrounded by three or more members of the opposite sex. The most common scenario is a male surrounded by a group of females; when this is reversed it is referred to as a reverse harem. Manga with this tag usually have multiple female partners and one male, with each female personifying a popular character type.&#10;&#10;Related Tags: group, oral, schoolgirl",
+				"headphones":"Cute girls wearing headphones!",
 				"hentai":"Hentai (変態 or へんたい) is a Japanese word that, in the West, describes sexually explicit or pornographic comics and animation—especially those of Japanese origin, such as anime, manga, and eroge. On FAKKU we use the \"hentai\" tag to differentiate heterosexual content (hentai) from homosexual content (yaoi and yuri).&#10;&#10;Related Tags: vanilla, yaoi, yuri",
 				"horror":"Works intended to be scary, creepy, or shocking. Often includes some supernatural element such as ghosts, monsters, etc... However, they can also just explore the darker parts of human nature.",
 				"housewife":"Housewife is a term used to describe a married female who is not employed outside of the home, instead she manages the household while her husband works. Manga with this tag involve housewives while they are at home. Additionally it is used in place of a MILF tag.&#10;&#10;Related Tags: incest, netorare, oppai",
@@ -92,6 +112,7 @@ String.prototype.mReplace = function(type) {
 				"incest":"Incest, more commonly referred to as wincest, is the taboo involving sexual intercourse between close relatives. The idea of forbidden love is the main appeal behind incest. Though many people enjoy these stories, it is often much less appealing in real life.&#10;&#10;Related Tags: tsundere, vanilla",
 				"irrumatio":"A step up from a standard blowjob, the term Irrumatio is used to describe the act of (often roughly) \"fucking someone\'s face\". Generally involves deepthroating.&#10;&#10;Related Tags: oral, forced",
 				"kemonomimi":"Kemonomimi refers to characters with animal characteristics, such as cat ears, cat tails, etc. Generally these characters appear mostly human despite their animal characteristics.&#10;&#10;Related Tags: megane, tentacles, vanilla",
+				"loli":"A slang term for a childlike female character.",
 				"maid":"Maid outfits are extremely popular in Japan and are frequently worn in anime and manga. The most common style of Japanese maid outfit consists of a traditional French maid costume with an apron. Generally, Japanese maid costumes are usually one-piece above the knee and black/navy blue colored. Typically they include a short apron with frill and the skirt area of the dress is usually pleated. If knickers or petticoats are worn with it, they are usually ruffled (and the dress is sometimes short enough to display them).&#10;&#10;Related Tags: housewife, stockings, teacher",
 				"monster girl":"Monster girls are \"exotic\" beings (monsters, demons, aliens, etc) that are either part human or bear a strong resemblance to a human female. Manga with this tag most often include strong female monster that capture a human male. For more fun check out Monmusu Quest, a visual novel involving monster girls.&#10;&#10;Related Tags: femdom, kemonomimi, tentacles",
 				"nakadashi":"Nakadashi (なかだし) is the act of cumming inside (aka creampie).",
@@ -130,10 +151,20 @@ String.prototype.mReplace = function(type) {
 		break;
 	}
 
-  // Return the mapped value.
-  	return this.toLowerCase().replace(rMapped, function(matched) {
-						return eMapped[matched];
-					});
+  // Check if rMapped is same "length" as eMapped. Debug only.
+	if(lengthCheckChar && type == "char" || lengthCheckDesc && type == "desc") {
+		if(rMapped.toString().replace(/\\\|/, "").split("|").length != Object.keys(eMapped).length) {
+			console.error("Could not match length of map: " + type);
+		}
+
+		if(type == "char") { lengthCheckChar = false; }
+		if(type == "desc") { lengthCheckDesc = false; }
+	}
+
+	  // Return the mapped value.
+	  	return this.toLowerCase().replace(rMapped, function(matched) {
+							return eMapped[matched];
+						});
 }
 
 // Create clickable menu
@@ -266,38 +297,38 @@ checkLoggedIn(false, false); // Run checkLoggedIn function
 
 // Queue function
 // Thanks to debuggable for this. (http://bit.ly/dBugQFunc)
-$.queue = {
+$.notequeue = {
     _timer: null,
     _queue: [],
     add: function(fn, context, time) {
         var setTimer = function(time) {
-            $.queue._timer = setTimeout(function() {
-                time = $.queue.add();
-                if ($.queue._queue.length) {
+            $.notequeue._timer = setTimeout(function() {
+                time = $.notequeue.add();
+                if ($.notequeue._queue.length) {
                     setTimer(time);
                 }
             }, time || 2);
         }
 
         if (fn) {
-            $.queue._queue.push([fn, context, time]);
-            if ($.queue._queue.length == 1) {
+            $.notequeue._queue.push([fn, context, time]);
+            if ($.notequeue._queue.length == 1) {
                 setTimer(time);
             }
             return;
         }
 
-        var next = $.queue._queue.shift();
+        var next = $.notequeue._queue.shift();
         if (!next) {
             return 0;
         }
         next[0].call(next[1] || window);
-        //console.log("Left of Queue: " + $.queue._queue.length);
+        //console.log("Left of Queue: " + $.notequeue._queue.length);
         return next[2];
     },
     clear: function() {
-        clearTimeout($.queue._timer);
-        $.queue._queue = [];
+        clearTimeout($.notequeue._timer);
+        $.notequeue._queue = [];
     }
 };
 
@@ -414,7 +445,7 @@ function checkLoggedIn(reCache, loadmore) {
 							setNewVersion = true;
 						}
 			        };
-			        $.queue.add(doBind, this);
+			        $.notequeue.add(doBind, this);
 			    } else {
 			    	new_nArrayNames.unshift(name);
 			    }
@@ -889,6 +920,43 @@ function notesDone(pend, loadmore, errorCount) {
 		// popup("askRecache");
   	}
 
+  // Image hovering event
+  	var hovering = false;
+  	var hoverTimer;
+
+  	$("img.cover").on({
+  		mousemove: function(e) {
+  			var Y = e.pageY + 2;
+  			var X = e.pageX + 5;
+  			var imgHeight 	= e.pageY + e.target.naturalHeight;
+  			var windowSize 	= window.pageYOffset + window.innerHeight;
+
+  			if(windowSize <= imgHeight) {
+  				Y = Y - (imgHeight - windowSize) - 4;		// 4 is because 2 needs to be -2
+  			}
+
+  			$("div.image-hover").css({
+  				"top": Y,
+  				"left": X
+  			});
+
+  			hovering = true;
+  			clearTimeout(hoverTimer);
+  			//console.log("X: "+ e.pageX +", Y: "+ e.pageY);
+  		},
+		mouseenter: function(e) {
+			if(!hovering) {
+				$('<div class="image-hover"><img src="'+ this.src +'"></div>').hide().appendTo("body").delay(250).fadeIn(100);
+			} else {
+				$('<div class="image-hover"><img src="'+ this.src +'"></div>').appendTo("body");
+			}
+			//$("body").append('<div class="image-hover"><img src="'+ this.src +'"></div>');
+		},
+		mouseleave: function(e) {
+			$("div.image-hover").remove();
+  			hoverTimer = setTimeout(function() { hovering = false; }, 500);
+		}
+	});
 }
 
 // Function that saves the content of the notes div in localstorage

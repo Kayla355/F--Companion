@@ -94,6 +94,13 @@ div
 	height: 96px;
 	width: 70px;
 }
+.image-hover
+{
+	position: absolute;
+	z-index: 9999;
+	box-shadow: 5px 5px 10px 0px rgba(50, 50, 50, 0.75);
+	pointer-events: none;
+}
 .noteDiv ,.noteDiv-matched
 {
 	margin-bottom: 5px;

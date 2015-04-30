@@ -233,7 +233,8 @@ function notificationCheck() {
 							return;
 						} else {
 						  // Clear badge_number
-							localStorage["badge_number"] = 0;
+							badgeUpdate("update");
+							loggedIn = true;
 						}
 
 					  // Find each notification

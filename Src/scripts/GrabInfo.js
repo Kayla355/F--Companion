@@ -13,7 +13,7 @@ var notes;
 
 // Function for grabbing manga information
 function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pend, reCache, loadmore, noteName, from) {
-
+	// Change this to "window.location.host+window.url"?
 	if (window.location.pathname.match(/.*\/read.*/)) {
 		currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href');
 		//console.log("GrabInfo URL: " + currenturl);
