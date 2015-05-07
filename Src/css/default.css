@@ -223,6 +223,19 @@ div
 {
 	padding-top: 5px;
 }
+#error
+{
+	display: none;
+	background-color: rgb(255, 116, 116);
+	box-shadow: 3px 3px rgba(0, 0, 0, 0.3);
+	position: fixed;
+	width: 320px;
+	padding: 5px;
+	top: 0px;
+	left: 0;
+	text-align: center;
+	z-index: 9999;
+}
 #load-more
 {
 	display: none;

@@ -474,7 +474,18 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	var divTranslators 	= "";
 	var languageClass 	= "";
 
-	if (infodata[1] == "error") { error = true; console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); console.log("%cError Message: %c" + "(" + infodata[2] + ") " + infodata[4], "color: red;", "color: black;"); };
+	if (infodata[1] == "error") {
+
+		if(infodata[2] == "200") {
+			$('div#error').empty();
+			$('div#error').append("<b>The Fakku API appears to be down, try again later.</b>");
+			$('div#error').show();
+		}
+
+		error = true; 
+		console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); 
+		console.log("%cError Message: %c" + "(" + infodata[2] + ") " + infodata[4], "color: red;", "color: black;");
+	};
 	if (infodata[3] && !error)  { seriesArray = infodata[3] };
 	if (infodata[5] && !error)  { var languageLink = infodata[5].mReplace("char").toLowerCase();};
 	if (infodata[7] && !error)  { tagArray 			= infodata[7] };
@@ -923,16 +934,22 @@ function notesDone(pend, loadmore, errorCount) {
   // Image hovering event
   	var hovering = false;
   	var hoverTimer;
+  	var hoverTimerStart;
+  	var Y;
+  	var X;
 
   	$("img.cover").on({
   		mousemove: function(e) {
-  			var Y = e.pageY + 2;
-  			var X = e.pageX + 5;
-  			var imgHeight 	= e.pageY + e.target.naturalHeight;
-  			var windowSize 	= window.pageYOffset + window.innerHeight;
+  			if(e.pageY && e.pageX) {
+  				Y = e.pageY + 2;
+  				X = e.pageX + 5;
+  			}
+
+  			var imgHeight 	= (Y - 2) + e.target.naturalHeight;
+  			var windowSize 	= window.pageYOffset + window.innerHeight - 4; 	// 4 is because the +2 needs to be -2
 
   			if(windowSize <= imgHeight) {
-  				Y = Y - (imgHeight - windowSize) - 4;		// 4 is because 2 needs to be -2
+  				Y = Y - (imgHeight - windowSize);
   			}
 
   			$("div.image-hover").css({
@@ -940,19 +957,24 @@ function notesDone(pend, loadmore, errorCount) {
   				"left": X
   			});
 
-  			hovering = true;
   			clearTimeout(hoverTimer);
   			//console.log("X: "+ e.pageX +", Y: "+ e.pageY);
   		},
 		mouseenter: function(e) {
 			if(!hovering) {
-				$('<div class="image-hover"><img src="'+ this.src +'"></div>').hide().appendTo("body").delay(250).fadeIn(100);
+				clearTimeout(hoverTimerStart);
+				hoverTimerStart = setTimeout(function() {
+					hovering = true;
+					$('<div class="image-hover"><img src="'+ e.target.src +'"></div>').hide().appendTo("body").fadeIn(100);
+					debug = e;
+					$(e.target).trigger("mousemove");
+				}, 500);
 			} else {
-				$('<div class="image-hover"><img src="'+ this.src +'"></div>').appendTo("body");
+				$('<div class="image-hover"><img src="'+ e.target.src +'"></div>').appendTo("body");
 			}
-			//$("body").append('<div class="image-hover"><img src="'+ this.src +'"></div>');
 		},
 		mouseleave: function(e) {
+			clearTimeout(hoverTimerStart);
 			$("div.image-hover").remove();
   			hoverTimer = setTimeout(function() { hovering = false; }, 500);
 		}
