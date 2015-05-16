@@ -60,4 +60,5 @@
 - Updated JQuery to 2.1.3
 - Images will now expand when hovering over them.
 - The extension will now check for a new version on github and present a notification if it finds one.
+- Added option to download files as zip, instead of individual files.
 

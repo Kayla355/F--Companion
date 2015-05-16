@@ -165,7 +165,7 @@ div
 #filterInput
 {
 	position: fixed;
-	margin-right: 5px;
+	margin-right: 20px;
 	height: 19px;
 	width: 120px;
 	right: 37px;
@@ -256,19 +256,25 @@ div
 	position: relative;
 	top: 5px;
 }
-.close {
-	background: -webkit-linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), -webkit-radial-gradient(#F2D6D6, #FACCCC);
-	border-radius: 50px;
-	border: 0px solid #e6e6e6;
-	height: 12px;
-	width: 12px;
-	text-indent: -9999px;
+.close
+{
 	position: absolute;
-	text-decoration: none;
+	right: -13px;
+  	color: rgb(157, 10, 10);
+  	text-decoration: none !important;
 }
-.close:hover {
-	background: -webkit-linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0)), -webkit-radial-gradient(#FF0000, #FF9393);
+.close:before
+{
+	font-size: 16px !important;
+
+	transition: all 0.1s ease-in-out;
+}
+.close:hover:before
+{
 	cursor: pointer;
+	
+	color: rgb(255, 10, 10);
+	transition: all 0.1s ease-in-out;
 }
 ul
 {
@@ -326,10 +332,42 @@ a:hover
 	color: #009F07;
 	font-weight: 700;
 }
-.non-english a, .japanese a /* Remove japanese for release version  */
+.non-english a, .japanese a
 {
 	color: #9D0A0A;
 	font-weight: 700;
+}
+
+/* Hover Animations Topbar */
+
+#refresh, #recache, #filter
+{
+	display: inline-block !important;
+	text-decoration: none !important;
+}
+#refresh
+{
+	margin-left: 15px;
+}
+#recache
+{
+	margin-left: 18px;
+}
+
+#refresh:before, #recache:before, #filter:before 
+{
+	position: absolute;
+	font-size: 14px !important;
+	margin: 0 0 0 -17px !important;
+
+	transition: all 0.1s ease-in-out;
+}
+#refresh:hover:before, #recache:hover:before, #filter:hover:before 
+{
+	/*margin: 0 0 0 -15px !important;*/
+	transform: scale(0.8);
+
+	transition: all 0.1s ease-in-out;
 }
 
 /* Loading Animation */

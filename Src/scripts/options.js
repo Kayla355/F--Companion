@@ -12,59 +12,63 @@ var alertCheck;
 		}
 	}
 	if(alertCheck) {
-	    // Incognito Downloads
-				var select = document.getElementById("incognitomode");
-				localStorage["incognito_mode"] = select.checked;
+    	// Incognito Downloads
+			var select = document.getElementById("incognitomode");
+			localStorage["incognito_mode"] = select.checked;
 
-			// Fakku Notifications
-				var select = document.getElementById("fakkunotes");
-				// Message to enable/disable recursive function
-					chrome.runtime.sendMessage({msg: "GrabNotes"});
-				localStorage["fakku_notes"] = select.checked;
+		// Zip Downloads
+			var select = document.getElementById("zipdownload");
+			localStorage["zip_download"] = select.checked;
 
-			// Update Interval
-				var select = document.getElementById("updateinterval");
-				localStorage["update_interval"] = select.value;
+		// Fakku Notifications
+			var select = document.getElementById("fakkunotes");
+			// Message to enable/disable recursive function
+				chrome.runtime.sendMessage({msg: "GrabNotes"});
+			localStorage["fakku_notes"] = select.checked;
 
-			// Entries loaded per page
-				var select = document.getElementById("entryamount");
-				var entryamount = select.children[select.selectedIndex].value;
-				if (entryamount != localStorage["entry_amount"]) {
-					localStorage["html_content"] = "";
-				}
-				localStorage["entry_amount"] = entryamount;
+		// Update Interval
+			var select = document.getElementById("updateinterval");
+			localStorage["update_interval"] = select.value;
 
-			// What happens when the icon is pressed
-				var select = document.getElementById("buttonaction");
-				var buttonaction = select.children[select.selectedIndex].value;
-				localStorage["button_action"] = buttonaction;
+		// Entries loaded per page
+			var select = document.getElementById("entryamount");
+			var entryamount = select.children[select.selectedIndex].value;
+			if (entryamount != localStorage["entry_amount"]) {
+				localStorage["html_content"] = "";
+			}
+			localStorage["entry_amount"] = entryamount;
 
-			// What happens when there is a file conflic
-				var select = document.getElementById("conflictaction");
-				var conflictaction = select.children[select.selectedIndex].value;
-				localStorage["conflict_action"] = conflictaction;
+		// What happens when the icon is pressed
+			var select = document.getElementById("buttonaction");
+			var buttonaction = select.children[select.selectedIndex].value;
+			localStorage["button_action"] = buttonaction;
 
-			// Name of the created Folder
-				var select = document.getElementById("foldername");
-				var foldername = select.children[select.selectedIndex].value;
-				localStorage["folder_name"] = foldername;
-			
-			// Save the current order of file Structure
-				var fileSArray = [];
+		// What happens when there is a file conflic
+			var select = document.getElementById("conflictaction");
+			var conflictaction = select.children[select.selectedIndex].value;
+			localStorage["conflict_action"] = conflictaction;
 
-				for (i = 1; i <= fileChild; i++) {
-					var copypasta = $('div#fileColumns div:nth-child('+ i +')').text();
-					fileSArray[i] = copypasta;	
-				}
+		// Name of the created Folder
+			var select = document.getElementById("foldername");
+			var foldername = select.children[select.selectedIndex].value;
+			localStorage["folder_name"] = foldername;
+		
+		// Save the current order of file Structure
+			var fileSArray = [];
 
-				localStorage["file_structure"] = JSON.stringify(fileSArray);
+			for (i = 1; i <= fileChild; i++) {
+				var copypasta = $('div#fileColumns div:nth-child('+ i +')').text();
+				fileSArray[i] = copypasta;	
+			}
 
-			// Update status to let user know options were saved.
-				var status = document.getElementById("status");
-				status.innerHTML = "Options Saved.";
-				setTimeout(function() {
-				status.innerHTML = "";
-				}, 1000);
+			localStorage["file_structure"] = JSON.stringify(fileSArray);
+
+		// Update status to let user know options were saved.
+			var status = document.getElementById("status");
+			status.innerHTML = "Options Saved.";
+			setTimeout(function() {
+			status.innerHTML = "";
+			}, 1000);
 	} else {
 		//alert("You need atleast one(1) Page Number under File Structure");
 		// Update status to let user know that there was an issue with File Structure.
@@ -90,6 +94,16 @@ var fileChild = fileSArray.length - 1;
 	}
 	var select = document.getElementById("incognitomode");
 		if (incognitomode == "true") {
+			select.checked = true;
+		}
+
+// Restore Zip downloads Status
+	var zipdownload = localStorage["zip_download"];
+	if (!zipdownload) {
+		return;
+	}
+	var select = document.getElementById("zipdownload");
+		if (zipdownload == "true") {
 			select.checked = true;
 		}
 
@@ -213,3 +227,19 @@ $(document).ready(function() {
 
 document.addEventListener('DOMContentLoaded', restore_options);
 document.querySelector('#save').addEventListener('click', save_options);
+
+$("#restoreItems").on("click", function() {
+	$("#restoreItems").text("Working...");
+	JSON.parse(localStorage["n_array_names"]).forEach(function(item) {
+		var array = JSON.parse(localStorage[item]);
+
+  		if(array[5] == "hidden") {
+  			array[5] = "shown";
+  			localStorage[item] = JSON.stringify(array);
+  		}
+	})
+
+	$("#restoreItems").text("Done!");
+	setTimeout(function() {$("#restoreItems").text("Restore")}, 2000);
+
+})

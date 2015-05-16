@@ -145,16 +145,20 @@ input[type=number]::-webkit-outer-spin-button
   vertical-align: top;
   display: inline-block;
   cursor: default;
-  color: #fff;
+  color: #000;
   text-shadow: #000 0 1px;
   text-align: center;
-  background-image: url(chrome-extension://__MSG_@@extension_id__/images/trashcan.png);
+  /*background-image: url(chrome-extension://__MSG_@@extension_id__/images/trashcan.png);*/
   background-size: 26px;
   background-repeat: no-repeat;
   -moz-user-select: none;
   -khtml-user-select: none;
   -webkit-user-select: none;
   user-select: none;
+}
+#removeColumn:before
+{
+  margin-left: 0px;
 }
 #removeColumn.over 
 {

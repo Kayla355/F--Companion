@@ -8,6 +8,9 @@
 	}
 	if (localStorage["incognito_mode"] === undefined) {
 		localStorage["incognito_mode"] = "true";
+	}
+	if (localStorage["zip_download"] === undefined) {
+		localStorage["zip_download"] = "true";
 	}	
 	if (localStorage["button_action"] === undefined) {
 		localStorage["button_action"] = "download";
@@ -68,7 +71,7 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 			// Temporary solution to excludes not working properly
 			if (tab.url.match(/.*\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
 				// Change browserAction to Notifications
-				if (localStorage["fakku_notes"] == "true") {
+				if (localStorage["fakku_notes"]) {
 					badgeUpdate("notes");
 					chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
 					return;
@@ -87,7 +90,7 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 	}
 
   // Change browserAction to Notifications
-	if (localStorage["fakku_notes"] == "true") {
+	if (localStorage["fakku_notes"]) {
 		badgeUpdate("notes");
 		chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
 	} else {
@@ -96,10 +99,19 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 	}
 }
 
-function createCORSRequest(method, url) {
+function createCORSRequest(p) {
 	var xhr = new XMLHttpRequest();
+
+	if(p.responseType) { 
+		xhr.responseType = p.responseType;
+	}
+
+	if(!p.method || !p.url) {
+		return;
+	}
+
 	if ("withCredentials" in xhr) {
-		xhr.open(method, url, true);
+		xhr.open(p.method, p.url, true);
 	} else if(typeof XDomainRequest != "undefined") {
 		xhr = new XDomainRequest();
 		xhr.open(method, url);
@@ -117,7 +129,7 @@ var optionsArray 	= [];
 var linkarray 		= [];
 var infoarray 		= [];
 var loggedIn		= true;
-var incognitoMode;
+var incognitoMode	= localStorage["incognito_mode"]
 var nDropdown;
 var checkNotes;
 
@@ -164,7 +176,7 @@ if (Math.floor(Math.round(((new Date()).getTime() - (new Date(localStorage["gith
 	var github_version;
 	var github_update;
 
-	var xhr = createCORSRequest("GET", "https://raw.githubusercontent.com/Kayla355/F--Companion/master/Src/manifest.json");
+	var xhr = createCORSRequest({method: "GET", url: "https://raw.githubusercontent.com/Kayla355/F--Companion/master/Src/manifest.json"});
 	xhr.onload = function() {
 		github_version = xhr.responseText.match(/"version": ".*?(?=")/)[0].replace('"version": "', "").replace(/\./g, "");
 
@@ -191,7 +203,7 @@ if(localStorage["n_array_names"] !== undefined) {
 }
 
 // Timer to check for notifications
-if (localStorage["fakku_notes"] == "true") {
+if (localStorage["fakku_notes"]) {
 	notificationCheck();
 } else {
 	badgeClear(true);
@@ -200,7 +212,7 @@ if (localStorage["fakku_notes"] == "true") {
 // Function to check for notifications
 function notificationCheck() {
 	var start = new Date().getTime();
-	if (localStorage["fakku_notes"] == "true") {
+	if (localStorage["fakku_notes"]) {
 	  // Clear Console
 	  console.clear();
 	  // Check if Login cookie has expired.
@@ -290,7 +302,11 @@ function notificationCheck() {
 								} else {
 									noteArray[0] = "new";
 									nNew = true;
-									i = localStorage["badge_number"];
+
+									if(iExists && !iExists[1] == "error") {
+										i = localStorage["badge_number"];
+									}
+									
 									i++;
 									localStorage["badge_number"] = i;
 								}
@@ -304,7 +320,7 @@ function notificationCheck() {
 								}
 						  // If it does not exist
 							} else {
-								if(localStorage["first_time"] == "true") {
+								if(localStorage["first_time"]) {
 									noteArray[0] = "old";
 									nNew = false;
 								} else {
@@ -363,7 +379,7 @@ function notificationCheck() {
 
 					  // If conversion of localstorage links from http to https has not been done.
 					  // This is done because Fakku has changed all links from http to https and the localstorage links still have http in them.
-						if (localStorage["http_to_https"] == "true") {
+						if (localStorage["http_to_https"]) {
 							$.each(new_nArrayNames, function(i, data) {
 								var http = JSON.parse(localStorage[data]);
 								if (http[2].match(/http:/)) {
@@ -389,7 +405,7 @@ function notificationCheck() {
 						if (nDropdown === true) {
 							chrome.extension.sendMessage({msg: "nDropdownDone"});
 						}
-						if (localStorage["first_time"] == "true") {
+						if (localStorage["first_time"]) {
 							localStorage["first_time"] = "false";
 						}
 
@@ -448,8 +464,8 @@ function test(notes) {
 
 // Convert non-object notes to object
 function convertNotesToObject() {
-	var notes = JSON.parse(localStorage["notes"]);
-	var noteNames = JSON.parse(localStorage["n_array_names"]);
+	var notes 		= JSON.parse(localStorage["notes"]);
+	var noteNames 	= JSON.parse(localStorage["n_array_names"]);
 
 	noteNames.forEach(function(name) {
 		var dName = name.replace("--note", "--info");
@@ -629,8 +645,9 @@ function downloadLinks() {
 	var folderStructure = localStorage["folder_name"];
 	var fileStructure	= JSON.parse(localStorage["file_structure"]);
 	var fslen 			= fileStructure.length - 1;
-	var filename    = "";
+	var filename    	= "";
 	var conflictRes 	= localStorage["conflict_action"];
+
 
 // Convert the folderStructure variable into the proper format
 	switch (folderStructure) {
@@ -718,20 +735,50 @@ function downloadLinks() {
 	}
 		
 // Triggers a download for each generated link.
-	var copypasta2 = "";
+	var downloadURL = "";
 	var downloadIds = [];
+	var zip 		= new JSZip();
+	var zipDownload = localStorage["zip_download"]; 	// Temp variable
+	var onloadCount = 0;
+
 	for (i = 1; i <= quant; i++) {
 		var str = '' + i;
 		while (str.length < 3) str = '0' + str;
-		copypasta2 = linkarray[i];
+		downloadURL = linkarray[i];
 			
 		var filename2 = filename.replace("pagenumber", str);
 		//console.log(folderStructure + "/" + filename2 + ext);
-		//console.log(copypasta2);
-
-		chrome.downloads.download({url: copypasta2, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
+		//console.log(downloadURL);
+	  
+	  	if(zipDownload) {
+	  	  // Zip Download
+	  		var xhr = createCORSRequest({method: "GET", url: downloadURL, responseType:"arraybuffer"});
+	  		xhr.filename = filename2 + ext;
+			xhr.onload = function(data) {
+				zip.file(this.filename, data.target.response, {binary: true});
+				onloadCount++;
+				if(onloadCount === quant) {
+					var content = zip.generate({type: "blob"});
+					saveAs(content, folderStructure + ".zip");
+				}
+			};
+			xhr.send();
+	  	} else {
+	  	 // Normal Download
+			chrome.downloads.download({url: downloadURL, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
+	  	}
 			
 	}
+	
+// Example Code of downloading Zip
+	// var xhr = createCORSRequest({method: "GET", url: "https://t.fakku.net/images/manga/m/[Konmori]_Original_Work_-_milky_break/images/006.jpg", responseType:"arraybuffer"});
+	// 	xhr.onload = function(data) {
+	// 		var zip = new JSZip();
+	// 		zip.file("006.jpg", data.target.response, {binary: true});
+	// 		var content = zip.generate({type: "blob"});
+	// 		saveAs(content, "test.zip");
+	// 	};
+	// xhr.send();
 }
 
 chrome.downloads.onChanged.addListener(function (downloadID) {

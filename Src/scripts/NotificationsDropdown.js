@@ -614,7 +614,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 				$('div#'+divName).append('<div id="right">'+
 					'<div class="wrap">'+
 						'<div id="hidediv">'+
-							'<button title="Remove" class="close">Close</button>'+
+							'<a title="Remove" class="close flaticon-cross108"></a>'+
 						'</div>'+
 						'<div class="content-name">'+
 							'<h1>'+ infodata[2] +'</h1>'+
@@ -759,7 +759,7 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 		}
 	});
   // Hide/Remove div click action
-	$('div#'+ divName +' button.close').mousedown(function(event) {
+	$('div#'+ divName +' .close').mousedown(function(event) {
 		if(event.button == 0) {
 			event.preventDefault();
 			var x=event.clientX; 
@@ -767,18 +767,18 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 			var offsetY=$(document).scrollTop();
 			//console.log(x + ", " + y);
 			//console.log($(document).scrollTop());
-			lightsOff();
+			//lightsOff();
 			$('div#float').empty();
 			$('div#float').show();
 			$('div#float').append("<b>Removed</b>");
 			$('div#float').css("left", x - 90);
 			$('div#float').css("top", y + offsetY);
 			localStorage[href.replace("https://www.fakku.net", "") + "--note"] = localStorage[href.replace("https://www.fakku.net", "") + "--note"].replace("shown", "hidden");
-			$(event.target.parentNode.parentNode.parentNode.parentNode).hide();
+			$(event.target.parentNode.parentNode.parentNode.parentNode).animate({height: "toggle"}, 350);
 			popup("removeClicked")
 		}
 	});
-	$('div#'+ divName +' button.close').mouseup(function(event) {
+	$('div#'+ divName +' .close').mouseup(function(event) {
 			event.preventDefault();
 		});
 
