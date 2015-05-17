@@ -256,11 +256,28 @@ div
 	position: relative;
 	top: 5px;
 }
+#progress-bar {
+	border-radius: 15px;
+	background-color: #BBBBBB;
+	overflow: hidden;
+	margin-top: 10px;
+}
+#progress-bar div {
+	height: 20px;
+	background: red;
+}
+#progress-bar center {
+	margin-top: 2px;
+	font-weight: bold;
+	position: absolute;
+	top: 34px;
+	left: 45%
+}
 .close
 {
 	position: absolute;
 	right: -13px;
-  	color: rgb(157, 10, 10);
+  	color: #9D0A0A;
   	text-decoration: none !important;
 }
 .close:before

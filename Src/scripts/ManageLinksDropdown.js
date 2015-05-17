@@ -171,8 +171,24 @@ function requestDownload() {
 		$('div#loading').hide();
 		$('div#center').css("width", "186px");
 		$('div#center b').text("Success! Downloading Now.");
+		
+		if(localStorage["zip_download"] == "true") {
+			if(localStorage["progress_bar"] == "100") {
+				localStorage["progress_bar"] = 0;
+			}
+			$('div#center b').text("Downloading & Compressing");
+			$('div#center').append("<div id='progress-bar' style='display: inline-block; width: 170px'><center>0%</center><div></div></div>");
+			$('div#center').css("height", "50px");
+			setInterval(updateProgressBar, 10);
+		}
+		
 
 	return;
 	}
 	setTimeout(requestDownload ,20);
+}
+
+function updateProgressBar() {
+	$('div#progress-bar center').text(localStorage["progress_bar"]+"%");
+	$('div#progress-bar div').css("width", localStorage["progress_bar"]+"%");
 }

@@ -71,7 +71,7 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 			// Temporary solution to excludes not working properly
 			if (tab.url.match(/.*\/\/www.fakku.net\/.*\/(favorites($|#|&|\?|\/.*)|english($|#|&|\?|\/.*)|japanese($|#|&|\?|\/.*)|artists($|#|&|\?|\/.*)|translators($|#|&|\?|\/.*)|series($|#|&|\?|\/.*)|newest($|#|&|\?|\/.*)|popular($|#|&|\?|\/.*)|downloads($|#|&|\?|\/.*)|controversial($|#|&|\?|\/.*)|tags($|#|&|\?|\/.*))/)) {
 				// Change browserAction to Notifications
-				if (localStorage["fakku_notes"]) {
+				if (localStorage["fakku_notes"] == "true") {
 					badgeUpdate("notes");
 					chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
 					return;
@@ -129,7 +129,6 @@ var optionsArray 	= [];
 var linkarray 		= [];
 var infoarray 		= [];
 var loggedIn		= true;
-var incognitoMode	= localStorage["incognito_mode"]
 var nDropdown;
 var checkNotes;
 
@@ -203,7 +202,7 @@ if(localStorage["n_array_names"] !== undefined) {
 }
 
 // Timer to check for notifications
-if (localStorage["fakku_notes"]) {
+if (localStorage["fakku_notes"] == "true") {
 	notificationCheck();
 } else {
 	badgeClear(true);
@@ -212,7 +211,7 @@ if (localStorage["fakku_notes"]) {
 // Function to check for notifications
 function notificationCheck() {
 	var start = new Date().getTime();
-	if (localStorage["fakku_notes"]) {
+	if (localStorage["fakku_notes"] == "true") {
 	  // Clear Console
 	  console.clear();
 	  // Check if Login cookie has expired.
@@ -320,7 +319,7 @@ function notificationCheck() {
 								}
 						  // If it does not exist
 							} else {
-								if(localStorage["first_time"]) {
+								if(localStorage["first_time"] == "true") {
 									noteArray[0] = "old";
 									nNew = false;
 								} else {
@@ -379,7 +378,7 @@ function notificationCheck() {
 
 					  // If conversion of localstorage links from http to https has not been done.
 					  // This is done because Fakku has changed all links from http to https and the localstorage links still have http in them.
-						if (localStorage["http_to_https"]) {
+						if (localStorage["http_to_https"] == "true") {
 							$.each(new_nArrayNames, function(i, data) {
 								var http = JSON.parse(localStorage[data]);
 								if (http[2].match(/http:/)) {
@@ -405,7 +404,7 @@ function notificationCheck() {
 						if (nDropdown === true) {
 							chrome.extension.sendMessage({msg: "nDropdownDone"});
 						}
-						if (localStorage["first_time"]) {
+						if (localStorage["first_time"] == "true") {
 							localStorage["first_time"] = "false";
 						}
 
@@ -727,18 +726,10 @@ function downloadLinks() {
 		}
 	}
 		
-// Check if incognito download
-	if (localStorage["incognito_mode"] == "true") {
-		incognitoMode = true;
-	} else {
-		incognitoMode = false;
-	}
-		
 // Triggers a download for each generated link.
 	var downloadURL = "";
 	var downloadIds = [];
 	var zip 		= new JSZip();
-	var zipDownload = localStorage["zip_download"]; 	// Temp variable
 	var onloadCount = 0;
 
 	for (i = 1; i <= quant; i++) {
@@ -750,13 +741,14 @@ function downloadLinks() {
 		//console.log(folderStructure + "/" + filename2 + ext);
 		//console.log(downloadURL);
 	  
-	  	if(zipDownload) {
+	  	if(localStorage["zip_download"] == "true") {
 	  	  // Zip Download
 	  		var xhr = createCORSRequest({method: "GET", url: downloadURL, responseType:"arraybuffer"});
 	  		xhr.filename = filename2 + ext;
 			xhr.onload = function(data) {
 				zip.file(this.filename, data.target.response, {binary: true});
 				onloadCount++;
+				localStorage["progress_bar"] = Math.round((onloadCount / quant).toFixed(2) * 100);
 				if(onloadCount === quant) {
 					var content = zip.generate({type: "blob"});
 					saveAs(content, folderStructure + ".zip");
@@ -782,7 +774,7 @@ function downloadLinks() {
 }
 
 chrome.downloads.onChanged.addListener(function (downloadID) {
-	if (incognitoMode) {
+	if (localStorage["incognito_mode"] == "true") {
 		if (downloadID.state) {
 			if (downloadID.state.current == "complete" || downloadID.state.current == "interrupted") {
 				chrome.downloads.search({id: downloadID.id}, function(result) {

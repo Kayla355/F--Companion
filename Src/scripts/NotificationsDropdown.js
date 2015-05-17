@@ -1132,6 +1132,7 @@ function requestDownload(href) {
 	startDownload();
 }
 
+var progressBarInterval;
 // Function that tells the background script to start downloading
 function startDownload() {
 	if (errorReport) {
@@ -1152,9 +1153,27 @@ function startDownload() {
 		//console.log("sent message to background");
 		$('div#float').empty();
 		$('div#float').append("<b>Success! Downloading Now.</b>");
-		popup("downloading");
+		if(localStorage["zip_download"] == "true") {
+			if(localStorage["progress_bar"] == "100") {
+				localStorage["progress_bar"] = 0;
+			}
+			$('div#float b').text("Downloading & Compressing");
+			$('div#float').append("<div id='progress-bar' style='display: block; margin-top: 4px'><center style='top: 25px;'>0%</center><div></div></div>");
+			progressBarInterval = setInterval(updateProgressBar, 10);
+		} else {
+			popup("downloading");
+		}
 
 		return;
 	}
 	setTimeout(startDownload ,20);
+}
+
+function updateProgressBar() {
+	$('div#progress-bar center').text(localStorage["progress_bar"]+"%");
+	$('div#progress-bar div').css("width", localStorage["progress_bar"]+"%");
+	if(localStorage["progress_bar"] == "100") {
+		clearInterval(progressBarInterval);
+		popup("downloading");
+	}
 }
