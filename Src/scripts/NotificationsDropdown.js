@@ -1170,8 +1170,18 @@ function startDownload() {
 }
 
 function updateProgressBar() {
-	$('div#progress-bar center').text(localStorage["progress_bar"]+"%");
-	$('div#progress-bar div').css("width", localStorage["progress_bar"]+"%");
+	if(localStorage["progress_bar"] != "404") {
+		$('div#progress-bar center').text(localStorage["progress_bar"]+"%");
+		$('div#progress-bar div').css("width", localStorage["progress_bar"]+"%");
+	} else {
+		$('div#float b').text("Failed to download files");
+		$('div#progress-bar center').text(localStorage["progress_bar"]);
+		$('div#progress-bar div').css("width", "0%");
+
+		clearInterval(progressBarInterval);
+		setTimeout(function() { popup("downloading") }, 1000);
+	}
+
 	if(localStorage["progress_bar"] == "100") {
 		clearInterval(progressBarInterval);
 		popup("downloading");

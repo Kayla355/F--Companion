@@ -189,6 +189,12 @@ function requestDownload() {
 }
 
 function updateProgressBar() {
-	$('div#progress-bar center').text(localStorage["progress_bar"]+"%");
-	$('div#progress-bar div').css("width", localStorage["progress_bar"]+"%");
+	if(localStorage["progress_bar"] != "404") {
+		$('div#progress-bar center').text(localStorage["progress_bar"]+"%");
+		$('div#progress-bar div').css("width", localStorage["progress_bar"]+"%");
+	} else {
+		$('div#center b').text("Failed to download files");
+		$('div#progress-bar center').text(localStorage["progress_bar"]);
+		$('div#progress-bar div').css("width", "0%");
+	}
 }

@@ -746,12 +746,16 @@ function downloadLinks() {
 	  		var xhr = createCORSRequest({method: "GET", url: downloadURL, responseType:"arraybuffer"});
 	  		xhr.filename = filename2 + ext;
 			xhr.onload = function(data) {
-				zip.file(this.filename, data.target.response, {binary: true});
-				onloadCount++;
-				localStorage["progress_bar"] = Math.round((onloadCount / quant).toFixed(2) * 100);
-				if(onloadCount === quant) {
-					var content = zip.generate({type: "blob"});
-					saveAs(content, folderStructure + ".zip");
+				if(data.target.status == 200) {
+					zip.file(this.filename, data.target.response, {binary: true});
+					onloadCount++;
+					localStorage["progress_bar"] = Math.round((onloadCount / quant).toFixed(2) * 100);
+					if(onloadCount === quant) {
+						var content = zip.generate({type: "blob"});
+						saveAs(content, folderStructure + ".zip");
+					}
+				} else {
+					localStorage["progress_bar"] = 404;
 				}
 			};
 			xhr.send();
