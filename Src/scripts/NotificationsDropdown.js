@@ -600,6 +600,10 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 				$('div#'+divName).append('<div id="left">'+
 					'<div class="wrap">'+
 						'<div class="images">'+
+							'<span class="fakkubooks">'+
+								'<p>Fakku!</p>'+
+								'<p>Books</p>'+
+							'</span>'+
 							'<img class="cover" src="'+ infodata[9] +'" itemprop="image">'+
 							'<img class="cover" src="'+ infodata[10] +'" itemprop="image">'+
 						'</div>'+
@@ -648,8 +652,13 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 
 					}
 			  // Fix left div height
-					$('div#'+ divName +' div#left div.wrap div.images').css("height", $('div#'+ divName +' div#right').height() - 60);
-					$('div#'+ divName +' div#left div.wrap div.images img').css("height", "100%");
+				$('div#'+ divName +' div#left div.wrap div.images').css("height", $('div#'+ divName +' div#right').height() - 60);
+				$('div#'+ divName +' div#left div.wrap div.images img').css("height", "100%");
+
+			  // Show fakku books mark
+				if(infodata[12]) {
+					$('div#'+ divName +' div#left div.wrap span.fakkubooks').show();
+				}
 
 			// End of create 
 

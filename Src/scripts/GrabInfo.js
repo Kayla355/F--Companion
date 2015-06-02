@@ -47,6 +47,9 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			var imgSample	= "";
 			var date 		= 0;
 			var type 		= "";
+			var fakkubook 	= false;
+
+			debug = data.content;
 			
 			try { 
 				notes = JSON.parse(localStorage["notes"]);
@@ -54,7 +57,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 				notes = {};
 			}
 
-			if (data.content == "") {
+			if (data.content == "" || $.isEmptyObject(data.content)) {
 				error = true;
 				$.ajax({     
 					type: "GET",		
@@ -88,6 +91,10 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					}
 					date 		= data.content.content_date;
 					type 		= data.content.content_category;
+					
+					if(data.content.content_publishers) {
+						fakkubook = true;
+					}
 				} catch(e) {
 					console.log(e);
 				}
@@ -118,6 +125,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					description: 	description,
 					tags: 			tags,
 					date: 			date,
+					fakkubook: 		fakkubook,
 					images: {
 						cover: 		imgCover,
 						sample: 	imgSample
@@ -149,6 +157,7 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 			infoarray[9] 	= imgCover;
 			infoarray[10] 	= imgSample;
 			infoarray[11]	= date;
+			infoarray[12]	= fakkubook;
 
 			if (error) {
 				if (storedError) {
