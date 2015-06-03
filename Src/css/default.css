@@ -22,9 +22,9 @@ div
 	background-color: #FAFAFA;
 	border: 1px solid #DDD;
 	vertical-align: top;
-	border-radius: 0 3px 3px 0;
 	-moz-border-radius: 0 6px 6px 0;
 	-webkit-border-radius: 0 6px 6px 0;
+	border-radius: 0 6px 6px 0;
 	display: inline-block;
 	min-height: 156px;
 	position: relative;
@@ -109,6 +109,7 @@ div
 	box-shadow: inset 0 0 1px #FF6F6F;
 	-moz-border-radius: 0 6px 6px;
 	-webkit-border-radius: 0 6px 6px 0;
+	border-radius: 0 6px 6px 0;
 }
 .noteDiv-hidden
 {
@@ -118,6 +119,7 @@ div
 	box-shadow: inset 0 0 1px #FF6F6F;
 	-moz-border-radius: 0 6px 6px;
 	-webkit-border-radius: 0 6px 6px 0;
+	border-radius: 0 6px 6px 0;
 	display: none;
 }
 .noteDiv-filtered
@@ -128,6 +130,7 @@ div
 	box-shadow: inset 0 0 1px #FF6F6F;
 	-moz-border-radius: 0 6px 6px;
 	-webkit-border-radius: 0 6px 6px 0;
+	border-radius: 0 6px 6px 0;
 	display: none;
 }
 .content-name 
@@ -178,6 +181,7 @@ div
 	border: 1px solid #000000;
 	-moz-border-radius: 3px;
 	-webkit-border-radius: 3px;
+	border-radius: 3px;
 	padding: 4 10 4 10;
 	z-index: 100000;
 	display: none;
@@ -300,9 +304,9 @@ div
 	border-left: 30px solid transparent;
 	border-right: 30px solid transparent;
 	border-bottom: 30px solid rgb(255, 68, 68);
-	margin-top: 9px;
-	margin-left: -25px;
-	transform: rotate(-45deg);
+	margin-top: 5px;
+	margin-left: -30px;
+	transform: rotate(-45deg)  scale(0.81);
 	box-shadow: 0px 8px 2px -6px rgba(0, 0, 0, 0.42);
 }
 .fakkubooks p {

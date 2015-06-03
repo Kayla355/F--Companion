@@ -64,8 +64,12 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					url: currenturl.replace("api.", "www."),
 					dataType: "html",
 					async: false,
-					success: function(html) { 
+					success: function(html) {
 						errorMessage = $(html).find('div#error.message h3').text();
+						
+						if(errorMessage == "") {
+							errorMessage = "Unknown Error!";
+						}
 					},
 					error: function(error) {
 						storedError = error;
@@ -168,6 +172,10 @@ function grabInfo(downloadurl, notifications, ndownload, nold, nseen, nshown, pe
 					infoarray[2] = "411";
 					infoarray[4] = errorMessage;
 					infoarray[3] = downloadurl;
+
+					if(errorMessage == "Unknown Error!") {
+						infoarray[2] = "0";
+					}
 				}
 			}
 

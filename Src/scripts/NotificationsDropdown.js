@@ -17,6 +17,7 @@
 	var loadedHTML		= false;
 	var outOfNotes		= false;
 	var lastNote 		= "";
+	var popupTimeout;
 	var debug;
 	localStorage["notes_done_amount"] = 0;
 
@@ -264,11 +265,12 @@ function lightsOn() {
 
 // Function for removing the popup download box
 function popup(from) {
-
 	var avoidID = [from, "download", "hidediv", "askRecache", "float", "loadingtrial", "loadingtrailnotes", "yes", "load-more"];
 
+	clearTimeout(popupTimeout);
+
 	if (from != "downloadClicked" && from != "askRecache") {
-		var popup = setTimeout(removePopup, 750);
+		popupTimeout = setTimeout(removePopup, 750);
 	}
 
 	$(document, '#whiteWrapper').on("click", function(event) {
@@ -285,7 +287,7 @@ function popup(from) {
 		$('div#float').css("left", null);
 		$('div#float').css("top", null);
 		$(document).off("click");
-		clearTimeout(popup);
+		clearTimeout(popupTimeout);
 
 		if (from == "removeClicked") {
 			storeContent();
@@ -1151,8 +1153,8 @@ function startDownload() {
 		$('div#float').empty();
 		$('div#float').append("<b>Error recieved from server, try again.</b>");
 		$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
+		
 		return;
-
 	}
 	//console.log("docReadyInfo: " + docReadyInfo + " & docReadyLink: " + docReadyLink);
 	if (docReadyLink && docReadyInfo) {
@@ -1163,7 +1165,7 @@ function startDownload() {
 		$('div#float').empty();
 		$('div#float').append("<b>Success! Downloading Now.</b>");
 		if(localStorage["zip_download"] == "true") {
-			if(localStorage["progress_bar"] == "100") {
+			if(localStorage["progress_bar"] == "100" || localStorage["progress_bar"] == "404") {
 				localStorage["progress_bar"] = 0;
 			}
 			$('div#float b').text("Downloading & Compressing");
@@ -1192,6 +1194,7 @@ function updateProgressBar() {
 	}
 
 	if(localStorage["progress_bar"] == "100") {
+		console.log("DONE");
 		clearInterval(progressBarInterval);
 		popup("downloading");
 	}
