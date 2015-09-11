@@ -170,6 +170,15 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 });
 
+// Listen for a change to the login cookie
+chrome.cookies.onChanged.addListener(function(object) {
+	if(object.cookie.name === "fakku_sid" && object.cause === "explicit" && localStorage["badge_number"] === "Err") {
+		console.log("Fakku cookie updated");
+		notificationCheck();
+	}
+	//console.log(object.cookie.name+" changed", object);
+});
+
 // Check for new extension version on github
 if (Math.floor(Math.round(((new Date()).getTime() - (new Date(localStorage["github_lastchecked"])).getTime()) / 1000) / 86400) >= 1) {
 	var github_version;
@@ -213,12 +222,11 @@ function notificationCheck() {
 	var start = new Date().getTime();
 	if (localStorage["fakku_notes"] == "true") {
 	  // Clear Console
-	  console.clear();
-	  // Check if Login cookie has expired.
+	  //console.clear();
+	  // Check if Login cookie exists
 		chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
 			if (!results) {
 				badgeUpdate("error");
-				recursiveNote(5000);
 				console.log("Failed to find login cookie for Fakku.net");
 			} else {
 			  // Ajax Function to get the subscriptions
@@ -235,10 +243,9 @@ function notificationCheck() {
 						} catch(e) {
 							var notes = {};
 						}
-					  // Check if there was an error on the page.
+					  // Check if there was an error on the page. *Backup for the rare instance of the cookie not being expired, yet you are logged out.
 						if($(html).find('div#error').length !== 0) {
 							badgeUpdate("error");
-							recursiveNote(5000);
 							console.log("Failed to find login cookie for Fakku.net");
 							loggedIn = false;
 							return;

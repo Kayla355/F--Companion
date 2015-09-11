@@ -31,15 +31,16 @@ function grabLinks(downloadurl, notifications, ndownload) {
 		async: false,
 		success: function(data) {
 		//console.log("GrabLinks Success");
-
-			linkarray = [];
-			linkarray[0] = "linkarray";
-			$.each(data.pages, function(i, data) {
-				linkarray.push(data.image);
-			});
-			linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4));
-
-			msgDocReadyLink(ndownload);
+			if (data.content != "" || !$.isEmptyObject(data.content)) {
+				linkarray = ["linkarray"];
+				$.each(data.pages, function(i, data) {
+					linkarray.push(data.image);
+				});
+				linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4));
+				msgDocReadyLink(ndownload);
+			} else  {
+				this.error({status: 0, statusText: "Query returned empty."});
+			}
 		},
 		error: function(error) {
 			msgError(error);
@@ -51,9 +52,9 @@ function grabLinks(downloadurl, notifications, ndownload) {
 // Sends a message stating that the links have been grabbed properly.
 function msgDocReadyLink(ndownload) {
 	chrome.runtime.sendMessage({msg: "docReadyLink", data: linkarray});
-	if (ndownload) {
-		nDocReadyLink(linkarray);
-	}
+	// if (ndownload) {
+	// 	nDocReadyLink(linkarray);
+	// }
 }
 
 // Sends a message stating that there was an error when grabbing the links.

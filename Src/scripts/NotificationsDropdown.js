@@ -1032,14 +1032,14 @@ function openTab(tabUrl) {
 	});
 }
 
-// Function waiting for the links to finish being grabbed.
-function nDocReadyLink() {
-	docReadyLink = true;
-};
-// Function waiting for the info to finish being grabbed.
-function nDocReadyInfo() {
-	docReadyInfo = true;
-};
+// // Function waiting for the links to finish being grabbed.
+// function nDocReadyLink() {
+// 	docReadyLink = true;
+// };
+// // Function waiting for the info to finish being grabbed.
+// function nDocReadyInfo() {
+// 	docReadyInfo = true;
+// };
 // Function listening for any potential error.
 function msgError(error) {
 	if (!errorReport) {
@@ -1156,28 +1156,22 @@ function startDownload() {
 		
 		return;
 	}
-	//console.log("docReadyInfo: " + docReadyInfo + " & docReadyLink: " + docReadyLink);
-	if (docReadyLink && docReadyInfo) {
-		chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray})
-		docReadyLink = false;
-		docReadyInfo = false;
-		//console.log("sent message to background");
-		$('div#float').empty();
-		$('div#float').append("<b>Success! Downloading Now.</b>");
-		if(localStorage["zip_download"] == "true") {
-			if(localStorage["progress_bar"] == "100" || localStorage["progress_bar"] == "404") {
-				localStorage["progress_bar"] = 0;
-			}
-			$('div#float b').text("Downloading & Compressing");
-			$('div#float').append("<div id='progress-bar' style='display: block; margin-top: 4px'><center style='top: 25px;'>0%</center><div></div></div>");
-			progressBarInterval = setInterval(updateProgressBar, 10);
-		} else {
-			popup("downloading");
-		}
 
-		return;
+	chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray})
+
+	//console.log("sent message to background");
+	$('div#float').empty();
+	$('div#float').append("<b>Success! Downloading Now.</b>");
+	if(localStorage["zip_download"] == "true") {
+		if(localStorage["progress_bar"] == "100" || localStorage["progress_bar"] == "404") {
+			localStorage["progress_bar"] = 0;
+		}
+		$('div#float b').text("Downloading & Compressing");
+		$('div#float').append("<div id='progress-bar' style='display: block; margin-top: 4px'><center style='top: 25px;'>0%</center><div></div></div>");
+		progressBarInterval = setInterval(updateProgressBar, 10);
+	} else {
+		popup("downloading");
 	}
-	setTimeout(startDownload ,20);
 }
 
 function updateProgressBar() {
