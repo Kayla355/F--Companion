@@ -23,9 +23,8 @@
 
 
   // Debugging
-  	var debug;
-	var lengthCheckChar = true;
-	var lengthCheckDesc = true;
+	var lengthCheckChar = false;
+	var lengthCheckDesc = false;
 
 String.prototype.mReplace = function(type) {
 
@@ -559,7 +558,8 @@ function notificationInfo(object, notes) {
 			$('div#'+ divName +' div#right div.wrap div.row-small div.right i').text(object.age);
 		}
 
-		divDate = timeSince.minutes;
+		//divDate = timeSince.minutes;
+		divDate = new Date(mDate*1000);
 	}
 
 	if (object.appendType == "prepend" || object.reCache || object.loadmore) {
@@ -612,10 +612,10 @@ function notificationInfo(object, notes) {
 
 			  // Main Div
 				if (object.appendType == "append") {
-					$('div#content div#notes').append('<div id="'+ divName +'" date="'+divDate+'" class="noteDiv"></div>');
+					$('div#content div#notes').append('<div id="'+ divName +'" class="noteDiv"></div>');
 				} else {
 					//idCounter = 1;
-					$('div#content div#notes').prepend('<div id="'+ divName +'" date="'+divDate+'" class="noteDiv"></div>');
+					$('div#content div#notes').prepend('<div id="'+ divName +'" class="noteDiv"></div>');
 				}
 
 			  // Assign language class
@@ -662,7 +662,7 @@ function notificationInfo(object, notes) {
 						'</div>'+
 						'<div class="row-small">'+
 							'<div class="left"><b>'+ object.infodata[1] +'</b> Pages</div>'+
-							'<div class="right"><i>'+ object.age +'</i></div>'+
+							'<div class="right" title="'+ divDate +'"><i>'+ object.age +'</i></div>'+
 						'</div>'+
 						'<div class="hr"></div>'+
 						'<div id="description" class="row-left-full" itemprop="description"><b>Description: </b>'+ object.infodata[8] +'</div>'+
@@ -931,9 +931,9 @@ function notesDone(pend, loadmore, errorCount) {
 
 	// Sort divs
 	$("div.noteDiv").sort(function(a,b){
-		return $(a).attr("date") - $(b).attr("date");
+		return Date.parse($(a).find("#right .wrap .row-small .right").attr("title")) - Date.parse($(b).find("#right .wrap .row-small .right").attr("title"));
 	}).each(function(){
-		$("#notes").append(this);
+		$("#notes").prepend(this);
 	})
 
 	if (pend == "prepend") {
