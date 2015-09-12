@@ -18,10 +18,12 @@
 	var outOfNotes		= false;
 	var lastNote 		= "";
 	var popupTimeout;
-	var debug;
+	var grab_notes		= {};
 	localStorage["notes_done_amount"] = 0;
 
+
   // Debugging
+  	var debug;
 	var lengthCheckChar = true;
 	var lengthCheckDesc = true;
 
@@ -295,8 +297,6 @@ function popup(from) {
 	}
 }
 
-checkLoggedIn(false, false); // Run checkLoggedIn function
-
 // Queue function
 // Thanks to debuggable for this. (http://bit.ly/dBugQFunc)
 $.notequeue = {
@@ -334,8 +334,10 @@ $.notequeue = {
     }
 };
 
+checkLoggedIn({reCache: false, loadmore: false}); // Run checkLoggedIn function
+
 // Check if Login cookie has expired.
-function checkLoggedIn(reCache, loadmore) {
+function checkLoggedIn(object) {
 	start = new Date().getTime();
 	
 	chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
@@ -354,14 +356,13 @@ function checkLoggedIn(reCache, loadmore) {
 		  // Check if version saved in localStorage matches current version. Also force recache if html_content does not exist.
 			if (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"] || !localStorage["html_content"]) {
 				if (!localStorage["app_version"] || !localStorage["html_content"]) {
-					reCache = true;
+					object.reCache = true;
 				} else {
 					var currentVersion 	= chrome.app.getDetails().version.replace(/\./g, "");
 					var oldVersion		= localStorage["app_version"].replace(/\./g, "");
 					var diff 			= currentVersion.slice(1, 2) - oldVersion.slice(1, 2);
 
 					if (diff >= 1 || diff <= -1) {
-						//reCache = true;
 						askRecache = true;
 					}
 				}
@@ -370,7 +371,7 @@ function checkLoggedIn(reCache, loadmore) {
 		  // Gather and create notifications 
 		  	$('div#content').css("width", "545px");
 		  	//$('div#content').css("height", "600px");
-		  	if (reCache || localStorage["new_note"] == "true" || loadmore) {
+		  	if (object.reCache || localStorage["new_note"] == "true" || object.loadmore) {
 		  		lightsOff();
 		  		$('div#float').empty();
 				$('div#float').show();
@@ -380,9 +381,9 @@ function checkLoggedIn(reCache, loadmore) {
 		  	var nArrayNames = JSON.parse(localStorage["n_array_names"]);
 		  	var doArray 	= new Array();
 		  	//loadmore && perPage > nArrayNames.length - parseInt(localStorage['notes_done_amount'])
-		  	if (perPage == "all" || perPage > nArrayNames.length && !loadmore) {
+		  	if (perPage == "all" || perPage > nArrayNames.length && !object.loadmore) {
 		  		doArray = nArrayNames;
-		  	} else if(loadmore) {
+		  	} else if(object.loadmore) {
 		  		var notesAmount = parseInt(localStorage['notes_done_amount']);
 		  		doArray = nArrayNames.slice(notesAmount, (notesAmount + parseInt(perPage)));
 		  		//console.log(nArrayNames.slice(parseInt(localStorage['notes_done_amount'])));
@@ -407,6 +408,10 @@ function checkLoggedIn(reCache, loadmore) {
 			}
 		  // For each arrayname in localstorage
 			doArray.forEach(function(name) {
+				grab_notes[name] = {
+			  		status: "working"
+			  	}
+
 				try {
 					if(name !== undefined) {
 						loadNote(name, false);
@@ -421,7 +426,8 @@ function checkLoggedIn(reCache, loadmore) {
 			});
 			function loadNote(name, bypass) {
 				lastNote = name;
-				if (JSON.parse(localStorage[name])[0] == "old" && !reCache || bypass) {
+
+				if (JSON.parse(localStorage[name])[0] == "old" && !object.reCache || bypass) {
 					var self = this, doBind = function() {
 						var nNote = JSON.parse(localStorage[name]);
 						var nInfo;
@@ -431,16 +437,34 @@ function checkLoggedIn(reCache, loadmore) {
 						//console.log(nNote);
 						//console.log(nInfo);
 					  // Check if manga exists and reCache is false
-						if (nInfo && !reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
-							//console.log("Manga exists in localStorage");
-
-							notificationInfo(JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]), nNote[2], nNote[3], nNote[0], nNote[5], "append", reCache, loadmore, name, "nInfo");
+						if (nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
+						  // If it does exist do...
+							notificationInfo({
+								infodata: JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]),
+								href: nNote[2],
+								age: nNote[3],
+								isNew: nNote[0],
+								isHidden: nNote[5],
+								appendType: "append",
+								name: name,
+								from: "loadnote",
+								reCache: object.reCache,
+								loadmore: object.loadmore
+							});
 							
 						} else {
-							//console.log("Manga does not exists in localStorage");
-							//console.log(nNote[2]);
-
-							grabInfo(nNote[2], true, false, nNote[3], nNote[0], nNote[5], "prepend", reCache, loadmore, name, "gInfo");	
+						  // If it does not exist do...
+							grabInfo({
+								href: nNote[2],
+								age: nNote[3],
+								isNew: nNote[0],
+								isHidden: nNote[5],
+								appendType: "prepend",
+								name: name,
+								from: "notes",
+								reCache: object.reCache,
+								loadmore: object.loadmore
+							});
 						}
 					  // Update the app_version localStorage to current version
 						if (doArray[doArray.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
@@ -453,14 +477,14 @@ function checkLoggedIn(reCache, loadmore) {
 			    }
 			}
 			new_nArrayNames.forEach(function(name) {
-				loadNote(name, true);
+			  	loadNote(name, true);
 			});
 		}
 	});
 }
 
 // Function waiting for the information from GrabInfo
-function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, loadmore, noteName, from) {
+function notificationInfo(object, notes) {
 
   // Variables
 	var tagArray 		= new Array();
@@ -470,47 +494,48 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	var error 			= false;
  
   // Div variables
-	var divName 		= noteName.replace("--note", "").replace("/", "").replace("/", "-");
+	var divName 		= object.name.replace("--note", "").replace("/", "").replace("/", "-");
 	var divTags 		= "";
 	var divArtists 		= "";
 	var divTranslators 	= "";
 	var languageClass 	= "";
+	var divDate 		= "";
 
-	if (infodata[1] == "error") {
+	if (object.infodata[1] == "error") {
 
-		if(infodata[2] == "200") {
+		if(object.infodata[2] == "200") {
 			$('div#error').empty();
 			$('div#error').append("<b>The Fakku API appears to be down, try again later.</b>");
 			$('div#error').show();
 		}
 
 		error = true; 
-		console.log("%cError Parsing: %c" + infodata[3], "color: red;", "color: black;"); 
-		console.log("%cError Message: %c" + "(" + infodata[2] + ") " + infodata[4], "color: red;", "color: black;");
+		console.log("%cError Parsing: %c" + object.infodata[3], "color: red;", "color: black;"); 
+		console.log("%cError Message: %c" + "(" + object.infodata[2] + ") " + object.infodata[4], "color: red;", "color: black;");
 	};
-	if (infodata[3] && !error)  { seriesArray = infodata[3] };
-	if (infodata[5] && !error)  { var languageLink = infodata[5].mReplace("char").toLowerCase();};
-	if (infodata[7] && !error)  { tagArray 			= infodata[7] };
-	if (infodata[4] && !error)  { artistArray 		= infodata[4] };
-	if (infodata[6] && !error)  { translatorArray 	= infodata[6] };
+	if (object.infodata[3] && !error)  { seriesArray = object.infodata[3] };
+	if (object.infodata[5] && !error)  { var languageLink = object.infodata[5].mReplace("char").toLowerCase();};
+	if (object.infodata[7] && !error)  { tagArray 			= object.infodata[7] };
+	if (object.infodata[4] && !error)  { artistArray 		= object.infodata[4] };
+	if (object.infodata[6] && !error)  { translatorArray 	= object.infodata[6] };
 
 	var seriesName = seriesArray[0].attribute;
 	var seriesLink = seriesArray[0].attribute.mReplace("char").toString().toLowerCase(); 
 
   // Check if the stored html should be appended
-	if (!loadedHTML && !reCache && !userRefresh) {
+	if (!loadedHTML && !object.reCache && !userRefresh) {
 		loadedHTML = true;
 	  // Append content to body
 		$('div#notes').append(JSON.parse(localStorage["html_content"]));
-	} else if (reCache) {
+	} else if (object.reCache) {
 		loadedHTML = true;
 	}
-	////idCounter++
+	//idCounter++
 
   // Update time
-	if (infodata[11] && !error) {
+	if (object.infodata[11] && !error) {
 		var nDate 		= Math.round(new Date().getTime()/1000);
-		var mDate 		= infodata[11];
+		var mDate 		= object.infodata[11];
 		var hoursDiff	= nDate - mDate;
 		var timeSince	= {
 				days: Math.floor(hoursDiff / 86400),
@@ -520,33 +545,35 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 		var endText;
 
 		if (timeSince.days >= 1) {
-			nold = timeSince.days;
+			object.age = timeSince.days;
 			if (timeSince.days == 1) { endText = " day ago" } else { endText = " days ago" };
 		} else if (timeSince.hours >= 1) {
-			nold = timeSince.hours;
+			object.age = timeSince.hours;
 			if (timeSince.days == 1) { endText = " hour ago" } else { endText = " hours ago" };
 		} else {
-			nold = timeSince.minutes;
+			object.age = timeSince.minutes;
 			if (timeSince.days <= 1) { endText = " minute ago" } else { endText = " minutes ago" };
 		}
-		nold = nold + endText;
-		if (pend == "append") {
-			$('div#'+ divName +' div#right div.wrap div.row-small div.right i').text(nold);
+		object.age = object.age + endText;
+		if (object.appendType == "append") {
+			$('div#'+ divName +' div#right div.wrap div.row-small div.right i').text(object.age);
 		}
+
+		divDate = timeSince.minutes;
 	}
 
-	if (pend == "prepend" || reCache || loadmore) {	
+	if (object.appendType == "prepend" || object.reCache || object.loadmore) {
 		//idCounterTemp = //idCounter;
 		//idCounter = $('div#content div#notes div.noteDiv').length + 1;
 		
 	  // Make sure items get appended if action is loadmore
-	  	if(loadmore) { pend = "append" }
+	  	if(object.loadmore) { object.appendType = "append" }
 
 	  // Adds "--info" to the end of the href string to match the name in localStorage
-		localStorage[href.replace("https://www.fakku.net", "") + "--info"] = JSON.stringify(infodata);
+		localStorage[object.href.replace("https://www.fakku.net", "") + "--info"] = JSON.stringify(object.infodata);
 			
 	  // Create divs
-		if (infodata[2] && !error) {
+		if (object.infodata[2] && !error) {
 			////idCounter++;
 
 			// For each in array do...
@@ -584,15 +611,15 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 				});
 
 			  // Main Div
-				if (pend == "append") {
-					$('div#content div#notes').append('<div id="'+ divName +'" class="noteDiv"></div>');
+				if (object.appendType == "append") {
+					$('div#content div#notes').append('<div id="'+ divName +'" date="'+divDate+'" class="noteDiv"></div>');
 				} else {
 					//idCounter = 1;
-					$('div#content div#notes').prepend('<div id="'+ divName +'" class="noteDiv"></div>');
+					$('div#content div#notes').prepend('<div id="'+ divName +'" date="'+divDate+'" class="noteDiv"></div>');
 				}
 
 			  // Assign language class
-				if (infodata[5] == "english") {
+				if (object.infodata[5] == "english") {
 					languageClass = "english";
 				} else {
 					languageClass = "non-english";
@@ -606,8 +633,8 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 								'<p>Fakku!</p>'+
 								'<p>Books</p>'+
 							'</span>'+
-							'<img class="cover" src="'+ infodata[9] +'" itemprop="image">'+
-							'<img class="cover" src="'+ infodata[10] +'" itemprop="image">'+
+							'<img class="cover" src="'+ object.infodata[9] +'" itemprop="image">'+
+							'<img class="cover" src="'+ object.infodata[10] +'" itemprop="image">'+
 						'</div>'+
 						'<ul>'+
 							'<li><a id="read-online" href="#">Read Online</a></li>'+
@@ -623,22 +650,22 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 							'<a title="Remove" class="close flaticon-cross108"></a>'+
 						'</div>'+
 						'<div class="content-name">'+
-							'<h1>'+ infodata[2] +'</h1>'+
+							'<h1>'+ object.infodata[2] +'</h1>'+
 						'</div>'+
 						'<div class="row">'+
 							'<div class="left">Series: <a id="'+ seriesLink +'" href="#">'+ seriesName +'</a></div>'+
-							'<div class="right">Language: <span class="'+ languageClass +'"><a id="'+ languageLink +'" href="#">'+ infodata[5] +'</a></span></div>'+
+							'<div class="right">Language: <span class="'+ languageClass +'"><a id="'+ languageLink +'" href="#">'+ object.infodata[5] +'</a></span></div>'+
 						'</div>'+
 						'<div class="row">'+
 							'<div class="left">Artist: '+ divArtists +'</div>'+
 							'<div class="right">Translator: <span class="english">'+ divTranslators +'</span></div>'+
 						'</div>'+
 						'<div class="row-small">'+
-							'<div class="left"><b>'+ infodata[1] +'</b> Pages</div>'+
-							'<div class="right"><i>'+ nold +'</i></div>'+
+							'<div class="left"><b>'+ object.infodata[1] +'</b> Pages</div>'+
+							'<div class="right"><i>'+ object.age +'</i></div>'+
 						'</div>'+
 						'<div class="hr"></div>'+
-						'<div id="description" class="row-left-full" itemprop="description"><b>Description: </b>'+ infodata[8] +'</div>'+
+						'<div id="description" class="row-left-full" itemprop="description"><b>Description: </b>'+ object.infodata[8] +'</div>'+
 						'<div class="row-left-full" itemprop="keywords"><b>Tags: </b>'+ divTags +'</div>'+
 					'</div>'+
 				'</div>');
@@ -658,14 +685,14 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 				$('div#'+ divName +' div#left div.wrap div.images img').css("height", "100%");
 
 			  // Show fakku books mark
-				if(infodata[12]) {
+				if(object.infodata[12]) {
 					$('div#'+ divName +' div#left div.wrap span.fakkubooks').show();
 				}
 
 			// End of create 
 
 		  // Change class to hidden if true
-			if (nshown == "hidden") {
+			if (object.isHidden == "hidden") {
 				$('div#'+divName).attr("class", "noteDiv-hidden");
 			}
 		  // Remove unused Divs
@@ -682,20 +709,20 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 	}
 	
 	// Run function that will attach Event Listeners to page
-	if (!error && !userRefresh || !error && pend == "prepend") {
-		attachEventListeners(divName, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray);
+	if (!error && !userRefresh || !error && object.appendType == "prepend") {
+		attachEventListeners(divName, object.href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray);
 	}
 
   // If div position was set to prepend
-  	if (pend == "prepend") {
+  	if (object.appendType == "prepend") {
   		//idCounter = //idCounterTemp;
   	}
   // If new change to old to indicate that the entry has been seen
-	if (nseen == "new") {
-		var note = JSON.parse(localStorage[href.replace("https://www.fakku.net", "") + "--note"]);
+	if (object.isNew == "new") {
+		var note = JSON.parse(localStorage[object.href.replace("https://www.fakku.net", "") + "--note"]);
 		note[0] = "old"
-		notesToUpdate[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note)
-		//localStorage[href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
+		notesToUpdate[object.href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note)
+		//localStorage[object.href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
 
 	//console.log("//idCounter: "+//idCounter)
@@ -704,7 +731,7 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
 
   // If this is the last notifiction then... (Might need a new way to do this later, as it will most likely break if I decide to not load ALL the notifications at once)
   	var extra = 0;
-  	if (loadmore) {
+  	if (object.loadmore) {
   		extra = perPageMore - parseInt(localStorage["notes_done_amount"]) - 1;
   	}
 		
@@ -712,10 +739,27 @@ function notificationInfo(infodata, href, nold, nseen, nshown, pend, reCache, lo
   // Check if last note in list
   	//console.log("From: "+from);
   	//console.log("noteName: "+noteName);
-	if(noteName == lastNote) {
-		//console.log("notesDone triggered");
-		notesDone(pend, loadmore, errorCount);
-	}
+  	if(object.from === "loadnote") {
+  		if(object.name == lastNote) {
+			//console.log("notesDone triggered");
+			notesDone(object.appendType, object.loadmore, errorCount)
+		}
+  	} else {
+  		var isDone = true;
+
+		for(var note in grab_notes) {
+	  		if(grab_notes.hasOwnProperty(note)) {
+	  			if(grab_notes[note].status !== "done") {
+					isDone = false;
+				}
+	  		}
+	  	}
+
+	  	if(isDone) {
+	  		notesDone(object.appendType, object.loadmore, errorCount)
+	  	}
+  	}
+	
 };
 
 function attachEventListeners (divName, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray) {
@@ -885,6 +929,13 @@ function notesDone(pend, loadmore, errorCount) {
 	$('div#float').empty();
 	//console.log("loadingtrail should be gone");
 
+	// Sort divs
+	$("div.noteDiv").sort(function(a,b){
+		return $(a).attr("date") - $(b).attr("date");
+	}).each(function(){
+		$("#notes").append(this);
+	})
+
 	if (pend == "prepend") {
 		localStorage["new_note"] = "false";
 	}
@@ -920,6 +971,8 @@ function notesDone(pend, loadmore, errorCount) {
 
 		popup("askRecache");
   	} else if(localStorage["github_update"] == "true" && localStorage["github_notified"] != "true") {
+  // Disabled for now //
+  
   // 		localStorage["github_notified"] = "true";
   // 		//localStorage["app_version"] = chrome.app.getDetails().version;
 
@@ -1032,14 +1085,6 @@ function openTab(tabUrl) {
 	});
 }
 
-// // Function waiting for the links to finish being grabbed.
-// function nDocReadyLink() {
-// 	docReadyLink = true;
-// };
-// // Function waiting for the info to finish being grabbed.
-// function nDocReadyInfo() {
-// 	docReadyInfo = true;
-// };
 // Function listening for any potential error.
 function msgError(error) {
 	if (!errorReport) {
@@ -1114,13 +1159,13 @@ function recacheNotes(reCache) {
 	outOfNotes		= false;
 	localStorage["notes_done_amount"] = 0;
 
-	checkLoggedIn(reCache, false);
+	checkLoggedIn({reCache: reCache, loadmore: false});
 }
 
 function loadMore() {
 	if(!outOfNotes) {
 		$('div#float').attr("class", "float-loadmore");
-		checkLoggedIn(false, true);
+		checkLoggedIn({reCache: false, loadmore: true});
 	} else {
 		$('div#float').attr("class", "float-loadmore-not");
 		$('div#float').attr("style", "");
@@ -1137,10 +1182,14 @@ function requestDownload(href) {
 	// Grab Info and Links
 	//console.log(href);
 
-	grabInfo(href, false, true);
-	grabLinks(href, false, true);
-	
-	startDownload();
+	var object = {
+		href: href,
+		from: "download"
+	}
+
+	grabInfo(object);
+	grabLinks(object);
+
 }
 
 var progressBarInterval;

@@ -230,197 +230,186 @@ function notificationCheck() {
 				console.log("Failed to find login cookie for Fakku.net");
 			} else {
 			  // Ajax Function to get the subscriptions
-				$.ajax({
-					type: "GET",
-					url: "https://www.fakku.net/subscriptions",
-					dataType: "html",
-					async: false,
-					success: function(html) {
-					  // Keep track of the names of the arrays
-						var nArrayNames = [];
-						try { 
-							var notes = JSON.parse(localStorage["notes"]);
-						} catch(e) {
-							var notes = {};
-						}
-					  // Check if there was an error on the page. *Backup for the rare instance of the cookie not being expired, yet you are logged out.
-						if($(html).find('div#error').length !== 0) {
-							badgeUpdate("error");
-							console.log("Failed to find login cookie for Fakku.net");
-							loggedIn = false;
-							return;
-						} else {
-						  // Clear badge_number
-							badgeUpdate("update");
-							loggedIn = true;
-						}
+			  	getAjaxData("https://www.fakku.net/subscriptions").then(function(html) {
+				  // Keep track of the names of the arrays
+					var nArrayNames = [];
+					try { 
+						var notes = JSON.parse(localStorage["notes"]);
+					} catch(e) {
+						var notes = {};
+					}
+				  // Check if there was an error on the page. *Backup for the rare instance of the cookie not being expired, yet you are logged out.
+					if($(html).find('div#error').length !== 0) {
+						badgeUpdate("error");
+						console.log("Failed to find login cookie for Fakku.net");
+						loggedIn = false;
+						return;
+					} else {
+					  // Clear badge_number
+						badgeUpdate("update");
+						loggedIn = true;
+					}
 
-					  // Find each notification
-						$(html).find('div.notification').each(function(i, div) {
-							var nTags = [];
-						// Find each <a> under the current notification
-							$(div).find('a').each(function(i, anchor) {
-								var tagCheck = $(anchor).attr("href");
-							// If the <a> is a tag link add it to the tag array
-								if (tagCheck.match(/\/tags\/.*/)) {
-									nTags.push($(anchor).text());
+				  // Find each notification
+					$(html).find('div.notification').each(function(i, div) {
+						var nTags = [];
+					// Find each <a> under the current notification
+						$(div).find('a').each(function(i, anchor) {
+							var tagCheck = $(anchor).attr("href");
+						// If the <a> is a tag link add it to the tag array
+							if (tagCheck.match(/\/tags\/.*/)) {
+								nTags.push($(anchor).text());
+							}
+						});
+
+						var nName 	= $(div).find('a:nth-last-of-type(1)').text();
+						var nHref 	= "https://www.fakku.net" + $(div).find('a:nth-last-of-type(1)').attr("href");
+						var nOld	= $(div).find('i').text();
+						var type 	= nHref.match(/(doujinshi|manga)/)[0];
+						var nNew;
+						var nStatus;
+
+						//console.log("Checked Notifications");
+						//console.log("Name: " + nName);
+						//console.log("Link: " + nHref);
+						//console.log("Uploaded: " + nOld);
+						//console.log("Under Tags: " + JSON.stringify(nTags));
+
+						var noteArray 	= [];
+						var nStorage 	= $(div).find("a:nth-last-of-type(1)").attr("href");
+
+					// Assigning states for old/new & hidden/shown
+					  // Check if localStorage entry exists
+						if (localStorage[nStorage + "--note"]) {
+							var nExists		= JSON.parse(localStorage[nStorage + "--note"]);
+
+							if (localStorage[nStorage + "--info"]) {
+								var iExists = JSON.parse(localStorage[nStorage + "--info"]);
+
+							  // Checks if the info stored has an unknown error and if true recache the note.
+								if (iExists[1] == "error" && !iExists[2].toString().match(/(404|410|411)/)) {
+									console.log("Item contains Unknown error removed & re-checking.");
+									nExists = ""; 
+									iExists = "";
+									localStorage.removeItem(localStorage[nStorage + "--note"]);
+									localStorage.removeItem(localStorage[nStorage + "--info"]);
 								}
-							});
+							}
 
-							var nName 	= $(div).find('a:nth-last-of-type(1)').text();
-							var nHref 	= "https://www.fakku.net" + $(div).find('a:nth-last-of-type(1)').attr("href");
-							var nOld	= $(div).find('i').text();
-							var type 	= nHref.match(/(doujinshi|manga)/)[0];
-							var nNew;
-							var nStatus;
-
-							//console.log("Checked Notifications");
-							//console.log("Name: " + nName);
-							//console.log("Link: " + nHref);
-							//console.log("Uploaded: " + nOld);
-							//console.log("Under Tags: " + JSON.stringify(nTags));
-
-							var noteArray 	= [];
-							var nStorage 	= $(div).find("a:nth-last-of-type(1)").attr("href");
-
-						// Assigning states for old/new & hidden/shown
-						  // Check if localStorage entry exists
-							if (localStorage[nStorage + "--note"]) {
-								var nExists		= JSON.parse(localStorage[nStorage + "--note"]);
-
-								if (localStorage[nStorage + "--info"]) {
-									var iExists = JSON.parse(localStorage[nStorage + "--info"]);
-
-								  // Checks if the info stored has an unknown error and if true recache the note.
-									if (iExists[1] == "error" && !iExists[2].toString().match(/(404|410|411)/)) {
-										console.log("Item contains Unknown error removed & re-checking.");
-										nExists = ""; 
-										iExists = "";
-										localStorage.removeItem(localStorage[nStorage + "--note"]);
-										localStorage.removeItem(localStorage[nStorage + "--info"]);
-									}
-								}
-
-							  // Checks if old or new
-								if (nExists[0] == "old") {
-									noteArray[0] = "old";
-									nNew = false;
-								} else {
-									noteArray[0] = "new";
-									nNew = true;
-
-									if(iExists && !iExists[1] == "error") {
-										i = localStorage["badge_number"];
-									}
-									
-									i++;
-									localStorage["badge_number"] = i;
-								}
-							  // Checks if hidden or shown
-								if (nExists[5] == "hidden") {
-									noteArray[5] = "hidden";
-									nStatus = "hidden";
-								} else {
-									noteArray[5] = "shown";
-									nStatus = "shown";
-								}
-						  // If it does not exist
+						  // Checks if old or new
+							if (nExists[0] == "old") {
+								noteArray[0] = "old";
+								nNew = false;
 							} else {
-								if(localStorage["first_time"] == "true") {
-									noteArray[0] = "old";
-									nNew = false;
-								} else {
-									noteArray[0] = "new";
-									nNew = true;
+								noteArray[0] = "new";
+								nNew = true;
+
+								if(iExists && !iExists[1] == "error") {
+									i = localStorage["badge_number"];
 								}
-									
-								i = localStorage["badge_number"];
+								
 								i++;
 								localStorage["badge_number"] = i;
-
+							}
+						  // Checks if hidden or shown
+							if (nExists[5] == "hidden") {
+								noteArray[5] = "hidden";
+								nStatus = "hidden";
+							} else {
 								noteArray[5] = "shown";
 								nStatus = "shown";
 							}
+					  // If it does not exist
+						} else {
+							if(localStorage["first_time"] == "true") {
+								noteArray[0] = "old";
+								nNew = false;
+							} else {
+								noteArray[0] = "new";
+								nNew = true;
+							}
+								
+							i = localStorage["badge_number"];
+							i++;
+							localStorage["badge_number"] = i;
 
-							noteArray[1] = nName;
-							noteArray[2] = nHref;
-							noteArray[3] = nOld;
-							noteArray[4] = JSON.stringify(nTags);
+							noteArray[5] = "shown";
+							nStatus = "shown";
+						}
 
-							notes['['+type+'] '+nName] = {
-								info: {
-									name: 		nName,
-									href: 		nHref,
-									age: 		nOld,
-									tags: 		JSON.stringify(nTags),
-									status: 	nStatus,
-									newNote: 	nNew,
-								},
-								data: {},
-							};
+						noteArray[1] = nName;
+						noteArray[2] = nHref;
+						noteArray[3] = nOld;
+						noteArray[4] = JSON.stringify(nTags);
 
-							localStorage[nStorage + "--note"] = JSON.stringify(noteArray);
+						notes['['+type+'] '+nName] = {
+							info: {
+								name: 		nName,
+								href: 		nHref,
+								age: 		nOld,
+								tags: 		JSON.stringify(nTags),
+								status: 	nStatus,
+								newNote: 	nNew,
+							},
+							data: {},
+						};
 
-							nArrayNames.push(nStorage + "--note");
+						localStorage[nStorage + "--note"] = JSON.stringify(noteArray);
 
-							//console.log(noteArray); // Leave uncommented
-							//console.log(nStorage);
-							//console.log(localStorage[nStorage + "--note"]);
+						nArrayNames.push(nStorage + "--note");
 
+						//console.log(noteArray); // Leave uncommented
+						//console.log(nStorage);
+						//console.log(localStorage[nStorage + "--note"]);
+
+					});
+				// Create/Update the array of names
+					var new_nArrayNames = [];
+
+				  // Push localStorage array into current array
+					if (localStorage["n_array_names"]) {
+						JSON.parse(localStorage["n_array_names"]).forEach(function(name) {
+							nArrayNames.push(name);
 						});
-					// Create/Update the array of names
-						var new_nArrayNames = [];
-
-					  // Push localStorage array into current array
-						if (localStorage["n_array_names"]) {
-							JSON.parse(localStorage["n_array_names"]).forEach(function(name) {
-								nArrayNames.push(name);
-							});
-						}
-					  // Remove duplicates from array
-						$.each(nArrayNames, function(i, name) {
-							//console.log(i + " : " + name);
-							if ($.inArray(name, new_nArrayNames) === -1) new_nArrayNames.push(name);
-						});
-
-					  // If conversion of localstorage links from http to https has not been done.
-					  // This is done because Fakku has changed all links from http to https and the localstorage links still have http in them.
-						if (localStorage["http_to_https"] == "true") {
-							$.each(new_nArrayNames, function(i, data) {
-								var http = JSON.parse(localStorage[data]);
-								if (http[2].match(/http:/)) {
-									http[2] = http[2].replace("http:", "https:");
-								}
-								localStorage[data] = JSON.stringify(http);
-							});
-							localStorage["http_to_https"] = "false";
-						}
-
-						localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
-						//localStorage["notes"] = JSON.stringify(notes);
-						console.log(notes);
-						//test(notes);
-						//console.log(localStorage["n_array_names"]);
-
-						var end = new Date().getTime();
-						var time = end - start;
-						console.log('Background Execution time: ' + time / 1000 + 's');
-
-					  // If last notification; then set first_time to false; if it was previously true
-					  // Also if request was sent from nDropdown send done message
-						if (nDropdown === true) {
-							chrome.extension.sendMessage({msg: "nDropdownDone"});
-						}
-						if (localStorage["first_time"] == "true") {
-							localStorage["first_time"] = "false";
-						}
-
-					},
-					error: function(error) {
-						//msgError(error);
-						//console.log("Error: " + error);
 					}
-				});
+				  // Remove duplicates from array
+					$.each(nArrayNames, function(i, name) {
+						//console.log(i + " : " + name);
+						if ($.inArray(name, new_nArrayNames) === -1) new_nArrayNames.push(name);
+					});
+
+				  // If conversion of localstorage links from http to https has not been done.
+				  // This is done because Fakku has changed all links from http to https and the localstorage links still have http in them.
+					if (localStorage["http_to_https"] == "true") {
+						$.each(new_nArrayNames, function(i, data) {
+							var http = JSON.parse(localStorage[data]);
+							if (http[2].match(/http:/)) {
+								http[2] = http[2].replace("http:", "https:");
+							}
+							localStorage[data] = JSON.stringify(http);
+						});
+						localStorage["http_to_https"] = "false";
+					}
+
+					localStorage["n_array_names"] = JSON.stringify(new_nArrayNames);
+					//localStorage["notes"] = JSON.stringify(notes);
+					console.log(notes);
+					//test(notes);
+					//console.log(localStorage["n_array_names"]);
+
+					var end = new Date().getTime();
+					var time = end - start;
+					console.log('Background Execution time: ' + time / 1000 + 's');
+
+				  // If last notification; then set first_time to false; if it was previously true
+				  // Also if request was sent from nDropdown send done message
+					if (nDropdown === true) {
+						chrome.extension.sendMessage({msg: "nDropdownDone"});
+					}
+					if (localStorage["first_time"] == "true") {
+						localStorage["first_time"] = "false";
+					}
+			  	});
 				if(loggedIn) {
 				  // Update Badgenumber
 					badgeUpdate("update");
@@ -432,6 +421,14 @@ function notificationCheck() {
 	} else {
 		clearTimeout(checkNotes);
 	}
+}
+
+function getAjaxData(href) {
+	return $.ajax({
+		type: "GET",
+		url: href,
+		dataType: "html",
+	});
 }
 
 // Updates the stored HTML content
@@ -635,8 +632,8 @@ function recursiveNote(updateInterval) {
 // Function for downloading the links.
 function downloadLinks() {
 		
-	//console.log(infoarray);
-	//console.log(linkarray);
+	console.log(infoarray);
+	console.log(linkarray);
 	
 	var imgURL 			= linkarray[1];
 	var quant 			= parseInt(infoarray[1]);
