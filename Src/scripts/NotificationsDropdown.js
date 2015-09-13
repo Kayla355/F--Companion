@@ -438,6 +438,8 @@ function checkLoggedIn(object) {
 					  // Check if manga exists and reCache is false
 						if (nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
 						  // If it does exist do...
+						  	grab_notes[name].isNew = false;
+
 							notificationInfo({
 								infodata: JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]),
 								href: nNote[2],
@@ -453,6 +455,8 @@ function checkLoggedIn(object) {
 							
 						} else {
 						  // If it does not exist do...
+						  	grab_notes[name].isNew = true;
+
 							grabInfo({
 								href: nNote[2],
 								age: nNote[3],
@@ -749,7 +753,7 @@ function notificationInfo(object, notes) {
 
 		for(var note in grab_notes) {
 	  		if(grab_notes.hasOwnProperty(note)) {
-	  			if(grab_notes[note].status !== "done") {
+	  			if(grab_notes[note].status !== "done" && grab_notes[note].isNew) {
 					isDone = false;
 				}
 	  		}
