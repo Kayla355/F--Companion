@@ -10,10 +10,20 @@
 	var linkarray 		= null;
 	var infoarray 		= null;
 	var conflictCheck 	= false;
+	var siteVar;
+
+chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+	try {
+		siteVar = tabs[0].url.toLowerCase().match(/(fakku|pururin)/)[0];
+	} catch(error) {
+		console.error(error);
+	}
+});
+	
 	
 // Message that prompts the grabLinks to start.
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	chrome.tabs.sendMessage(tabs[0].id, {msg: "grabLinks"}, function(response) {
+	chrome.tabs.sendMessage(tabs[0].id, {msg: "grabLinks-" + siteVar}, function(response) {
 		//console.log(response.response);
 		if (response.response == "grabLinksOK") {
 			grablinks = true;
@@ -23,7 +33,7 @@ chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 
 // Message that prompts the grabInfo to start.
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-	chrome.tabs.sendMessage(tabs[0].id, {msg: "grabInfo"}, function(response) {
+	chrome.tabs.sendMessage(tabs[0].id, {msg: "grabInfo-" + siteVar}, function(response) {
 		//console.log(response.response);
 		if (response.response == "grabInfoOK") {
 			grabinfo = true;
@@ -41,6 +51,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		sendResponse({msg: "recieved"});
 		linkarray = request.data;
 		docReadyLink = true;
+
+		if (docReadyLink && docReadyInfo) {
+			if (localStorage["button_action"] == "download") {
+				requestDownload();
+			} else if (localStorage["button_action"] == "links") {
+				requestLinks();
+			}
+		}
 		//console.log(request.data);
 		//console.log("Fetching Link Info");
 	}
@@ -51,6 +69,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		sendResponse({msg: "recieved"});
 		infoarray = request.data;
 		docReadyInfo = true;
+
+		if (docReadyLink && docReadyInfo) {
+			if (localStorage["button_action"] == "download") {
+				requestDownload();
+			} else if (localStorage["button_action"] == "links") {
+				requestLinks();
+			}
+		}
 	}
 });
 
@@ -77,54 +103,52 @@ if (localStorage["button_action"] == "links" ) {
 	$('div#center').css("width", "160px");
 	$('div#center').css("height", "25px");
 	$('div#center').append("<b>Preparing Links</b>");
-	requestLinks();
+	//requestLinks();
 }
 
 // Function that requests the links in string format
 function requestLinks() {
 	if (docReadyLink && docReadyInfo) {
 
-			var imgURL 					= linkarray[1];
-			var quant  					= parseInt(infoarray[1]);
-			var quantlen 				= imgURL.length -1;
-			var textarea1 				= localStorage["text_area1"];
-			var textarea2 				= localStorage["text_area2"];
+		var imgURL 					= linkarray[1];
+		var quant  					= parseInt(infoarray[1]);
+		var quantlen 				= imgURL.length -1;
+		var textarea1 				= localStorage["text_area1"];
+		var textarea2 				= localStorage["text_area2"];
+		
+			docReadyLink = false;
+			docReadyInfo = false;
+			//console.log("RequestLinks: " + linkarray);
+			//console.log("RequestLinks: " + infoarray);
 			
-				docReadyLink = false;
-				docReadyInfo = false;
-				//console.log("RequestLinks: " + linkarray);
-				//console.log("RequestLinks: " + infoarray);
-				
-				$('div#loading').hide();
-				$('div#center').css("width", "");
-				$('div#center').css("height", "");
-				$('div#center b').remove();
-				$('div#center').append("<textarea id='copypasta' wrap='off' cols ='" + quantlen + "' rows='" + quant + "' readonly style='overflow:hidden;padding-bottom:3px;resize:none'>");
-							
+			$('div#loading').hide();
+			$('div#center').css("width", "");
+			$('div#center').css("height", "");
+			$('div#center b').remove();
+			$('div#center').append("<textarea id='copypasta' wrap='off' cols ='" + quantlen + "' rows='" + quant + "' readonly style='overflow:hidden;padding-bottom:3px;resize:none'>");
 						
-			var copypasta2 = "";
-			for (var i = 1; i <= quant; i++) {
-				var str = '' + i;
-				while (str.length < 3) str = '0' + str;
-				copypasta2 = copypasta2 + linkarray[i].toString() + "\n" ;
-				
-			}
-
-			document.getElementById('copypasta').value=copypasta2;
 					
-			$("#copypasta").focus(function() {
-				var $this = $(this);
-				$this.select();
-					// Work around Chrome's little problem
-					$this.mouseup(function() {
-					// Prevent further mouseup intervention
-					$this.unbind("mouseup");
-					return false;
-				});
+		var copypasta2 = "";
+		for (var i = 1; i <= quant; i++) {
+			var str = '' + i;
+			while (str.length < 3) str = '0' + str;
+			copypasta2 = copypasta2 + linkarray[i].toString() + "\n" ;
+			
+		}
+
+		document.getElementById('copypasta').value=copypasta2;
+				
+		$("#copypasta").focus(function() {
+			var $this = $(this);
+			$this.select();
+				// Work around Chrome's little problem
+				$this.mouseup(function() {
+				// Prevent further mouseup intervention
+				$this.unbind("mouseup");
+				return false;
 			});
-		return;
+		});
 	}
-	setTimeout(requestLinks ,20);
 }
 
 
@@ -138,7 +162,7 @@ if (localStorage["button_action"] == "download") {
 	$('div#center').css("width", "160px");
 	$('div#center').css("height", "25px");
 	$('div#center').append("<b>Preparing Download</b>");
-	requestDownload();
+	//requestDownload();
 }
 
 // Recursive Function to check if the links are ready for download.
@@ -181,11 +205,7 @@ function requestDownload() {
 			$('div#center').css("height", "50px");
 			setInterval(updateProgressBar, 10);
 		}
-		
-
-	return;
 	}
-	setTimeout(requestDownload ,20);
 }
 
 function updateProgressBar() {

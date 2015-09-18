@@ -19,10 +19,10 @@
 		localStorage["conflict_action"] = "uniquify";
 	}
 	if (localStorage["folder_name"] === undefined) {
-		localStorage["folder_name"] = "manganame";
+		localStorage["folder_name"] = "[NAME]";
 	}	
 	if (localStorage["file_structure"] === undefined) {
-		localStorage["file_structure"] = '[null,"Page Number"]';
+		localStorage["file_structure"] = '[PAGE]';
 	}
 	if (localStorage["fakku_notes"] === undefined) {
 		localStorage["fakku_notes"] = "false";
@@ -86,6 +86,11 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 				chrome.browserAction.setPopup({popup: "Dropdown.html"});
 				return;
 			}
+		} else if(tab.url.match(/.*\/\/pururin.com\/(gallery|view|thumbs)\/.*/)) {
+			// Change browserAction to Download
+				badgeUpdate("download");
+				chrome.browserAction.setPopup({popup: "Dropdown.html"});
+				return;
 		}
 	}
 
@@ -431,6 +436,17 @@ function getAjaxData(href) {
 	});
 }
 
+function getAjaxData2(href, type) {
+	return $.ajax({
+		type: "GET",
+		url: href,
+		dataType: type,
+		error: function(error) {
+			console.error(error);
+		}
+	});
+}
+
 // Updates the stored HTML content
 function updateHTMLContent(note) {
 	var html = $.parseHTML(JSON.parse(localStorage["html_content"]));
@@ -632,8 +648,8 @@ function recursiveNote(updateInterval) {
 // Function for downloading the links.
 function downloadLinks() {
 		
-	console.log(infoarray);
-	console.log(linkarray);
+	//console.log(infoarray);
+	//console.log(linkarray);
 	
 	var imgURL 			= linkarray[1];
 	var quant 			= parseInt(infoarray[1]);
@@ -645,89 +661,65 @@ function downloadLinks() {
 	var translator		= infoarray[6];
 	var tags			= infoarray[7];
 	var description 	= infoarray[8];
-	var folderStructure = localStorage["folder_name"];
-	var fileStructure	= JSON.parse(localStorage["file_structure"]);
-	var fslen 			= fileStructure.length - 1;
-	var filename    	= "";
 	var conflictRes 	= localStorage["conflict_action"];
-
-
-// Convert the folderStructure variable into the proper format
-	switch (folderStructure) {
-		case "manganame":
-			folderStructure = manganame;
-			break;
-		case "series":
-			folderStructure = series;
-			break;
-		case "authorname":
-			folderStructure = authorname;
-			break;
-		case "language":
-			folderStructure = language;
-			break;
-		case "translator":
-			folderStructure = translator;
-			break;
-		case "pagenumber":
-			folderStructure = pagenumber;
-			break;
-		case "tags":
-			folderStructure = tags;
-			break;
+	var names = {};
+	var structure 		= {
+		folder: localStorage["folder_name"],
+		file: localStorage["file_structure"]
 	}
 
-// Remove "." if it's the last character
-	while (folderStructure.match("[.]$")) {
-		folderStructure = folderStructure.replace(".", "");
-	}
-// Remove any of the following characters, \/:*?"<>|
-	while (folderStructure.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|')) {
-		//console.log(folderStructure);
-		var r = folderStructure.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|');
-		folderStructure = folderStructure.replace(r, "");
+	var note = {
+		name: manganame,
+		series: series,
+		author: authorname,
+		translator: translator,
+		language: language,
+		tags: tags,
 	}
 
-// Convert the fileStructure array into the proper format	
-	for (var i = 1; i <= fslen; i++) {
-		var languageCheck = false;
-		var languagePrev 	= false;
-		switch (fileStructure[i]) {
-			case "Manga Name":
-				fileStructure[i] = manganame;
-				break;
-			case "Series Name":
-				fileStructure[i] = series;
-				break;
-			case "Author Name":
-				fileStructure[i] = authorname;
-				break;
-			case "Language":
-				fileStructure[i] = "(" + language + ")";
-				languageCheck = true;
-				break;
-			case "Translator":
-				fileStructure[i] = translator;
-				break;
-			case "Page Number":
-				fileStructure[i] = "pagenumber";
-				break;
-			case "Tags":
-				fileStructure[i] = tags;
-				break;
+// Create the folder/filename structure
+	for(var name in {folder: 0, file: 0}) {
+
+		var string = structure[name];
+		names[name] = { text: "" };
+
+	  // Remove "." if it's the last character
+		while (string.match("[.]$")) {
+			string = string.replace(".", "");
+		}
+	  // Remove any of the following characters, \/:*?"<>|
+		while (string.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|')) {
+			//console.log(string);
+			var r = string.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|');
+			string = string.replace(r, "");
 		}
 
-		if (i == 1) {
-			filename = fileStructure[i];
-		} else if (languageCheck) {
-			filename = filename + fileStructure[i];
-			languagePrev = true;
-		}else if (languagePrev) {
-			filename = filename + " " + fileStructure[i];
-			languagePrev = false;
-		} else {
-			filename = filename + " - " + fileStructure[i];
+	  // Convert arrays to single string
+		for (var prop in note) {
+			if(note.hasOwnProperty(prop)) {
+				try {
+					names[name][prop] = note[prop].join(", ");
+				} catch(e) {
+					names[name][prop] = note[prop];
+				}
+			}
 		}
+	  
+		var rMapped = /\[NAME\]|\[SERIES\]|\[ARTIST\]|\[LANGUAGE\]|\[TRANSLATOR\]|\[PAGE\]|\[TAGS\]/gi;
+		var eMapped = {
+			"[NAME]": names[name].name,
+			"[SERIES]": names[name].series,
+			"[ARTIST]": names[name].author,
+			"[LANGUAGE]": names[name].language,
+			"[TRANSLATOR]": names[name].translator,
+			"[PAGE]": "pagenumber",
+			"[TAGS]": names[name].tags,
+		};
+
+	  // Return the mapped value.
+	  	names[name].text = string.toUpperCase().replace(rMapped, function(matched) {
+			return eMapped[matched];
+		});
 	}
 		
 // Triggers a download for each generated link.
@@ -741,7 +733,7 @@ function downloadLinks() {
 		while (str.length < 3) str = '0' + str;
 		downloadURL = linkarray[i];
 			
-		var filename2 = filename.replace("pagenumber", str);
+		var filename2 = names.file.text.replace("pagenumber", str);
 		//console.log(folderStructure + "/" + filename2 + ext);
 		//console.log(downloadURL);
 	  
@@ -756,7 +748,7 @@ function downloadLinks() {
 					localStorage["progress_bar"] = Math.round((onloadCount / quant).toFixed(2) * 100);
 					if(onloadCount === quant) {
 						var content = zip.generate({type: "blob"});
-						saveAs(content, folderStructure + ".zip");
+						saveAs(content, names.folder.text + ".zip");
 					}
 				} else {
 					localStorage["progress_bar"] = 404;
@@ -765,7 +757,7 @@ function downloadLinks() {
 			xhr.send();
 	  	} else {
 	  	 // Normal Download
-			chrome.downloads.download({url: downloadURL, filename: folderStructure + "/" + filename2 + ext, conflictAction: conflictRes});
+			chrome.downloads.download({url: downloadURL, filename: names.folder.text + "/" + filename2 + ext, conflictAction: conflictRes});
 	  	}
 			
 	}

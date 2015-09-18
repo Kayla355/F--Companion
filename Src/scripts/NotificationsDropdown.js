@@ -457,7 +457,7 @@ function checkLoggedIn(object) {
 						  // If it does not exist do...
 						  	grab_notes[name].isNew = true;
 
-							grabInfo({
+							fakku.getInfo({
 								href: nNote[2],
 								age: nNote[3],
 								isNew: nNote[0],
@@ -552,10 +552,10 @@ function notificationInfo(object, notes) {
 			if (timeSince.days == 1) { endText = " day ago" } else { endText = " days ago" };
 		} else if (timeSince.hours >= 1) {
 			object.age = timeSince.hours;
-			if (timeSince.days == 1) { endText = " hour ago" } else { endText = " hours ago" };
+			if (timeSince.hours == 1) { endText = " hour ago" } else { endText = " hours ago" };
 		} else {
 			object.age = timeSince.minutes;
-			if (timeSince.days <= 1) { endText = " minute ago" } else { endText = " minutes ago" };
+			if (timeSince.minutes <= 1) { endText = " minute ago" } else { endText = " minutes ago" };
 		}
 		object.age = object.age + endText;
 		if (object.appendType == "append") {
@@ -1191,8 +1191,8 @@ function requestDownload(href) {
 		from: "download"
 	}
 
-	grabInfo(object);
-	grabLinks(object);
+	fakku.getInfo(object);
+	fakku.getLinks(object);
 
 }
 

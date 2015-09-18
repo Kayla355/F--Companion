@@ -33,10 +33,10 @@
 							File Conflicts:
 						</div>
 						<div class="mainDiv">
-							Folder Name:
+							Foldername:
 						</div>
-						<div class="mainDiv">
-							Filename Structure:
+						<div style="margin-top: 44px" class="mainDiv">
+							Filename:
 						</div>
 					</div>
 					<div id="right">
@@ -62,30 +62,15 @@
 							-->
 							</select>
 						</div>
-						<div class="dropdown">
-							<select title="Name of the folder that is created." id="foldername">
-								<option value="manganame">Manga Name</option>
-								<option value="series">Series Name</option>
-								<option value="authorname">Author Name</option>
-								<option value="translator">Translator</option>
-							</select>
+						<div class="input">
+							<textarea rows="4" cols="30" id="outputFoldername" class="structure" style="resize: none"></textarea>
 						</div>
-						<div class="dropdown">
-							<select title="How to construct the filename out of the information gathered." id="filedivtype">
-								<option value="manganame">Manga Name</option>
-								<option value="series">Series Name</option>
-								<option value="authorname">Author Name</option>
-								<option value="language">Language</option>
-								<option value="translator">Translator</option>
-								<option value="pagenumber">Page Number</option>
-								<option value="tags">Tags</option>
-							</select>
-							<button id="addFileDiv">Add</button>
-							<div id="removeColumn" class="flaticon-recycle-bin"></div>
+						<div class="input">
+							<textarea rows="4" cols="30" id="outputFilename" class="structure" style="resize: none"></textarea>
 						</div>
 					</div>
 					
-					<div id="fileColumns"></div>
+					<div id="folderName"></div>
 					<div id="fileName"></div>
 				</div>
 
@@ -152,7 +137,16 @@
 			<button id="save" class="save">Save</button>
 		</div>
 	</div>
+	<div id="help" style="display: none">
+		<p>The following tags can be used when creating a file or foldername(not case-sensitive):</p>
+		<p><span><b style="color: green">[NAME]:</b></span><span> The Name of the manga.</span></p>
+		<p><span><b style="color: green">[SERIES]:</b></span><span> The Series or parody the manga belongs to.</span></p>
+		<p><span><b style="color: green">[ARTIST]:</b></span><span> The Artist or Author that created the manga.</span></p>
+		<p><span><b style="color: green">[LANGUAGE]:</b></span><span> The Language that the manga is in.</span></p>
+		<p><span><b style="color: green">[TRANSLATOR]:</b></span><span> The Translator or Scanlator of the manga.</span></p>
+		<p><span><b style="color: green">[TAGS]:</b></span><span> The content tags of the manga.</span></p>
+		<p><span><b style="color: green">[PAGE]:</b></span><span> The current page of the manga (Can only be used in the filename)</span></p>
+	</div>
 </body>
 	<script src="scripts/options.js"></script>
-	<script src="scripts/dragable.js"></script>
 </html>

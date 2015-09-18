@@ -4,14 +4,20 @@ function save_options() {
 var fileChild = $('div#fileColumns').children().length;
 var alertCheck;
 	// Check if there is atleast one Page Number in File Structure else alert popup.
-	for (var i = 1; i <= fileChild; i++) {
-		if($('div#fileColumns div:nth-child('+ i +')').text() == "Page Number") {
-			alertCheck = true;
+	if(!$("#outputFilename").val().toUpperCase().match(/\[PAGE\]/) || $("#outputFilename").val() === "" || $("#outputFoldername").val() === "" || $("#outputFoldername").val().toUpperCase().match(/\[PAGE\]/) || !$("#outputFilename").val().toUpperCase().match(/\[NAME\]|\[SERIES\]|\[ARTIST\]|\[LANGUAGE\]|\[TRANSLATOR\]|\[PAGE\]|\[TAGS\]/) || !$("#outputFoldername").val().toUpperCase().match(/\[NAME\]|\[SERIES\]|\[ARTIST\]|\[LANGUAGE\]|\[TRANSLATOR\]|\[PAGE\]|\[TAGS\]/)) {
+		if($("#outputFoldername").val().toUpperCase().match(/\[PAGE\]/)) {
+			alertCheck = "folderpage";
+		} else if ($("#outputFilename").val() === "" || $("#outputFoldername").val() === "" || !$("#outputFilename").val().toUpperCase().match(/\[NAME\]|\[SERIES\]|\[ARTIST\]|\[LANGUAGE\]|\[TRANSLATOR\]|\[PAGE\]|\[TAGS\]/) || !$("#outputFoldername").val().toUpperCase().match(/\[NAME\]|\[SERIES\]|\[ARTIST\]|\[LANGUAGE\]|\[TRANSLATOR\]|\[PAGE\]|\[TAGS\]/)) {
+			alertCheck = "boxempty";
+		} else if (!$("#outputFilename").val().toUpperCase().match(/\[PAGE\]/)){
+			alertCheck = "nopage";
 		} else {
 			alertCheck = false;
 		}
+	} else {
+		alertCheck = false;
 	}
-	if(alertCheck) {
+	if(!alertCheck) {
     	// Incognito Downloads
 			var select = document.getElementById("incognitomode");
 			localStorage["incognito_mode"] = select.checked;
@@ -49,19 +55,12 @@ var alertCheck;
 			localStorage["conflict_action"] = conflictaction;
 
 		// Name of the created Folder
-			var select = document.getElementById("foldername");
-			var foldername = select.children[select.selectedIndex].value;
+			var foldername = document.getElementById("outputFoldername").value;
 			localStorage["folder_name"] = foldername;
 		
 		// Save the current order of file Structure
-			var fileSArray = [];
-
-			for (i = 1; i <= fileChild; i++) {
-				var copypasta = $('div#fileColumns div:nth-child('+ i +')').text();
-				fileSArray[i] = copypasta;	
-			}
-
-			localStorage["file_structure"] = JSON.stringify(fileSArray);
+			var filename = document.getElementById("outputFilename").value;
+			localStorage["file_structure"] = filename;
 
 		// Update status to let user know options were saved.
 			var status = document.getElementById("status");
@@ -70,11 +69,21 @@ var alertCheck;
 			status.innerHTML = "";
 			}, 1000);
 	} else {
-		//alert("You need atleast one(1) Page Number under File Structure");
-		// Update status to let user know that there was an issue with File Structure.
-			var status = document.getElementById("status");
+	  //alert("You need atleast one(1) Page Number under File Structure");
+	  // Update status to let user know that there was an issue with File Structure.
+		var status = document.getElementById("status");
+
+		if(alertCheck === "folderpage") {
+			status.innerHTML = "<div style='color: red;'>The foldername cannot contain a pagenumber.</div>";
+		} else if(alertCheck === "boxempty") {
+			status.innerHTML = "<div style='color: red;'>Foldername and Filename is either empty or contains no variable tags to generate a name from.</div>";
+		} else if(alertCheck === "nopage") {
 			status.innerHTML = "<div style='color: red;'>You need atleast one 'Page Number' under Filename Structure.</div>";
-			setTimeout(function() {
+		} else {
+			status.innerHTML = "<div style='color: red;'>Non-descript error occured while attempting to save.</div>";
+		}
+
+		setTimeout(function() {
 			status.innerHTML = "";
 		}, 3000);
 	}
@@ -82,10 +91,6 @@ var alertCheck;
 
 // Restores select box state to saved value from localStorage.
 function restore_options() {
-// Global Variables
-var fileSArray = JSON.parse(localStorage["file_structure"]);
-//var folderSArray = JSON.parse(localStorage["folder_structure"]);
-var fileChild = fileSArray.length - 1;
 
 // Restore Incognito downloads Status
 	var incognitomode = localStorage["incognito_mode"];
@@ -172,28 +177,126 @@ var fileChild = fileSArray.length - 1;
 	if (!foldername) {
 		return;
 	}
-	var select = document.getElementById("foldername");
-	for (var i = 0; i < select.children.length; i++) {
-		var child = select.children[i];
-		if (child.value == foldername) {
-			child.selected = "true";
-			break;
-		}
-	}
+	document.getElementById("outputFoldername").value = foldername;
 
 // Restore file Structure Status
-	for (var i = 1; i <= fileChild; i++) {
-		var text = fileSArray[i].toString();
-		$('div#fileColumns').append('<div id="fileColumn" class="column" draggable="true">'+ text +'</div>');
-		
-		if (i == fileChild) {
-			chrome.extension.sendMessage({msg: "runQueryLoaded"})
-		}
+	var filename = localStorage["file_structure"];
+	if (!filename) {
+		return;
 	}
+	document.getElementById("outputFilename").value = filename;
 }
 
 
-// Function for Tabs and Tab Content
+
+///////////////////////////////////////////////
+// Functions for previewing file structures //
+/////////////////////////////////////////////
+function addTextListener() {
+	var textareas = document.querySelectorAll('.structure');
+	[].forEach.call(textareas, function(textarea) {
+		textarea.addEventListener('change', updatePreview, false);
+		textarea.addEventListener('focus', function() {
+			document.getElementById('help').style.display = "block";
+		}, false);
+		textarea.addEventListener('blur', function() {
+			document.getElementById('help').style.display = "none";
+		}, false);
+	})
+}
+
+// Create the preview of the fileStructure
+function updatePreview() {
+	var error = false;
+	$(".structure").each(function(i, textarea) {
+		var string = "empty";
+		var from = $(textarea).prop("id");
+
+		if($(textarea).val() !== "") {
+			string = $(textarea).val();
+		}
+		
+		var preview = {
+			text: ""
+		}
+
+		var note = {
+			name: "When the Angel's Away",
+			series: ["Sora no Otoshimono"],
+			author: ["Pinvise", "Suzutsuki Kurara"],
+			translator: ["YQII"],
+			language: "English",
+			page: "012",
+			tags: ["paizuri", "anal", "vanilla", "oral", "oppai", "glasses", "schoolgirl", "toys", "hentai", "nakadashi", "socks", "cunnilingus"]
+		}
+
+	  // Convert arrays to single string
+		for (var prop in note) {
+			if(note.hasOwnProperty(prop)) {
+				try {
+					preview[prop] = note[prop].join(", ");
+				} catch(e) {
+					preview[prop] = note[prop];
+				}
+			}
+		}
+
+	  // Remove "." if it's the last character
+		while (string.match("[.]$")) {
+			string = string.replace(".", "");
+		}
+	  // Remove any of the following characters, \/:*?"<>|
+		while (string.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|')) {
+			error = true;
+			//console.log(string);
+			var r = string.match('\\\\|\/|\\:|\\*|\\?|\\"|\\<|\\>|\\|');
+			string = string.replace(r, "");
+		}
+
+		var rMapped = /\[NAME\]|\[SERIES\]|\[ARTIST\]|\[LANGUAGE\]|\[TRANSLATOR\]|\[PAGE\]|\[TAGS\]/gi;
+		var eMapped = {
+			"[NAME]": "<span style='color: #7F3FFD;'>"+ preview.name +"</span>",
+			"[SERIES]": "<span style='color: #FF00F4;'>"+ preview.series +"</span>",
+			"[ARTIST]": "<span style='color: #00CEFF'>"+ preview.author +"</span>",
+			"[LANGUAGE]": "<span style='color: #EC463F'>"+ preview.language +"</span>",
+			"[TRANSLATOR]": "<span style='color: #008000'>"+ preview.translator +"</span>",
+			"[PAGE]": "<span style='color: #0FE200'>"+ preview.page +"</span>",
+			"[TAGS]": "<span style='color: #FFA500'>"+ preview.tags +"</span>",
+		};
+
+	  // Return the mapped value.
+	  	preview.text = string.toUpperCase().replace(rMapped, function(matched) {
+			return eMapped[matched];
+		});
+
+	  	if(from === "outputFoldername") {
+	  		$('div#folderName').html('Foldername: ' + preview.text);
+	  	} else if(from === "outputFilename") {
+	  		$('div#fileName').html('Filename: ' + preview.text +".jpg");
+	  	}
+
+	  	if(error) {
+	  	  // Update status to let user know that there was an issue with File Structure.
+			document.getElementById("status").innerHTML = '<div style="color: red;">You can not use any of the following characters in filenames: \ / : * ? " < > |</div>';
+	  	} else {
+	  		document.getElementById("status").innerHTML = "";
+	  	}
+
+	})
+}
+
+// chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+// 	if (request.msg == "runQueryLoaded") {
+// 		querySelectLoaded();
+// 		addFileRemListen();
+// 		sendResponse({msg: "done"});
+// 	}
+// });
+
+
+////////////////////////////////////////
+// Function for Tabs and Tab Content //
+//////////////////////////////////////
 $(document).ready(function() {
 	$('.tabs .tab-links a').on('click', function(e) {
 		var currentAttrValue = $(this).attr('href');
@@ -225,9 +328,6 @@ $(document).ready(function() {
 	})
 })
 
-document.addEventListener('DOMContentLoaded', restore_options);
-document.querySelector('#save').addEventListener('click', save_options);
-
 $("#restoreItems").on("click", function() {
 	$("#restoreItems").text("Working...");
 	JSON.parse(localStorage["n_array_names"]).forEach(function(item) {
@@ -243,3 +343,13 @@ $("#restoreItems").on("click", function() {
 	setTimeout(function() {$("#restoreItems").text("Restore")}, 2000);
 
 })
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Restore Functions
+	restore_options(); // Needs to be before preview functions
+  
+  // Preview functions
+	updatePreview();
+	addTextListener();
+});
+document.querySelector('#save').addEventListener('click', save_options);
