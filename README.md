@@ -64,7 +64,7 @@ _\*On older versions of Chrome the Opera method will also work. While on newer v
   * There will now be a popup asking if you would like to force a recache when a major version change has been detected.
   * Added "endless-scrolling", meaning that you can load more items when you reach the bottom of the page. Amount can be changed in options.
   * Added Pururin.com support for downloads!
-  *Larger rewrite to improve the general speed of the extension as a result of re-enabling async requests, which also improved the speed of downloads.
+  * Larger rewrite to improve the general speed of the extension as a result of re-enabling async requests, which also improved the speed of downloads.
   * New scrollbar apperance for notifications.
   * Changed the customization of the file & foldernames of files. Allowing for a greater control over the filenames created.
 
