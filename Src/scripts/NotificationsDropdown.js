@@ -169,120 +169,106 @@ String.prototype.mReplace = function(type) {
 						});
 }
 
-// Create clickable menu
-$(document).ready(function() {
-	$('a#refresh').on("click", function(event) { event.preventDefault(); refreshNotes(); });
 
-	$('a#recache').on("click", function(event) { event.preventDefault(); recacheNotes(true); });
-
-	$('a#loadmore').on("click", function(event) { event.preventDefault(); loadMore(); });
-
-	$('a#filter').on("mousedown", function(event) {
-		event.preventDefault();
-		$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
-		$('div#menu div.right').on("keyup", function() { filter() })
-		fInput_rem();
-	});
-	$('a#filter').mouseup(function(event) { event.preventDefault(); });
-})
-
-// Create Input
-function fInput_add () {
-	$('a#filter').off("mousedown");
-	$('a#filter').on("mousedown", function(event) {
-		event.preventDefault();
-		$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
-		$('div#menu div.right').on("keyup", function() { filter() })
-
-		fInput_rem();
-	});
-}
-// Remove Input
-function fInput_rem () {		
-	$('a#filter').off("mousedown");
-	$('a#filter').on("mousedown", function(event) {
-		event.preventDefault();
-		$('input#filterInput').remove();
-		$('div#menu div.right').off("keyup")
-
-		$('div.noteDiv-matched').attr('class', 'noteDiv');
-		$('div.noteDiv-filtered').attr('class', 'noteDiv');
-
-		fInput_add();
-	});
-}
 // Function to filter notifications
-function filter(event) {
-	clearTimeout(filterTimer)
-	filterTimer = setTimeout(function(event) {
-		var input = $('input#filterInput').val().toLowerCase().split(/, | /);
+var filter = {
+	add: function() {
+		$('a#filter').off("mousedown");
+		$('a#filter').on("mousedown", function(event) {
+			event.preventDefault();
+			$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
+			$('div#menu div.right').on("keyup", function() { filter.filter(); })
 
-		$('div.noteDiv-matched').attr('class', 'noteDiv');
-		$('div.noteDiv-filtered').attr('class', 'noteDiv');
+			filter.rem();
+		});
+	},
+	rem: function() {
+		$('a#filter').off("mousedown");
+		$('a#filter').on("mousedown", function(event) {
+			event.preventDefault();
+			$('input#filterInput').remove();
+			$('div#menu div.right').off("keyup")
 
-	  // For each noteDiv
-		if (input[0] != "") {
-			$('div.noteDiv').each(function(index, div) {
-				var tagArray = new Array();
-				var matched = 0;
-				var i = input.length;
-			  // Grab tags
-				$(div).find('div#right div.row-left-full a').each(function(i, val) {
-					tagArray.push($(val).text().toLowerCase());
+			$('div.noteDiv-matched').attr('class', 'noteDiv');
+			$('div.noteDiv-filtered').attr('class', 'noteDiv');
+
+			filter.add();
+		});
+	},
+	filter: function(event) {
+		clearTimeout(filterTimer)
+		filterTimer = setTimeout(function(event) {
+			var input = $('input#filterInput').val().toLowerCase().split(/, | /);
+
+			$('div.noteDiv-matched').attr('class', 'noteDiv');
+			$('div.noteDiv-filtered').attr('class', 'noteDiv');
+
+		  // For each noteDiv
+			if (input[0] != "") {
+				$('div.noteDiv').each(function(index, div) {
+					var tagArray = new Array();
+					var matched = 0;
+					var i = input.length;
+				  // Grab tags
+					$(div).find('div#right div.row-left-full a').each(function(i, val) {
+						tagArray.push($(val).text().toLowerCase());
+					});
+				  // For each tag match & if matched then increase match count until the match count is the same as input length.
+				  // If the matched count and the input length is the same hide other divs
+					input.forEach(function (value) {
+						if (tagArray.toString().match(value)) {
+							matched++
+							if (matched == i) {
+								$(div).attr('class', 'noteDiv-matched');
+							}
+						};
+					})
+					matched = 0;
 				});
-			  // For each tag match & if matched then increase match count until the match count is the same as input length.
-			  // If the matched count and the input length is the same hide other divs
-				input.forEach(function (value) {
-					if (tagArray.toString().match(value)) {
-						matched++
-						if (matched == i) {
-							$(div).attr('class', 'noteDiv-matched');
-						}
-					};
-				})
-				matched = 0;
-			});
-		  // Hide the divs that were not matched
-			$('div.noteDiv').attr('class', 'noteDiv-filtered');
-		}
-	}, 50)
+			  // Hide the divs that were not matched
+				$('div.noteDiv').attr('class', 'noteDiv-filtered');
+			}
+		}, 50)
+	}
 }
 
 // Turning the lights on/off
-function lightsOff() {
-	// $('#whiteWrapper').on('click', function() {
-	// 	lightsOn();
-	// });
-	$('#whiteWrapper').css("opacity", "0.6").show();
-	// $('#whiteWrapper').fadeTo(300, 0.6);
-}
-
-function lightsOn() {
-	// $('#float').fadeOut(100).hide();
-	// $('#whiteWrapper').fadeOut(300);
-	$('#whiteWrapper').hide();
-	$('#whiteWrapper').off();
+var lights = {
+	on: function() {
+		// $('#float').fadeOut(100).hide();
+		// $('#whiteWrapper').fadeOut(300);
+		$('#whiteWrapper').hide();
+		$('#whiteWrapper').off();
+	},
+	off: function() {
+		// $('#whiteWrapper').on('click', function() {
+		// 	lights.on();
+		// });
+		$('#whiteWrapper').css("opacity", "0.6").show();
+		// $('#whiteWrapper').fadeTo(300, 0.6);
+	}
 }
 
 // Function for removing the popup download box
-function popup(from) {
-	var avoidID = [from, "download", "hidediv", "askRecache", "float", "loadingtrial", "loadingtrailnotes", "yes", "load-more"];
+var popup = {
+	add: function(from) {
+		var avoidID = [from, "download", "hidediv", "askRecache", "float", "loadingtrial", "loadingtrailnotes", "yes", "load-more"];
 
-	clearTimeout(popupTimeout);
+		clearTimeout(popupTimeout);
 
-	if (from != "downloadClicked" && from != "askRecache") {
-		popupTimeout = setTimeout(removePopup, 750);
-	}
-
-	$(document, '#whiteWrapper').on("click", function(event) {
-		event.preventDefault();
-		if($.inArray(event.target.id, avoidID) === -1 && $.inArray(event.target.parentNode.id, avoidID) === -1) {
-			removePopup();
+		if (from != "downloadClicked" && from != "askRecache") {
+			popupTimeout = setTimeout(popup.remove, 750);
 		}
-	});
 
-	function removePopup() {
-		lightsOn();
+		$(document, '#whiteWrapper').on("click", function(event) {
+			event.preventDefault();
+			if($.inArray(event.target.id, avoidID) === -1 && $.inArray(event.target.parentNode.id, avoidID) === -1) {
+				popup.remove();
+			}
+		});
+	},
+	remove: function() {
+		lights.on();
 		$('div#float').hide();
 		$('div#float').empty();
 		$('div#float').css("left", null);
@@ -295,6 +281,19 @@ function popup(from) {
 		}
 	}
 }
+
+// Create clickable menu
+$(document).ready(function() {
+	$('a#refresh').on("click", function(event) { event.preventDefault(); refreshNotes(); });
+
+	$('a#recache').on("click", function(event) { event.preventDefault(); recacheNotes(true); });
+
+	$('a#loadmore').on("click", function(event) { event.preventDefault(); loadMore(); });
+
+	$('a#filter').mouseup(function(event) { event.preventDefault(); });
+
+	filter.add();
+})
 
 // Queue function
 // Thanks to debuggable for this. (http://bit.ly/dBugQFunc)
@@ -371,7 +370,7 @@ function checkLoggedIn(object) {
 		  	$('div#content').css("width", "545px");
 		  	//$('div#content').css("height", "600px");
 		  	if (object.reCache || localStorage["new_note"] == "true" || object.loadmore) {
-		  		lightsOff();
+		  		lights.off();
 		  		$('div#float').empty();
 				$('div#float').show();
 				$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
@@ -801,14 +800,14 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 			var offsetY=$(document).scrollTop();
 			//console.log(x + ", " + y);
 			//console.log($(document).scrollTop());
-			//lightsOff();
+			//lights.off();
 			$('div#float').empty();
 			$('div#float').show();
 			$('div#float').prepend("<div id='loading' class='loadingtrail'></div>");
 			$('div#float').append("<b>Preparing Download</b>");
 			$('div#float').css("left", x + 15);
 			$('div#float').css("top", y + offsetY - 10);
-			popup("downloadClicked");
+			popup.add("downloadClicked");
 		}
 	});
 	$('div#'+ divName +' a#download').mouseup(function(event) {
@@ -826,7 +825,7 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 			var offsetY=$(document).scrollTop();
 			//console.log(x + ", " + y);
 			//console.log($(document).scrollTop());
-			//lightsOff();
+			//lights.off();
 			$('div#float').empty();
 			$('div#float').show();
 			$('div#float').append("<b>Removed</b>");
@@ -834,7 +833,7 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 			$('div#float').css("top", y + offsetY);
 			localStorage[href.replace("https://www.fakku.net", "") + "--note"] = localStorage[href.replace("https://www.fakku.net", "") + "--note"].replace("shown", "hidden");
 			$(event.target.parentNode.parentNode.parentNode.parentNode).animate({height: "toggle"}, 350);
-			popup("removeClicked")
+			popup.add("removeClicked")
 		}
 	});
 	$('div#'+ divName +' .close').mouseup(function(event) {
@@ -925,7 +924,7 @@ function notesDone(pend, loadmore, errorCount) {
 		}
 	}
 	
-	lightsOn();
+	lights.on();
 	$('div#load-more').show();
 	$('div#float').hide();
 	$('div#float').attr("class", "");
@@ -965,7 +964,7 @@ function notesDone(pend, loadmore, errorCount) {
 		$('div#float').attr("class", "float-recache");
 
 		$('div#content').css("width", "545px");
-	  	lightsOff();
+	  	lights.off();
 		$('div#float').show();
 
 		$('div#float div#askRecache div#options #yes').on('click', function(event) {
@@ -973,7 +972,7 @@ function notesDone(pend, loadmore, errorCount) {
 			recacheNotes(true);
 		});
 
-		popup("askRecache");
+		popup.add("askRecache");
   	} else if(localStorage["github_update"] == "true" && localStorage["github_notified"] != "true") {
   // Disabled for now //
   
@@ -988,7 +987,7 @@ function notesDone(pend, loadmore, errorCount) {
 		// $('div#float').attr("class", "float-recache");
 
 		// $('div#content').css("width", "545px");
-	 //  	lightsOff();
+	 //  	lights.off();
 		// $('div#float').show();
 
 		// $('div#float div#askRecache div#options #yes').on('click', function(event) {
@@ -996,7 +995,7 @@ function notesDone(pend, loadmore, errorCount) {
 		// 	openTab("https://github.com/Kayla355/F--Companion");
 		// });
 
-		// popup("askRecache");
+		// popup.add("askRecache");
   	}
 
   // Image hovering event
@@ -1107,7 +1106,7 @@ function refreshNotes() {
 	$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
 
 	$('div#content').css("width", "545px");
-  	lightsOff();
+  	lights.off();
   	$('div#float').css("top", "50%");
   	$('div#float').css("left", "45%");
 	$('div#float').show();
@@ -1130,7 +1129,7 @@ function refreshNotes() {
 // Listen for message that says refresh complete
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.msg == "nDropdownDone") {
-		lightsOn();
+		lights.on();
 		$('div#float').hide();
 		$('div#float').attr("class", "");
 
@@ -1173,11 +1172,11 @@ function loadMore() {
 	} else {
 		$('div#float').attr("class", "float-loadmore-not");
 		$('div#float').attr("style", "");
-		lightsOff();
+		lights.off();
 		$('div#float').empty();
 		$('div#float').show();
 		$('div#float').append("<b>Found no more Items</b>");
-		popup("loadmore");
+		popup.add("loadmore");
 	}
 }
 
@@ -1223,7 +1222,7 @@ function startDownload() {
 		$('div#float').append("<div id='progress-bar' style='display: block; margin-top: 4px'><center style='top: 25px;'>0%</center><div></div></div>");
 		progressBarInterval = setInterval(updateProgressBar, 10);
 	} else {
-		popup("downloading");
+		popup.add("downloading");
 	}
 }
 
@@ -1237,12 +1236,12 @@ function updateProgressBar() {
 		$('div#progress-bar div').css("width", "0%");
 
 		clearInterval(progressBarInterval);
-		setTimeout(function() { popup("downloading") }, 1000);
+		setTimeout(function() { popup.add("downloading") }, 1000);
 	}
 
 	if(localStorage["progress_bar"] == "100") {
 		console.log("DONE");
 		clearInterval(progressBarInterval);
-		popup("downloading");
+		popup.add("downloading");
 	}
 }

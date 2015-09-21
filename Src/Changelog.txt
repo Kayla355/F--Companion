@@ -62,3 +62,9 @@
 - The extension will now check for a new version on github and present a notification if it finds one.
 - Added option to download files as zip, instead of individual files.
 
+// Version 0.4.2 (Un-released)
+- Added Pururin.com support for downloads!
+- Larger rewrite to improve the general speed of the extension as a result of re-enabling async requests, which also improved the speed of downloads.
+- New scrollbar apperance for notifications.
+- Changed the customization of the file & foldernames of files. Allowing for a greater control over the filenames created.
+
