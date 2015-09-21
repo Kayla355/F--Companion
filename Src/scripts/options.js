@@ -202,7 +202,7 @@ function addTextListener() {
 		textarea.addEventListener('blur', function() {
 			document.getElementById('help').style.display = "none";
 		}, false);
-	})
+	});
 }
 
 // Create the preview of the fileStructure
@@ -218,7 +218,7 @@ function updatePreview() {
 		
 		var preview = {
 			text: ""
-		}
+		};
 
 		var note = {
 			name: "When the Angel's Away",
@@ -228,7 +228,7 @@ function updatePreview() {
 			language: "English",
 			page: "012",
 			tags: ["paizuri", "anal", "vanilla", "oral", "oppai", "glasses", "schoolgirl", "toys", "hentai", "nakadashi", "socks", "cunnilingus"]
-		}
+		};
 
 	  // Convert arrays to single string
 		for (var prop in note) {
@@ -282,7 +282,7 @@ function updatePreview() {
 	  		document.getElementById("status").innerHTML = "";
 	  	}
 
-	})
+	});
 }
 
 // chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
@@ -320,13 +320,13 @@ $(document).ready(function() {
 
 			  // Paste text data and reverse order of paragraphs
 				$('div#changelog-content').html(data);
-				$('div#changelog-content').children().each(function(i, li) { $('div#changelog-content').prepend(li); })
+				$('div#changelog-content').children().each(function(i, li) { $('div#changelog-content').prepend(li); });
 			});
 	 	}
 
 	 	e.preventDefault();
-	})
-})
+	});
+});
 
 $("#restoreItems").on("click", function() {
 	$("#restoreItems").text("Working...");
@@ -337,12 +337,12 @@ $("#restoreItems").on("click", function() {
   			array[5] = "shown";
   			localStorage[item] = JSON.stringify(array);
   		}
-	})
+	});
 
 	$("#restoreItems").text("Done!");
-	setTimeout(function() {$("#restoreItems").text("Restore")}, 2000);
+	setTimeout(function() {$("#restoreItems").text("Restore");}, 2000);
 
-})
+});
 
 document.addEventListener('DOMContentLoaded', function() {
   // Restore Functions

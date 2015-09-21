@@ -80,12 +80,12 @@ var fakku = {
 				notes = {};
 			}
 
-			if (data.content == "" || $.isEmptyObject(data.content)) {
+			if (data.content === "" || $.isEmptyObject(data.content)) {
 				error = true;
 				getAjaxData(currenturl.replace("api.", "www."), "HTML").then(function(html) {
 					errorMessage = $(html).find('div#error.message h3').text();
 					
-					if(errorMessage == "") {
+					if(errorMessage === "") {
 						errorMessage = "Unknown Error!";
 					}
 				});
@@ -118,7 +118,7 @@ var fakku = {
 				}
 
 			  // Check if http:// or https:// is included in the link. Newer links don't have them included while older ones do.
-				if (!imgCover.match(/http/) && imgCover != "") {
+				if (!imgCover.match(/http/) && imgCover !== "") {
 					imgCover = "https:" + imgCover;
 					imgSample = "https:" + imgSample;
 				}
@@ -210,7 +210,7 @@ var fakku = {
 				notificationInfo(object, notes);
 			} else {
 				//console.log("Download Grabinfo triggered");
-				sendReadyMessage("docReadyInfo", infoarray)
+				sendReadyMessage("docReadyInfo", infoarray);
 				if(object.from === "download") {
 					checkDownloadReady();
 				}
@@ -232,13 +232,13 @@ var fakku = {
 		}
 
 		getAjaxData(currenturl, "JSON").then(function(data) {
-			if (data.content != "" || !$.isEmptyObject(data.content)) {
+			if (data.content !== "" || !$.isEmptyObject(data.content)) {
 				linkarray = ["linkarray"];
 				$.each(data.pages, function(i, data) {
 					linkarray.push(data.image);
 				});
 				linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4)); // File Extension
-				sendReadyMessage("docReadyLink", linkarray)
+				sendReadyMessage("docReadyLink", linkarray);
 				if(object.from === "download") {
 					checkDownloadReady();
 				}
@@ -247,7 +247,7 @@ var fakku = {
 			}
 		});
 	}
-}
+};
 
 // Grabber for Pururin
 var pururin = {
@@ -348,7 +348,7 @@ var pururin = {
 				notificationInfo(object, notes);
 			} else {
 				//console.log("Download Grabinfo triggered");
-				sendReadyMessage("docReadyInfo", infoarray)
+				sendReadyMessage("docReadyInfo", infoarray);
 				if(object.from === "download") {
 					checkDownloadReady();
 				}
@@ -372,14 +372,14 @@ var pururin = {
 		getAjaxData(currenturl, "html").then(function(html) {
 			var manga = JSON.parse($(html).find("script:last-child").text().match(/{.*}/));
 
-			if (manga != "" || !$.isEmptyObject(manga)) {
+			if (manga !== "" || !$.isEmptyObject(manga)) {
 				linkarray = ["linkarray"];
 				$.each(manga.images, function(i, data) {
 					var link = "http://pururin.com/f/"+ data.f.slice(0, -4) +"/"+ manga.slug +"-"+ (parseInt(data.i)+1) + data.f.slice(-4);
 					linkarray.push(link);
 				});
 				linkarray.push(manga.images[0].f.slice(-4)); // File Extension
-				sendReadyMessage("docReadyLink", linkarray)
+				sendReadyMessage("docReadyLink", linkarray);
 				if(object.from === "download") {
 					checkDownloadReady();
 				}
@@ -388,7 +388,7 @@ var pururin = {
 			}
 		});
 	}
-}
+};
 
 
 function checkDownloadReady() {
@@ -409,7 +409,7 @@ function errorHandling (error) {
 		note[0] = "old";
 		localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
-	if (object.from === "notes" && error.status != 0) {
+	if (object.from === "notes" && error.status != "0") {
 		infoarray[0] = "infoarray";
 		infoarray[1] = "error";
 		infoarray[2] = error.status;

@@ -238,11 +238,12 @@ function notificationCheck() {
 			  	getAjaxData("https://www.fakku.net/subscriptions").then(function(html) {
 				  // Keep track of the names of the arrays
 					var nArrayNames = [];
-					try { 
-						var notes = JSON.parse(localStorage["notes"]);
-					} catch(e) {
-						var notes = {};
+					var notes = {};
+					
+					if(localStorage["notes"]) {
+					  notes = JSON.parse(localStorage["notes"]); //For old notes, I think... Might do nothing.
 					}
+
 				  // Check if there was an error on the page. *Backup for the rare instance of the cookie not being expired, yet you are logged out.
 					if($(html).find('div#error').length !== 0) {
 						badgeUpdate("error");
@@ -273,6 +274,8 @@ function notificationCheck() {
 						var type 	= nHref.match(/(doujinshi|manga)/)[0];
 						var nNew;
 						var nStatus;
+						var nExists;
+						var iExists;
 
 						//console.log("Checked Notifications");
 						//console.log("Name: " + nName);
@@ -286,10 +289,10 @@ function notificationCheck() {
 					// Assigning states for old/new & hidden/shown
 					  // Check if localStorage entry exists
 						if (localStorage[nStorage + "--note"]) {
-							var nExists		= JSON.parse(localStorage[nStorage + "--note"]);
+							nExists		= JSON.parse(localStorage[nStorage + "--note"]);
 
 							if (localStorage[nStorage + "--info"]) {
-								var iExists = JSON.parse(localStorage[nStorage + "--info"]);
+								iExists = JSON.parse(localStorage[nStorage + "--info"]);
 
 							  // Checks if the info stored has an unknown error and if true recache the note.
 								if (iExists[1] == "error" && !iExists[2].toString().match(/(404|410|411)/)) {
@@ -309,7 +312,7 @@ function notificationCheck() {
 								noteArray[0] = "new";
 								nNew = true;
 
-								if(iExists && !iExists[1] == "error") {
+								if(iExists && iExists[1] != "error") {
 									i = localStorage["badge_number"];
 								}
 								
@@ -581,7 +584,7 @@ function cleanStorage() {
 function badgeUpdate(status) {
   // When updateBadge is triggered from the notificationCheck
 	if (status == "update") {
-		if (localStorage["badge_number"] == 0) {
+		if (localStorage["badge_number"] == "0") {
 			badgeRed("");
 			localStorage["new_note"] = "false";
 		} else {
@@ -618,7 +621,7 @@ function badgeUpdate(status) {
   		badgeClear(true); 
   	}
   // When you leave a downloadable page and have a notification
-  	if (status != "download" && localStorage["badge_number"] != 0 && localStorage["badge_number_action"] != "true") {
+  	if (status != "download" && localStorage["badge_number"] != "0" && localStorage["badge_number_action"] != "true") {
   		badgeRed(localStorage["badge_number"]);
   	}
 }
@@ -666,7 +669,7 @@ function downloadLinks() {
 	var structure 		= {
 		folder: localStorage["folder_name"],
 		file: localStorage["file_structure"]
-	}
+	};
 
 	var note = {
 		name: manganame,
@@ -675,7 +678,7 @@ function downloadLinks() {
 		translator: translator,
 		language: language,
 		tags: tags,
-	}
+	};
 
 // Create the folder/filename structure
 	for(var name in {folder: 0, file: 0}) {

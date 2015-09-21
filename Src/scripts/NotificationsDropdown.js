@@ -167,7 +167,7 @@ String.prototype.mReplace = function(type) {
 	  	return this.toLowerCase().replace(rMapped, function(matched) {
 							return eMapped[matched];
 						});
-}
+};
 
 
 // Function to filter notifications
@@ -177,7 +177,7 @@ var filter = {
 		$('a#filter').on("mousedown", function(event) {
 			event.preventDefault();
 			$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
-			$('div#menu div.right').on("keyup", function() { filter.filter(); })
+			$('div#menu div.right').on("keyup", function() { filter.filter(); });
 
 			filter.rem();
 		});
@@ -187,7 +187,7 @@ var filter = {
 		$('a#filter').on("mousedown", function(event) {
 			event.preventDefault();
 			$('input#filterInput').remove();
-			$('div#menu div.right').off("keyup")
+			$('div#menu div.right').off("keyup");
 
 			$('div.noteDiv-matched').attr('class', 'noteDiv');
 			$('div.noteDiv-filtered').attr('class', 'noteDiv');
@@ -196,7 +196,7 @@ var filter = {
 		});
 	},
 	filter: function(event) {
-		clearTimeout(filterTimer)
+		clearTimeout(filterTimer);
 		filterTimer = setTimeout(function(event) {
 			var input = $('input#filterInput').val().toLowerCase().split(/, | /);
 
@@ -204,9 +204,9 @@ var filter = {
 			$('div.noteDiv-filtered').attr('class', 'noteDiv');
 
 		  // For each noteDiv
-			if (input[0] != "") {
+			if (input[0] !== "") {
 				$('div.noteDiv').each(function(index, div) {
-					var tagArray = new Array();
+					var tagArray = [];
 					var matched = 0;
 					var i = input.length;
 				  // Grab tags
@@ -217,20 +217,20 @@ var filter = {
 				  // If the matched count and the input length is the same hide other divs
 					input.forEach(function (value) {
 						if (tagArray.toString().match(value)) {
-							matched++
+							matched++;
 							if (matched == i) {
 								$(div).attr('class', 'noteDiv-matched');
 							}
-						};
-					})
+						}
+					});
 					matched = 0;
 				});
 			  // Hide the divs that were not matched
 				$('div.noteDiv').attr('class', 'noteDiv-filtered');
 			}
-		}, 50)
+		}, 50);
 	}
-}
+};
 
 // Turning the lights on/off
 var lights = {
@@ -247,7 +247,7 @@ var lights = {
 		$('#whiteWrapper').css("opacity", "0.6").show();
 		// $('#whiteWrapper').fadeTo(300, 0.6);
 	}
-}
+};
 
 // Function for removing the popup download box
 var popup = {
@@ -280,7 +280,7 @@ var popup = {
 			storeContent();
 		}
 	}
-}
+};
 
 // Create clickable menu
 $(document).ready(function() {
@@ -293,7 +293,7 @@ $(document).ready(function() {
 	$('a#filter').mouseup(function(event) { event.preventDefault(); });
 
 	filter.add();
-})
+});
 
 // Queue function
 // Thanks to debuggable for this. (http://bit.ly/dBugQFunc)
@@ -308,7 +308,7 @@ $.notequeue = {
                     setTimer(time);
                 }
             }, time || 2);
-        }
+        };
 
         if (fn) {
             $.notequeue._queue.push([fn, context, time]);
@@ -337,6 +337,69 @@ checkLoggedIn({reCache: false, loadmore: false}); // Run checkLoggedIn function
 // Check if Login cookie has expired.
 function checkLoggedIn(object) {
 	start = new Date().getTime();
+  var notesAmount;
+  var perPageMax;
+  var doArrayLength;
+  var nArrayNames = JSON.parse(localStorage["n_array_names"]);
+  var doArray 	= [];
+  var new_nArrayNames = [];
+	
+	var loadNote = function(name, bypass) {
+		lastNote = name;
+
+		if (JSON.parse(localStorage[name])[0] == "old" && !object.reCache || bypass) {
+			var self = this, doBind = function() {
+				var nNote = JSON.parse(localStorage[name]);
+				var nInfo;
+				if (localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]) {
+					nInfo = JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]);
+				}
+				//console.log(nNote);
+				//console.log(nInfo);
+			  // Check if manga exists and reCache is false
+				if (nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
+				  // If it does exist do...
+				  	grab_notes[name].isNew = false;
+
+					notificationInfo({
+						infodata: JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]),
+						href: nNote[2],
+						age: nNote[3],
+						isNew: nNote[0],
+						isHidden: nNote[5],
+						appendType: "append",
+						name: name,
+						from: "loadnote",
+						reCache: object.reCache,
+						loadmore: object.loadmore
+					});
+					
+				} else {
+				  // If it does not exist do...
+				  	grab_notes[name].isNew = true;
+
+					fakku.getInfo({
+						href: nNote[2],
+						age: nNote[3],
+						isNew: nNote[0],
+						isHidden: nNote[5],
+						appendType: "prepend",
+						name: name,
+						from: "notes",
+						reCache: object.reCache,
+						loadmore: object.loadmore
+					});
+				}
+			  // Update the app_version localStorage to current version
+				if (doArray[doArray.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
+					setNewVersion = true;
+				}
+	        };
+	        $.notequeue.add(doBind, this);
+	    } else {
+	    	new_nArrayNames.unshift(name);
+	    }
+	};
 	
 	chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
 		if (!results || localStorage["badge_number"] === "Err") {
@@ -374,30 +437,26 @@ function checkLoggedIn(object) {
 		  		$('div#float').empty();
 				$('div#float').show();
 				$('div#float').prepend("<div id='loading' class='loadingtrailnotes'></div>");
-		  	};
-
-		  	var nArrayNames = JSON.parse(localStorage["n_array_names"]);
-		  	var doArray 	= new Array();
+		  	}
+		  	
 		  	//loadmore && perPage > nArrayNames.length - parseInt(localStorage['notes_done_amount'])
 		  	if (perPage == "all" || perPage > nArrayNames.length && !object.loadmore) {
 		  		doArray = nArrayNames;
 		  	} else if(object.loadmore) {
-		  		var notesAmount = parseInt(localStorage['notes_done_amount']);
+		  		notesAmount = parseInt(localStorage['notes_done_amount']);
 		  		doArray = nArrayNames.slice(notesAmount, (notesAmount + parseInt(perPage)));
 		  		//console.log(nArrayNames.slice(parseInt(localStorage['notes_done_amount'])));
 		  	} else {
 		  		parsePerPage = parseInt(perPage) - 1;
-		  		var perPageMax 	= perPageMore + parsePerPage;
-
+		  		perPageMax 	= perPageMore + parsePerPage;
+		  		
 		  		while (perPageMore <= perPageMax) {
 			  		doArray.push(nArrayNames[perPageMore - 1]);
-			  		perPageMore++
+			  		perPageMore++;
 		  		}
 		  	}
-		  	var doArrayLength = doArray.length;
+		  	doArrayLength = doArray.length;
 			localStorage["notes_done_amount"] = doArrayLength + parseInt(localStorage["notes_done_amount"]);
-
-			var new_nArrayNames = new Array();
 
 			if(doArrayLength === 0) {
 				outOfNotes = true;
@@ -408,7 +467,7 @@ function checkLoggedIn(object) {
 			doArray.forEach(function(name) {
 				grab_notes[name] = {
 			  		status: "working"
-			  	}
+			  	};
 
 				try {
 					if(name !== undefined) {
@@ -422,62 +481,6 @@ function checkLoggedIn(object) {
 					console.error(e);
 				}
 			});
-			function loadNote(name, bypass) {
-				lastNote = name;
-
-				if (JSON.parse(localStorage[name])[0] == "old" && !object.reCache || bypass) {
-					var self = this, doBind = function() {
-						var nNote = JSON.parse(localStorage[name]);
-						var nInfo;
-						if (localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]) {
-							nInfo = JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]);
-						}
-						//console.log(nNote);
-						//console.log(nInfo);
-					  // Check if manga exists and reCache is false
-						if (nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] != "error" || nInfo && !object.reCache && nNote[0] == "old" && nInfo[1] == "error" && nInfo[2].toString().match(/(404|410|411)/)) {
-						  // If it does exist do...
-						  	grab_notes[name].isNew = false;
-
-							notificationInfo({
-								infodata: JSON.parse(localStorage[nNote[2].replace("https://www.fakku.net", "") + "--info"]),
-								href: nNote[2],
-								age: nNote[3],
-								isNew: nNote[0],
-								isHidden: nNote[5],
-								appendType: "append",
-								name: name,
-								from: "loadnote",
-								reCache: object.reCache,
-								loadmore: object.loadmore
-							});
-							
-						} else {
-						  // If it does not exist do...
-						  	grab_notes[name].isNew = true;
-
-							fakku.getInfo({
-								href: nNote[2],
-								age: nNote[3],
-								isNew: nNote[0],
-								isHidden: nNote[5],
-								appendType: "prepend",
-								name: name,
-								from: "notes",
-								reCache: object.reCache,
-								loadmore: object.loadmore
-							});
-						}
-					  // Update the app_version localStorage to current version
-						if (doArray[doArray.length - 2] == name && (localStorage["app_version"] != chrome.app.getDetails().version || !localStorage["app_version"])) {
-							setNewVersion = true;
-						}
-			        };
-			        $.notequeue.add(doBind, this);
-			    } else {
-			    	new_nArrayNames.unshift(name);
-			    }
-			}
 			new_nArrayNames.forEach(function(name) {
 			  	loadNote(name, true);
 			});
@@ -489,10 +492,10 @@ function checkLoggedIn(object) {
 function notificationInfo(object, notes) {
 
   // Variables
-	var tagArray 		= new Array();
-	var artistArray		= new Array();
-	var translatorArray	= new Array();
-	var seriesArray 	= [{attribute: "Not Specified", attribute_link: "/none"}]
+	var tagArray 		= [];
+	var artistArray		= [];
+	var translatorArray	= [];
+	var seriesArray 	= [{attribute: "Not Specified", attribute_link: "/none"}];
 	var error 			= false;
  
   // Div variables
@@ -502,6 +505,7 @@ function notificationInfo(object, notes) {
 	var divTranslators 	= "";
 	var languageClass 	= "";
 	var divDate 		= "";
+	var languageLink;
 
 	if (object.infodata[1] == "error") {
 
@@ -514,12 +518,12 @@ function notificationInfo(object, notes) {
 		error = true; 
 		console.log("%cError Parsing: %c" + object.infodata[3], "color: red;", "color: black;"); 
 		console.log("%cError Message: %c" + "(" + object.infodata[2] + ") " + object.infodata[4], "color: red;", "color: black;");
-	};
-	if (object.infodata[3] && !error)  { seriesArray = object.infodata[3] };
-	if (object.infodata[5] && !error)  { var languageLink = object.infodata[5].mReplace("char").toLowerCase();};
-	if (object.infodata[7] && !error)  { tagArray 			= object.infodata[7] };
-	if (object.infodata[4] && !error)  { artistArray 		= object.infodata[4] };
-	if (object.infodata[6] && !error)  { translatorArray 	= object.infodata[6] };
+	}
+	if (object.infodata[3] && !error)  { seriesArray = object.infodata[3]; }
+	if (object.infodata[5] && !error)  { languageLink = object.infodata[5].mReplace("char").toLowerCase();}
+	if (object.infodata[7] && !error)  { tagArray 			= object.infodata[7]; }
+	if (object.infodata[4] && !error)  { artistArray 		= object.infodata[4]; }
+	if (object.infodata[6] && !error)  { translatorArray 	= object.infodata[6]; }
 
 	var seriesName = seriesArray[0].attribute;
 	var seriesLink = seriesArray[0].attribute.mReplace("char").toString().toLowerCase(); 
@@ -548,13 +552,13 @@ function notificationInfo(object, notes) {
 
 		if (timeSince.days >= 1) {
 			object.age = timeSince.days;
-			if (timeSince.days == 1) { endText = " day ago" } else { endText = " days ago" };
+			if (timeSince.days == 1) { endText = " day ago"; } else { endText = " days ago"; }
 		} else if (timeSince.hours >= 1) {
 			object.age = timeSince.hours;
-			if (timeSince.hours == 1) { endText = " hour ago" } else { endText = " hours ago" };
+			if (timeSince.hours == 1) { endText = " hour ago"; } else { endText = " hours ago"; }
 		} else {
 			object.age = timeSince.minutes;
-			if (timeSince.minutes <= 1) { endText = " minute ago" } else { endText = " minutes ago" };
+			if (timeSince.minutes <= 1) { endText = " minute ago"; } else { endText = " minutes ago"; }
 		}
 		object.age = object.age + endText;
 		if (object.appendType == "append") {
@@ -570,7 +574,7 @@ function notificationInfo(object, notes) {
 		//idCounter = $('div#content div#notes div.noteDiv').length + 1;
 		
 	  // Make sure items get appended if action is loadmore
-	  	if(object.loadmore) { object.appendType = "append" }
+	  	if(object.loadmore) { object.appendType = "append"; }
 
 	  // Adds "--info" to the end of the href string to match the name in localStorage
 		localStorage[object.href.replace("https://www.fakku.net", "") + "--info"] = JSON.stringify(object.infodata);
@@ -582,7 +586,7 @@ function notificationInfo(object, notes) {
 			// For each in array do...
 			  // Create Tags Link
 				tagArray.forEach(function(e, i) {
-					var er = e.attribute.mReplace("char").toLowerCase()
+					var er = e.attribute.mReplace("char").toLowerCase();
 				  // If last in array do not use ", "
 					if (tagArray[tagArray.length - 1] == e) {
 						divTags += '<a id="'+ er +'" href="#" title="'+ $('<div/>').html(e.attribute.mReplace("desc")).text() +'">'+ e.attribute +'</a>';
@@ -592,24 +596,24 @@ function notificationInfo(object, notes) {
 				});
 			  // Create Artists Link"
 				artistArray.forEach(function(e) {
-					var er = e.attribute.mReplace("char").toLowerCase()
+					var er = e.attribute.mReplace("char").toLowerCase();
 
 				  // If last in array do not use ", "
 					if (artistArray[artistArray.length - 1] == e) {
-						divArtists += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>'
+						divArtists += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>';
 					} else {
-						divArtists += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>, '
+						divArtists += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>, ';
 					}
 				});
 			  // Create Translators Link"
 				translatorArray.forEach(function(e) {
-					var er = e.attribute.mReplace("char").toLowerCase()
+					var er = e.attribute.mReplace("char").toLowerCase();
 
 				  // If last in array do not use ", "
 					if (translatorArray[translatorArray.length - 1] == e) {
-						divTranslators += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>'
+						divTranslators += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>';
 					} else {
-						divTranslators += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>, '
+						divTranslators += '<a id="'+ er +'" href="#">'+ e.attribute +'</a>, ';
 					}
 				});
 
@@ -677,10 +681,10 @@ function notificationInfo(object, notes) {
 				if ($('div#'+ divName +' div#right div.wrap div#description.row-left-full').height() > 32) {
 
 				  // Create dropdown button
-				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full').css("height", "32px")
-				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full').css("overflow", "hidden")
-				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full b').css("cursor", "pointer")
-				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:")
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full').css("height", "32px");
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full').css("overflow", "hidden");
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full b').css("cursor", "pointer");
+				  	$('div#'+ divName +' div#right div.wrap div#description.row-left-full b').html("\&#9658\;Description:");
 
 					}
 			  // Fix left div height
@@ -699,7 +703,7 @@ function notificationInfo(object, notes) {
 				$('div#'+divName).attr("class", "noteDiv-hidden");
 			}
 		  // Remove unused Divs
-		  	if ($('div#'+ divName +' div#right div.wrap div.row:nth-of-type(4) div.right span').text() == "") {
+		  	if ($('div#'+ divName +' div#right div.wrap div.row:nth-of-type(4) div.right span').text() === "") {
 		  		$('div#'+ divName +' div#right div.wrap div.row:nth-of-type(4) div.right span').html("<a>Not Specified</a>");
 		  		$('div#'+ divName +' div#right div.wrap div.row:nth-of-type(4) div.right span').attr("class", "japanese");
 		  	}
@@ -708,7 +712,7 @@ function notificationInfo(object, notes) {
 	// If error then increase errorCount
 	if (error) {
 	  //console.log("Increased errorcount");
-		errorCount++
+		errorCount++;
 	}
 	
 	// Run function that will attach Event Listeners to page
@@ -723,8 +727,8 @@ function notificationInfo(object, notes) {
   // If new change to old to indicate that the entry has been seen
 	if (object.isNew == "new") {
 		var note = JSON.parse(localStorage[object.href.replace("https://www.fakku.net", "") + "--note"]);
-		note[0] = "old"
-		notesToUpdate[object.href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note)
+		note[0] = "old";
+		notesToUpdate[object.href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 		//localStorage[object.href.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
 
@@ -745,25 +749,25 @@ function notificationInfo(object, notes) {
   	if(object.from === "loadnote") {
   		if(object.name == lastNote) {
 			//console.log("notesDone triggered");
-			notesDone(object.appendType, object.loadmore, errorCount)
+			notesDone(object.appendType, object.loadmore, errorCount);
 		}
   	} else {
   		var isDone = true;
 
-		for(var note in grab_notes) {
-	  		if(grab_notes.hasOwnProperty(note)) {
-	  			if(grab_notes[note].status !== "done" && grab_notes[note].isNew) {
+		for(var _note in grab_notes) {
+	  		if(grab_notes.hasOwnProperty(_note)) {
+	  			if(grab_notes[_note].status !== "done" && grab_notes[_note].isNew) {
 					isDone = false;
 				}
 	  		}
 	  	}
 
 	  	if(isDone) {
-	  		notesDone(object.appendType, object.loadmore, errorCount)
+	  		notesDone(object.appendType, object.loadmore, errorCount);
 	  	}
   	}
 	
-};
+}
 
 function attachEventListeners (divName, href, seriesLink, languageLink, tagArray, artistArray, translatorArray, seriesArray) {
   // Div actions
@@ -786,14 +790,14 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 	  // Description links click action
   	$('div#'+ divName +' div#right div.wrap div#description.row-left-full a').on('click', function(event) {
 		event.preventDefault();
-		openTab(event.currentTarget.href)
-	})
+		openTab(event.currentTarget.href);
+	});
 
   // Download click action
 	// Had to use mousedown and mouseup instead of click because requestDownload was triggered first for some reason.
 	$('div#'+ divName +' a#download').mousedown(function(event) {
 	  // If left mouse button clicked, trigger download event
-		if(event.button == 0) {
+		if(event.button === 0) {
 			event.preventDefault();
 			var x=event.clientX; 
 			var y=event.clientY;
@@ -811,14 +815,14 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 		}
 	});
 	$('div#'+ divName +' a#download').mouseup(function(event) {
-		if(event.button == 0) {
+		if(event.button === 0) {
 			event.preventDefault();
 			requestDownload(href);
 		}
 	});
   // Hide/Remove div click action
 	$('div#'+ divName +' .close').mousedown(function(event) {
-		if(event.button == 0) {
+		if(event.button === 0) {
 			event.preventDefault();
 			var x=event.clientX; 
 			var y=event.clientY;
@@ -833,7 +837,7 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 			$('div#float').css("top", y + offsetY);
 			localStorage[href.replace("https://www.fakku.net", "") + "--note"] = localStorage[href.replace("https://www.fakku.net", "") + "--note"].replace("shown", "hidden");
 			$(event.target.parentNode.parentNode.parentNode.parentNode).animate({height: "toggle"}, 350);
-			popup.add("removeClicked")
+			popup.add("removeClicked");
 		}
 	});
 	$('div#'+ divName +' .close').mouseup(function(event) {
@@ -865,7 +869,7 @@ function attachEventListeners (divName, href, seriesLink, languageLink, tagArray
 	});
   // Create Translators Link"
 	translatorArray.forEach(function(e) {
-		var er = e.attribute.mReplace("char").toLowerCase()
+		var er = e.attribute.mReplace("char").toLowerCase();
 
 	  // If last in array do not use ", "
 		if (translatorArray[translatorArray.length - 1] == e) {
@@ -892,10 +896,10 @@ function newTabLink(divName, e, er, link) {
 		if (event.button != 2) {
 			event.preventDefault();
 			if (er == "read-online") {
-				er = e.replace("https://www.fakku.net/", "");;
+				er = e.replace("https://www.fakku.net/", "");
 				e  = "";
 			}
-			if (e == "") {
+			if (e === "") {
 				openTab("https://www.fakku.net/" + er);
 			} else {
 				openTab("https://www.fakku.net" + link);
@@ -908,7 +912,7 @@ function newTabLink(divName, e, er, link) {
 // Function that is run when all notes have been created
 function notesDone(pend, loadmore, errorCount) {
 	chrome.browserAction.setBadgeText({text: ""});
-	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]})
+	chrome.browserAction.setBadgeBackgroundColor({color: [0, 0, 0, 0]});
 	localStorage["badge_number"] = 0;
 
 	userRefresh = false;
@@ -918,7 +922,7 @@ function notesDone(pend, loadmore, errorCount) {
 		$('div.noteDiv:nth-of-type('+ $('div.noteDiv').length +')').remove();
 	}
 
-	if(notesToUpdate.length != 0) {
+	if(notesToUpdate.length !== 0) {
 		for(var note in notesToUpdate) {
 			localStorage[note] = notesToUpdate[note];
 		}
@@ -937,7 +941,7 @@ function notesDone(pend, loadmore, errorCount) {
 		return Date.parse($(a).find("#right .wrap .row-small .right").attr("title")) - Date.parse($(b).find("#right .wrap .row-small .right").attr("title"));
 	}).each(function(){
 		$("#notes").prepend(this);
-	})
+	});
 
 	if (pend == "prepend") {
 		localStorage["new_note"] = "false";
@@ -1059,7 +1063,7 @@ function storeContent() {
 
   // Store content in localStorage
 	var htmlContent = $('div#notes').html(); 
-	htmlContent = htmlContent.replace("	", "")
+	htmlContent = htmlContent.replace("	", "");
 	localStorage["html_content"] = JSON.stringify(htmlContent);
 	console.log("HTML Content Stored!");
 
@@ -1096,7 +1100,7 @@ function msgError(error) {
 		//console.log("Error Report Recieved")
 		//console.log(request.errorMessage);
 	}
-};
+}
 
 // Function to check for new notifications
 function refreshNotes() {
@@ -1118,7 +1122,7 @@ function refreshNotes() {
 
 		$('div.noteDiv-matched').attr('class', 'noteDiv');
 		$('div.noteDiv-filtered').attr('class', 'noteDiv');
-  	};
+  	}
 
 	userRefresh = true;
 
@@ -1188,7 +1192,7 @@ function requestDownload(href) {
 	var object = {
 		href: href,
 		from: "download"
-	}
+	};
 
 	fakku.getInfo(object);
 	fakku.getLinks(object);
@@ -1209,7 +1213,7 @@ function startDownload() {
 		return;
 	}
 
-	chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray})
+	chrome.extension.sendMessage({msg: "downloadLinks", linkdata: linkarray, infodata: infoarray});
 
 	//console.log("sent message to background");
 	$('div#float').empty();
@@ -1236,7 +1240,7 @@ function updateProgressBar() {
 		$('div#progress-bar div').css("width", "0%");
 
 		clearInterval(progressBarInterval);
-		setTimeout(function() { popup.add("downloading") }, 1000);
+		setTimeout(function() { popup.add("downloading"); }, 1000);
 	}
 
 	if(localStorage["progress_bar"] == "100") {
