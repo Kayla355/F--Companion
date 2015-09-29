@@ -176,7 +176,7 @@ var filter = {
 		$('a#filter').off("mousedown");
 		$('a#filter').on("mousedown", function(event) {
 			event.preventDefault();
-			$('div#menu div.right').prepend('<input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
+			$('div#menu div.right').prepend('<div><input id="filterInput" type="text" placeholder="Filter by tag" title="Input a tag and hit enter to begin filtering, separate tags by space." style="padding-right: 5px;"></div>');
 			$('div#menu div.right').on("keyup", function() { filter.filter(); });
 
 			filter.rem();
@@ -195,7 +195,7 @@ var filter = {
 			filter.add();
 		});
 	},
-	filter: function(event) {
+	filter: function() {
 		clearTimeout(filterTimer);
 		filterTimer = setTimeout(function(event) {
 			var input = $('input#filterInput').val().toLowerCase().split(/, | /);
@@ -216,6 +216,7 @@ var filter = {
 				  // For each tag match & if matched then increase match count until the match count is the same as input length.
 				  // If the matched count and the input length is the same hide other divs
 					input.forEach(function (value) {
+						//var regex = new RegExp("\\b"+value+"\\b"); //Matches whole word
 						if (tagArray.toString().match(value)) {
 							matched++;
 							if (matched == i) {
@@ -228,8 +229,8 @@ var filter = {
 			  // Hide the divs that were not matched
 				$('div.noteDiv').attr('class', 'noteDiv-filtered');
 			}
-		}, 50);
-	}
+		}, 250);
+	},
 };
 
 // Turning the lights on/off
@@ -337,12 +338,12 @@ checkLoggedIn({reCache: false, loadmore: false}); // Run checkLoggedIn function
 // Check if Login cookie has expired.
 function checkLoggedIn(object) {
 	start = new Date().getTime();
-  var notesAmount;
-  var perPageMax;
-  var doArrayLength;
-  var nArrayNames = JSON.parse(localStorage["n_array_names"]);
-  var doArray 	= [];
-  var new_nArrayNames = [];
+	var notesAmount;
+	var perPageMax;
+	var doArrayLength;
+	var nArrayNames = JSON.parse(localStorage["n_array_names"]);
+	var doArray 	= [];
+	var new_nArrayNames = [];
 	
 	var loadNote = function(name, bypass) {
 		lastNote = name;

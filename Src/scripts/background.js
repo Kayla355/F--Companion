@@ -175,11 +175,20 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 });
 
+var last_sid = {
+	cookie: {
+		value: 0
+	}
+};
 // Listen for a change to the login cookie
 chrome.cookies.onChanged.addListener(function(object) {
-	if(object.cookie.name === "fakku_sid" && object.cause === "explicit" && localStorage["badge_number"] === "Err") {
-		console.log("Fakku cookie updated");
-		notificationCheck();
+	if(object.cookie.name === "fakku_sid" && object.cause === "explicit") {
+		console.log("Fakku cookie updated", object);
+		if(localStorage["badge_number"] === "Err" && object.cookie.value !== last_sid.cookie.value) {
+			console.log("Performing check for new notes.");
+			notificationCheck();
+		}
+		last_sid = object;
 	}
 	//console.log(object.cookie.name+" changed", object);
 });
@@ -234,8 +243,8 @@ function notificationCheck() {
 				badgeUpdate("error");
 				console.log("Failed to find login cookie for Fakku.net");
 			} else {
-			  // Ajax Function to get the subscriptions
-			  	getAjaxData("https://www.fakku.net/subscriptions").then(function(html) {
+			  // Ajax Function to get the 'following' page.
+			  	getAjaxData("https://www.fakku.net/following").then(function(html) {
 				  // Keep track of the names of the arrays
 					var nArrayNames = [];
 					var notes = {};
