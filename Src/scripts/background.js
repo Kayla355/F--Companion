@@ -95,7 +95,7 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 	}
 
   // Change browserAction to Notifications
-	if (localStorage["fakku_notes"]) {
+	if (localStorage["fakku_notes"] === "true") {
 		badgeUpdate("notes");
 		chrome.browserAction.setPopup({popup: "DropdownNotes.html"});
 	} else {
