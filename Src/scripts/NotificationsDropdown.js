@@ -268,7 +268,7 @@ var popup = {
 			}
 		});
 	},
-	remove: function() {
+	remove: function(from) {
 		lights.on();
 		$('div#float').hide();
 		$('div#float').empty();

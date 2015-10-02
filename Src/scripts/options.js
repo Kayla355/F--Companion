@@ -309,7 +309,7 @@ $(document).ready(function() {
 
 	 	if (currentAttrValue == "#changelog") {
 	 	  // Load Changelog from textfile
-			$.get('changelog.txt', function(data) {
+			$.get('Changelog.txt', function(data) {
 
 				data = data.replace(/\/\//, "<p>").replace(/\n\/\/ /g, "</p><p>");
 				data += "</p>";
