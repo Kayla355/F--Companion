@@ -47,7 +47,7 @@ _\*On older versions of Chrome the Opera method will also work. While on newer v
 * Minor version 0.3.4:
   * Quick fix to notifications not loading when certain characters where not filtered properly.
 
-* Dev version 0.4.2.xx:
+* Dev version 0.4.3.xx:
   * The icon will now say "DL or "Link", depending on what option you have set, when it is the action that will be taken when pressed.
   * Fixed an issue with removed(actually hidden...) items causing issues when loading in newer items at the top.
   * Added "endless" scrolling to the notifications, which means that it will now load older entries as you reach the bottom of the page.
@@ -67,6 +67,7 @@ _\*On older versions of Chrome the Opera method will also work. While on newer v
   * Larger rewrite to improve the general speed of the extension as a result of re-enabling async requests, which also improved the speed of downloads.
   * New scrollbar apperance for notifications.
   * Changed the customization of the file & foldernames of files. Allowing for a greater control over the filenames created.
+  * Added nhentai.net support for downloads!
 
 [Full Changelog](https://github.com/Kayla355/F--Companion/blob/master/Changelog.txt)
 
