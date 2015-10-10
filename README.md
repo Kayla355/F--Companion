@@ -3,6 +3,8 @@
 
 F! Companion Chrome/Opera Extension
 ==========
+###### Currently supports: Fakku, Pururin & nHentai
+
 **F! Companion** is an extension for Chrome and Opera that lets you download all the pages of a manga at the press of a button. Or alternatively just show you the link for each page if you would rather use another downloader.
 
 This was and still is the main point of the extension, but version 0.4 and up has the added functionality of also utilizing the subscription system on Fakku and will notify you when there are new items available that you subscribe to, and can be displayed in the dropdown window of the extension.
