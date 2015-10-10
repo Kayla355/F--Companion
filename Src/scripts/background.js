@@ -81,13 +81,18 @@ function checkForValidUrl(tabId, tab, changeInfo) {
 					return;
 				}
 			} else {
-				// Change browserAction to Download
+			  // Change browserAction to Download
 				badgeUpdate("download");
 				chrome.browserAction.setPopup({popup: "Dropdown.html"});
 				return;
 			}
 		} else if(tab.url.match(/.*\/\/pururin.com\/(gallery|view|thumbs)\/.*/)) {
-			// Change browserAction to Download
+			  // Change browserAction to Download
+				badgeUpdate("download");
+				chrome.browserAction.setPopup({popup: "Dropdown.html"});
+				return;
+		} else if(tab.url.match(/.*\/\/nhentai.net\/g\/[0-9]*/)) {
+			  // Change browserAction to Download
 				badgeUpdate("download");
 				chrome.browserAction.setPopup({popup: "Dropdown.html"});
 				return;

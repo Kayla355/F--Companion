@@ -3,7 +3,7 @@
 
   "name": "F! Companion Dev",
   "description": "F! Companion lets you download all pages of a manga at once or just view the links to them.",
-  "version": "0.4.2.4",
+  "version": "0.4.3.0",
   "icons": { "256": "images/icon-256.png"},
   "options_page": "Options.html",
   "background": { "scripts": ["scripts/background.js", "scripts/lib/jquery-2.1.3.min.js", "scripts/lib/jszip.min.js", "scripts/lib/FileSaver.js"] },
@@ -15,6 +15,7 @@
     "cookies",
     "https://*.fakku.net/*",
     "http://*.pururin.com/*",
+    "http://*.nhentai.net/*",
     "https://raw.githubusercontent.com/*"
   ],
 
@@ -24,7 +25,7 @@
   },
   "content_scripts": [
 		{
-			"matches": ["https://www.fakku.net/doujinshi/*", "https://www.fakku.net/manga/*", "http://pururin.com/*"],
+			"matches": ["https://www.fakku.net/doujinshi/*", "https://www.fakku.net/manga/*", "http://pururin.com/*", "http://nhentai.net/*"],
 			"js": ["scripts/lib/jquery-2.1.3.min.js", "scripts/lib/jszip.min.js", "scripts/lib/FileSaver.js", "scripts/grabber.js"]
 		}
 	]

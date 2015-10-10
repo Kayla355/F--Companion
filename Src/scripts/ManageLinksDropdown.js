@@ -14,7 +14,7 @@
 
 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 	try {
-		siteVar = tabs[0].url.toLowerCase().match(/(fakku|pururin)/)[0];
+		siteVar = tabs[0].url.toLowerCase().match(/(fakku|pururin|nhentai)/)[0];
 	} catch(error) {
 		console.error(error);
 	}

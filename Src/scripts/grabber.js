@@ -1,21 +1,27 @@
 // Listen for message to start gathering the info
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.msg == "grabInfo-fakku") {
-		fakku.getInfo({from: "grabber"});
-		//console.log("Grabbing Info");
+
+	switch(request.msg) {
+		case "grabInfo-fakku":
+			fakku.getInfo({from: "grabber"});
+		break;
+		case "grabLinks-fakku":
+			fakku.getLinks({from: "grabber"});
+		break;
+		case "grabInfo-pururin":
+			pururin.getInfo({from: "grabber"});
+		break;
+		case "grabLinks-pururin":
+			pururin.getLinks({from: "grabber"});
+		break;
+		case "grabInfo-nhentai":
+			nhentai.getInfo({from: "grabber"});
+		break;
+		case "grabLinks-nhentai":
+			nhentai.getLinks({from: "grabber"});
+		break;
 	}
-	if (request.msg == "grabLinks-fakku") {
-		fakku.getLinks({from: "grabber"});
-		//console.log("Grabbing Links");
-	}
-	if (request.msg == "grabInfo-pururin") {
-		pururin.getInfo({from: "grabber"});
-		//console.log("Grabbing Links");
-	}
-	if (request.msg == "grabLinks-pururin") {
-		pururin.getLinks({from: "grabber"});
-		//console.log("Grabbing Links");
-	}
+	//console.log("Grabbing Info");
 	sendResponse({response: "grabLinksOK"});
 });
 
@@ -237,6 +243,7 @@ var fakku = {
 				$.each(data.pages, function(i, data) {
 					linkarray.push(data.image);
 				});
+
 				linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4)); // File Extension
 				sendReadyMessage("docReadyLink", linkarray);
 				if(object.from === "download") {
@@ -249,18 +256,29 @@ var fakku = {
 	}
 };
 
+
 // Grabber for Pururin
 var pururin = {
 	getInfo: function(object) {
 		infoArray = [];
-		infoObject = {};
+		infoObject = {
+			name: "",
+			parodies: [],
+			artists: [],
+			circles: "",
+			characters: [],
+			category: "",
+			scanlators: [],
+			languages: "",
+			date: [],
+			tags: [],
+			pages: "",
+			description: "Empty for now, might add this function later.",
+		};
 
 		if (window.location.pathname.match(/.*\/(view|thumbs).*/)) {
 			currenturl = $(".header-breadcrumbs span:nth-last-child(2) a").prop("href");
 			//console.log("GrabLinks URL: " + currenturl);
-		} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
-			//console.log("GrabLinks triggered from DropdownNotes");
-			currenturl = object.href.replace("www", "api") + "/read";
 		} else {
 			currenturl = window.location.href;
 			//console.log("GrabLinks URL: " + currenturl);
@@ -284,27 +302,30 @@ var pururin = {
 
 
 			try {
-				manganame = $(html).find("h1.otitle").text().match(/(.*)( \/.*)/)[1];
+				infoObject.name = $(html).find("h1.otitle").text().match(/(.*)( \/.*)/)[1];
 			} catch(e) {
-				manganame = $(html).find("h1.otitle").text();
+				infoObject.name = $(html).find("h1.otitle").text();
 			}
-			description = "Empty for now, might add this function later.";
 
-			$(html).find("tr").each(function(i, row) {
+			$(html).find("div.gallery-info tr").each(function(i, row) {
 
 				var field = $(row).find("td:first-child").text();
 				var values = [];
 
-				var rMapped = /\b(parody|circle|character|artist|language|scanlator|page|tag)\b/gi;
+				var rMapped = /\b(parody|circle|group|groups|character|artist|language|scanlator|page|tag|content|contents)\b/gi;
 				var eMapped = {
 					"parody": "parodies",
 					"circle": "circles",
+					"group": "circles",
+					"groups": "circles",
 					"character": "characters",
 					"artist": "artists",
 					"language": "languages",
 					"scanlator": "scanlators",
 					"page": "pages",
 					"tag": "tags",
+					"content": "tags",
+					"contents": "tags",
 				};
 
 			  // Return the mapped value.
@@ -312,6 +333,7 @@ var pururin = {
 					return eMapped[matched];
 				});
 
+			  // Separate each tag/value in row
 				if($(row).find("td:last-child ul").length !== 0) {
 					$(row).find("td:last-child ul").children().each(function(i, li) {
 						values.push($(li).text());
@@ -320,26 +342,38 @@ var pururin = {
 					values.push($(row).find("td:last-child").text());
 				}
 
-				infoObject[field] = values;
+			  // Assign values
+				switch(field) {
+					case "pages":
+						infoObject[field] = values[0].match(/(.*)(\ \(.*\))/)[1];
+					break;
+					case "languages":
+						infoObject[field] = values[0];
+					break;
+					default:
+						infoObject[field] = values;
+					break;
+				}
+				
 			});
 
-// Add check for names that are generated because sometimes they are listed as singular.
-// Series, author, translator, tags are arrays
+
+		  // Series, author, translator, tags are arrays
 			infoarray[0] 	= "infoarray";
-			infoarray[1] 	= infoObject.pages[0].match(/(.*)(\ \(.*\))/)[1];
-			infoarray[2] 	= manganame;
+			infoarray[1] 	= infoObject.pages;
+			infoarray[2] 	= infoObject.name;
 			infoarray[3] 	= infoObject.parodies;
 			infoarray[4] 	= infoObject.artists;
-			infoarray[5] 	= infoObject.languages[0];
+			infoarray[5] 	= infoObject.languages;
 			infoarray[6] 	= infoObject.scanlators;
-			infoarray[7] 	= infoObject.contents;
-			infoarray[8] 	= description;
+			infoarray[7] 	= infoObject.tags;
+			infoarray[8] 	= infoOBject.description;
 			infoarray[9] 	= imgCover; // Fix
 			infoarray[10] 	= imgSample; // Fix
 			infoarray[11]	= date; // fix
 			infoarray[12]	= false;
 
-			//console.log(infoObject);
+			//console.log(infoObject, infoarray);
 
 			if (object.from === "notes") {
 				//console.log("notifications Grabinfo triggered");
@@ -361,9 +395,6 @@ var pururin = {
 		if (window.location.pathname.match(/.*\/(gallery|thumbs).*/)) {
 			currenturl = $('div.content ul.thumblist li:first-child a').prop("href");
 			//console.log("GrabLinks URL: " + currenturl);
-		} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
-			//console.log("GrabLinks triggered from DropdownNotes");
-			currenturl = object.href.replace("www", "api") + "/read";
 		} else {
 			currenturl = window.location.href;
 			//console.log("GrabLinks URL: " + currenturl);
@@ -378,6 +409,7 @@ var pururin = {
 					var link = "http://pururin.com/f/"+ data.f.slice(0, -4) +"/"+ manga.slug +"-"+ (parseInt(data.i)+1) + data.f.slice(-4);
 					linkarray.push(link);
 				});
+
 				linkarray.push(manga.images[0].f.slice(-4)); // File Extension
 				sendReadyMessage("docReadyLink", linkarray);
 				if(object.from === "download") {
@@ -385,6 +417,152 @@ var pururin = {
 				}
 			} else  {
 				this.error({status: 0, statusText: "Query returned empty."});
+			}
+		});
+	}
+};
+
+// Grabber for nHentai
+// getLinks: working, getInfo: not working
+var nhentai = {
+	getInfo: function(object) {
+		infoArray = [];
+		infoObject = {
+			name: "",
+			parodies: [],
+			artists: [],
+			circles: "",
+			characters: [],
+			category: "",
+			scanlators: [],
+			languages: "",
+			date: [],
+			tags: [],
+			pages: "",
+			description: "Empty for now, might add this function later.",
+		};
+
+		if (window.location.pathname.match(/.*\/(view|thumbs).*/)) {
+			currenturl = $(".header-breadcrumbs span:nth-last-child(2) a").prop("href");
+			//console.log("GrabLinks URL: " + currenturl);
+		} else {
+			currenturl = window.location.href;
+			//console.log("GrabLinks URL: " + currenturl);
+		}
+
+		getAjaxData(currenturl, "html").then(function(html) {
+
+			var manganame 	= "";
+			var series		= [];
+			var authorname 	= [];
+			var translator 	= [];
+			var language 	= "";
+			var quant 		= 0;
+			var description = "";
+			var	tags	 	= [];
+			var imgCover 	= "";
+			var imgSample	= "";
+			var date 		= 0;
+			var type 		= "";
+			var fakkubook 	= false;
+
+			infoObject.name 	= $(html).find("div#info h1").text();
+			infoObject.date 	= $(html).find('div#info time').attr('datetime');
+			infoObject.pages 	= $(html).find('div#info div:not(.field-name)')[0].innerHTML.match(/([0-9]*) .*/)[1];
+
+			$(html).find("div#info div.field-name").each(function(i, row) {
+
+				var field = $(row)[0].innerText.match(/(.*?)(:)/)[1];
+				var values = [];
+
+				var rMapped = /\b(parody|circle|group|groups|character|artist|language|scanlator|page|tag|content|contents)\b/gi;
+				var eMapped = {
+					"parody": "parodies",
+					"circle": "circles",
+					"group": "circles",
+					"groups": "circles",
+					"character": "characters",
+					"artist": "artists",
+					"language": "languages",
+					"scanlator": "scanlators",
+					"page": "pages",
+					"tag": "tags",
+					"content": "tags",
+					"contents": "tags",
+				};
+
+			  // Return the mapped value.
+			  	field = field.toLowerCase().replace(rMapped, function(matched) {
+					return eMapped[matched];
+				});
+
+			  // Separate each tag/value in row
+				if($(row).find("a").length !== 0) {
+					$(row).find("a").each(function(i, tag) {
+						values.push(tag.innerText.match(/(.*?)( \(.*?\))/)[1].replace(/\&#8629/g, "").trim());
+					});
+				}
+
+			  // Assign values
+				infoObject[field] = values;
+			});
+
+		  // Series, author, translator, tags are arrays
+			infoarray[0] 	= "infoarray";
+			infoarray[1] 	= infoObject.pages;
+			infoarray[2] 	= infoObject.name;
+			infoarray[3] 	= infoObject.parodies;
+			infoarray[4] 	= infoObject.artists;
+			infoarray[5] 	= infoObject.languages;
+			infoarray[6] 	= infoObject.scanlators;
+			infoarray[7] 	= infoObject.tags;
+			infoarray[8] 	= description;
+			infoarray[9] 	= imgCover; // Fix
+			infoarray[10] 	= imgSample; // Fix
+			infoarray[11]	= date;
+			infoarray[12]	= false;
+
+			//console.log(infoObject, infoarray);
+
+			if (object.from === "notes") {
+				//console.log("notifications Grabinfo triggered");
+				object.infodata = infoarray;
+				grab_notes[object.name].status = "done";
+				notificationInfo(object, notes);
+			} else {
+				//console.log("Download Grabinfo triggered");
+				sendReadyMessage("docReadyInfo", infoarray);
+				if(object.from === "download") {
+					checkDownloadReady();
+				}
+			}
+		});
+	},
+	getLinks: function(object) {
+		linkarray   = [];
+
+		if (window.location.pathname.match(/\/g\/[0-9]*\/[0-9]*\//)) {
+			currenturl = $('div.back-to-gallery a').prop("href");
+			//console.log("GrabLinks URL: " + currenturl);
+		} else {
+			currenturl = window.location.href;
+			//console.log("GrabLinks URL: " + currenturl);
+		}
+
+		getAjaxData(currenturl, "html").then(function(html) {
+			var pageArray = $(html).find('div#thumbnail-container a.gallerythumb img');
+			linkarray = ["linkarray"];
+
+			$.each(pageArray, function(i, str) {
+				str = $(str).attr("data-src");
+				var link = str.match(/(.*\/\/)(t)(.*[0-9]*\/)([0-9]*t)(.*)/)
+				linkarray.push("http:"+link[1]+"i"+link[3]+link[4].slice(0, -1)+link[5]);
+			});
+
+			linkarray.push(linkarray[1].slice(-4)); // File Extension
+			sendReadyMessage("docReadyLink", linkarray);
+			if(object.from === "download") {
+				checkDownloadReady();
 			}
 		});
 	}
