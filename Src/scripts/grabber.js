@@ -44,20 +44,40 @@ function getAjaxData(href, type) {
 
 // Grabber for Fakku
 var fakku = {
+	getURL: function(from, object) {
+		var currenturl;
+
+		if(from === "info") {
+		  // Change this to "window.location.host+window.url"?
+			if (window.location.pathname.match(/.*\/read.*/)) {
+				currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href');
+				//console.log("GrabInfo URL: " + currenturl);
+			} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
+				//console.log("GrabInfo triggered from DropdownNotes");
+				currenturl = object.href.replace("www", "api");
+			} else {
+				currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
+				//console.log("GrabInfo URL: " + currenturl);
+			}
+		} else if(from === "links") {
+			if (window.location.pathname.match(/.*\/read.*/)) {
+				currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href') + "/read";
+				//console.log("GrabLinks URL: " + currenturl);
+			} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
+				//console.log("GrabLinks triggered from DropdownNotes");
+				currenturl = object.href.replace("www", "api") + "/read";
+			} else {
+				currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
+				//console.log("GrabLinks URL: " + currenturl);
+			}
+		}
+		
+		return currenturl;
+	},
 	getInfo: function(object) {
 		infoarray = [];
 
-		// Change this to "window.location.host+window.url"?
-		if (window.location.pathname.match(/.*\/read.*/)) {
-			currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href');
-			//console.log("GrabInfo URL: " + currenturl);
-		} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
-			//console.log("GrabInfo triggered from DropdownNotes");
-			currenturl = object.href.replace("www", "api");
-		} else {
-			currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href');
-			//console.log("GrabInfo URL: " + currenturl);
-		}
+		currenturl = this.getURL("info", object);
 
 		getAjaxData(currenturl, "JSON").then(function(data) {
 			var error;
@@ -226,16 +246,7 @@ var fakku = {
 	getLinks: function(object) {
 		linkarray   = [];
 
-		if (window.location.pathname.match(/.*\/read.*/)) {
-			currenturl = "https://api.fakku.net" + $('a.a-series-title.manga-title').attr('href') + "/read";
-			//console.log("GrabLinks URL: " + currenturl);
-		} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
-			//console.log("GrabLinks triggered from DropdownNotes");
-			currenturl = object.href.replace("www", "api") + "/read";
-		} else {
-			currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
-			//console.log("GrabLinks URL: " + currenturl);
-		}
+		currenturl = this.getURL("links", object);
 
 		getAjaxData(currenturl, "JSON").then(function(data) {
 			if (data.content !== "" || !$.isEmptyObject(data.content)) {
@@ -259,6 +270,29 @@ var fakku = {
 
 // Grabber for Pururin
 var pururin = {
+	getURL: function(from) {
+		var currenturl;
+
+		if(from === "info") {
+			if (window.location.pathname.match(/.*\/(view|thumbs).*/)) {
+				currenturl = $(".header-breadcrumbs span:nth-last-child(2) a").prop("href");
+				//console.log("GrabLinks URL: " + currenturl);
+			} else {
+				currenturl = window.location.href;
+				//console.log("GrabLinks URL: " + currenturl);
+			}
+		} else if(from === "links") {
+			if (window.location.pathname.match(/.*\/(gallery|thumbs).*/)) {
+				currenturl = $('div.content ul.thumblist li:first-child a').prop("href");
+				//console.log("GrabLinks URL: " + currenturl);
+			} else {
+				currenturl = window.location.href;
+				//console.log("GrabLinks URL: " + currenturl);
+			}
+		}
+
+		return currenturl;
+	},
 	getInfo: function(object) {
 		infoArray = [];
 		infoObject = {
@@ -276,13 +310,7 @@ var pururin = {
 			description: "Empty for now, might add this function later.",
 		};
 
-		if (window.location.pathname.match(/.*\/(view|thumbs).*/)) {
-			currenturl = $(".header-breadcrumbs span:nth-last-child(2) a").prop("href");
-			//console.log("GrabLinks URL: " + currenturl);
-		} else {
-			currenturl = window.location.href;
-			//console.log("GrabLinks URL: " + currenturl);
-		}
+		currenturl = this.getURL("info");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 
@@ -367,7 +395,7 @@ var pururin = {
 			infoarray[5] 	= infoObject.languages;
 			infoarray[6] 	= infoObject.scanlators;
 			infoarray[7] 	= infoObject.tags;
-			infoarray[8] 	= infoOBject.description;
+			infoarray[8] 	= infoObject.description;
 			infoarray[9] 	= imgCover; // Fix
 			infoarray[10] 	= imgSample; // Fix
 			infoarray[11]	= date; // fix
@@ -392,13 +420,7 @@ var pururin = {
 	getLinks: function(object) {
 		linkarray   = [];
 
-		if (window.location.pathname.match(/.*\/(gallery|thumbs).*/)) {
-			currenturl = $('div.content ul.thumblist li:first-child a').prop("href");
-			//console.log("GrabLinks URL: " + currenturl);
-		} else {
-			currenturl = window.location.href;
-			//console.log("GrabLinks URL: " + currenturl);
-		}
+		currenturl = this.getURL("links");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 			var manga = JSON.parse($(html).find("script:last-child").text().match(/{.*}/));
@@ -425,6 +447,16 @@ var pururin = {
 // Grabber for nHentai
 // getLinks: working, getInfo: not working
 var nhentai = {
+	getURL: function(from) {
+		if (window.location.pathname.match(/\/g\/[0-9]*\/[0-9]*\//)) {
+			currenturl = $('div.back-to-gallery a').prop("href");
+			//console.log("GrabLinks URL: " + currenturl);
+		} else {
+			currenturl = window.location.href;
+			//console.log("GrabLinks URL: " + currenturl);
+		}
+		return currenturl;
+	},
 	getInfo: function(object) {
 		infoArray = [];
 		infoObject = {
@@ -442,13 +474,7 @@ var nhentai = {
 			description: "Empty for now, might add this function later.",
 		};
 
-		if (window.location.pathname.match(/.*\/(view|thumbs).*/)) {
-			currenturl = $(".header-breadcrumbs span:nth-last-child(2) a").prop("href");
-			//console.log("GrabLinks URL: " + currenturl);
-		} else {
-			currenturl = window.location.href;
-			//console.log("GrabLinks URL: " + currenturl);
-		}
+		currenturl = this.getURL("info");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 
@@ -541,13 +567,7 @@ var nhentai = {
 	getLinks: function(object) {
 		linkarray   = [];
 
-		if (window.location.pathname.match(/\/g\/[0-9]*\/[0-9]*\//)) {
-			currenturl = $('div.back-to-gallery a').prop("href");
-			//console.log("GrabLinks URL: " + currenturl);
-		} else {
-			currenturl = window.location.href;
-			//console.log("GrabLinks URL: " + currenturl);
-		}
+		currenturl = this.getURL("links");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 			var pageArray = $(html).find('div#thumbnail-container a.gallerythumb img');
