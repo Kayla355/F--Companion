@@ -142,10 +142,10 @@ var loggedIn		= true;
 var nDropdown;
 var checkNotes;
 
-// Fetch request for options array.
+// Message function to recieve messages meant for the background script.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.fetch == "getOptionsArray") {
-		
+  // Fetch request for options array.
+	if(request.fetch == "getOptionsArray") {
 		optionsArray[1] = localStorage["button_action"];
 		optionsArray[2] = localStorage["text_area1"];
 		optionsArray[3] = localStorage["text_area2"];
@@ -156,28 +156,29 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		
 		sendResponse({data: options_array});
 	}
-});
 
-// Listen for a message to trigger the download function.
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.msg == "downloadLinks") {
+  // Listen for a message to trigger the download function.
+	if(request.msg == "downloadLinks") {
 		//console.log("DownloadLinks Triggered");
 		linkarray = request.linkdata;
 		infoarray = request.infodata;
 		downloadLinks();
 		sendResponse({msg: "done"});
 	}
-});
 
-// Listen for a message to trigger the notifcationCheck
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
-	if (request.msg == "GrabNotes") {
+  // Listen for a message to trigger the notifcationCheck
+	if(request.msg == "GrabNotes") {
 		if (request.from == "nDropdown") {
 			nDropdown = true;
 		}
 		notificationCheck();
 		sendResponse({msg: "done"});
 	}
+  // Listen for a message to trigger the cleanStorage function
+  	if(request.msg == "cleanLocalStorage") {
+  		cleanStorage(sendResponse); // Passing the sendResponse function to the cleanStorage function so that it can be called when done.
+  		return true; 				// Necessary to mark that you will be sending back a message at a later time, for some reason.
+  	}
 });
 
 var last_sid = {
@@ -265,8 +266,6 @@ function notificationCheck() {
 						loggedIn = false;
 						return;
 					} else {
-					  // Clear badge_number
-						badgeUpdate("update");
 						loggedIn = true;
 					}
 
@@ -575,7 +574,7 @@ function convertNotesToObject() {
 }
 
 // Function that cleans up the localstorage to avoid exceeding the storage limit
-function cleanStorage() {
+function cleanStorage(sendResponse) {
 	var nDate 	= Math.round(new Date().getTime()/1000); 	// seconds
 	var limit 	= localStorage["storage_time"]*86400; 		// seconds
 	var notes 	= JSON.parse(localStorage["notes"]);
@@ -590,8 +589,10 @@ function cleanStorage() {
 			}
 		}
 	}
+	
   // Update localstorage
 	localStorage["notes"] = JSON.stringify(notes);
+	sendResponse({msg: "done"});
 }
 
 // Update badge text
@@ -641,7 +642,7 @@ function badgeUpdate(status) {
 }
 
 // Update badgetext with red coloring
-function badgeRed (text) {
+function badgeRed(text) {
 	chrome.browserAction.setBadgeText({text: text});
 	chrome.browserAction.setBadgeBackgroundColor({color: [200, 0, 0, 255]});
 }

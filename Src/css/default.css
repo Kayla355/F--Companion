@@ -6,6 +6,10 @@ div
 {
 	vertical-align: top;
 }
+.hidden
+{
+	display: none;
+}
 #left 
 {
 	white-space: normal;

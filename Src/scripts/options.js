@@ -328,6 +328,8 @@ $(document).ready(function() {
 	});
 });
 
+
+// Debug functions
 $("#restoreItems").on("click", function() {
 	$("#restoreItems").text("Working...");
 	JSON.parse(localStorage["n_array_names"]).forEach(function(item) {
@@ -344,6 +346,20 @@ $("#restoreItems").on("click", function() {
 
 });
 
+$("#cleanLocalStorage").on("click", function() {
+	$("#cleanLocalStorage").text("Working...");
+	chrome.runtime.sendMessage({msg: "cleanLocalStorage"}, function(response) {
+		if(response.msg === "done") {
+			$("#cleanLocalStorage").text("Done!");
+			setTimeout(function() {$("#cleanLocalStorage").text("Clean");}, 2000);
+		} else {
+			$("#cleanLocalStorage").text("Error!");
+		    setTimeout(function() {$("#cleanLocalStorage").text("Clean");}, 4000);
+		}
+	});
+});
+
+// Eventlisteners
 document.addEventListener('DOMContentLoaded', function() {
   // Restore Functions
 	restore_options(); // Needs to be before preview functions

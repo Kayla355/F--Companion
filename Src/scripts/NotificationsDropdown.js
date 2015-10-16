@@ -520,8 +520,8 @@ function notificationInfo(object, notes) {
 		console.log("%cError Parsing: %c" + object.infodata[3], "color: red;", "color: black;"); 
 		console.log("%cError Message: %c" + "(" + object.infodata[2] + ") " + object.infodata[4], "color: red;", "color: black;");
 	}
-	if (object.infodata[3] && !error)  { seriesArray = object.infodata[3]; }
-	if (object.infodata[5] && !error)  { languageLink = object.infodata[5].mReplace("char").toLowerCase();}
+	if (object.infodata[3] && !error)  { seriesArray 		= object.infodata[3]; }
+	if (object.infodata[5] && !error)  { languageLink 		= object.infodata[5].mReplace("char").toLowerCase();}
 	if (object.infodata[7] && !error)  { tagArray 			= object.infodata[7]; }
 	if (object.infodata[4] && !error)  { artistArray 		= object.infodata[4]; }
 	if (object.infodata[6] && !error)  { translatorArray 	= object.infodata[6]; }
@@ -944,15 +944,15 @@ function notesDone(pend, loadmore, errorCount) {
 		$("#notes").prepend(this);
 	});
 
-	if (pend == "prepend") {
-		localStorage["new_note"] = "false";
-	}
+	// if (pend == "prepend") {
+	// 	localStorage["new_note"] = "false";
+	// }
 
 	if (setNewVersion) {
 		localStorage["app_version"] = chrome.app.getDetails().version;
 	}
-
-	if (localStorage["new_note"] == "false" && !loadmore) {
+	  //localStorage["new_note"] == "false" && 
+	if (!loadmore) {
 		storeContent();
 	}
 

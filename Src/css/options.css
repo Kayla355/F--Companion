@@ -6,6 +6,10 @@ font-size: 13px;
 a {
   text-decoration: none;
 }
+.hidden
+{
+  display: none;
+}
 #content 
 {
   float:left;
