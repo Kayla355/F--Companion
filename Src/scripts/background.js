@@ -766,7 +766,7 @@ function downloadLinks() {
 					localStorage["progress_bar"] = Math.round((onloadCount / quant).toFixed(2) * 100);
 					if(onloadCount === quant) {
 						var content = zip.generate({type: "blob"});
-						saveAs(content, names.folder.text + ".zip");
+						saveAs(content, names.folder.text + ".zip"); // Currently haven't found a way to do conflictres when using the FileSaver.js library
 					}
 				} else {
 					localStorage["progress_bar"] = 404;

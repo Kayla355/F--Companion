@@ -341,7 +341,7 @@ function checkLoggedIn(object) {
 	var notesAmount;
 	var perPageMax;
 	var doArrayLength;
-	var nArrayNames = JSON.parse(localStorage["n_array_names"]);
+	var nArrayNames = (localStorage["n_array_names"] !== undefined) ? JSON.parse(localStorage["n_array_names"]):localStorage["n_array_names"];
 	var doArray 	= [];
 	var new_nArrayNames = [];
 	
@@ -403,6 +403,7 @@ function checkLoggedIn(object) {
 	};
 	
 	chrome.cookies.get({url: "https://www.fakku.net", name: "fakku_sid"}, function(results) {
+		console.log(results);
 		if (!results || localStorage["badge_number"] === "Err") {
 			$('div#menu').hide();
 			$('div#notes').hide();
