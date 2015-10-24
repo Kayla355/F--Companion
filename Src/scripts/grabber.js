@@ -36,6 +36,7 @@ function getAjaxData(href, type) {
 		url: href,
 		dataType: type,
 		error: function(error) {
+
 			console.error(error);
 			//errorHandling(error);
 		}
@@ -68,6 +69,17 @@ var fakku = {
 				currenturl = object.href.replace("www", "api") + "/read";
 			} else {
 				currenturl = "https://api.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
+				//console.log("GrabLinks URL: " + currenturl);
+			}
+		} else if(from === "links non-api") {
+			if (window.location.pathname.match(/.*\/read.*/)) {
+				currenturl = "https://www.fakku.net" + $('a.a-series-title.manga-title').attr('href') + "/read";
+				//console.log("GrabLinks URL: " + currenturl);
+			} else if (window.location.pathname.match(/\/DropdownNotes.html$/)) {
+				//console.log("GrabLinks triggered from DropdownNotes");
+				currenturl = object.href + "/read";
+			} else {
+				currenturl = "https://www.fakku.net" + $('div#container div.sub-navigation.with-breadcrumbs div.breadcrumbs a:last-child').attr('href') + "/read";
 				//console.log("GrabLinks URL: " + currenturl);
 			}
 		}
@@ -245,11 +257,12 @@ var fakku = {
 	},
 	getLinks: function(object) {
 		linkarray   = [];
+		var that 	= this;
 
-		currenturl = this.getURL("links", object);
+		currenturl 	= this.getURL("links", object);
 
 		getAjaxData(currenturl, "JSON").then(function(data) {
-			if (data.content !== "" || !$.isEmptyObject(data.content)) {
+			if (data.pages == "" || $.isEmptyObject(data.pages) || data.pages == undefined) {
 				linkarray = ["linkarray"];
 				$.each(data.pages, function(i, data) {
 					linkarray.push(data.image);
@@ -261,8 +274,56 @@ var fakku = {
 					checkDownloadReady();
 				}
 			} else  {
-				this.error({status: 0, statusText: "Query returned empty."});
+				try {
+					currenturl = that.getURL("links non-api", object);
+					getAjaxData(currenturl, "html").then(function(html) {
+						linkarray = ["linkarray"];
+						thumbArray = JSON.parse($(html).text().match(/(window\.params\.thumbs \= )(.*);/)[2]);
+
+						thumbArray.forEach(function(img) {
+							var image = "https:" + img.replace("thumbs", "images").replace(".thumb", "");
+							linkarray.push(image);
+						})
+
+						linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4)); // File Extension
+						sendReadyMessage("docReadyLink", linkarray);
+						if(object.from === "download") {
+							checkDownloadReady();
+						}
+					});
+				} catch(e) {
+					console.log("Cathcing failed try");
+					//this.error({status: 0, statusText: "Query returned empty."});
+				}
 			}
+		}).fail(function() {
+			try {
+					currenturl = that.getURL("links non-api", object);
+					getAjaxData(currenturl, "html").then(function(html) {
+						linkarray = ["linkarray"];
+						thumbArray = JSON.parse($(html).text().match(/(window\.params\.thumbs \= )(.*);/));
+
+						if(thumbArray !== null) {
+							thumbArray = thumbArray[2];
+						} else {
+							return;
+						}
+
+						thumbArray.forEach(function(img) {
+							var image = "https:" + img.replace("thumbs", "images").replace(".thumb", "");
+							linkarray.push(image);
+						})
+
+						linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4)); // File Extension
+						sendReadyMessage("docReadyLink", linkarray);
+						if(object.from === "download") {
+							checkDownloadReady();
+						}
+					});
+				} catch(e) {
+					console.log("Cathcing failed try");
+					this.error({status: 0, statusText: "Query returned empty."});
+				}
 		});
 	}
 };
