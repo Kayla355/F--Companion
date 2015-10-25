@@ -83,13 +83,12 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 // Listener listening for any potential error.
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.msg == "Error") {
-		if (!errorReport) {
-			sendResponse({msg: "recieved"});
-			errorReport = true;
-			errorMsg = request.errorMessage;
-			//console.log("Error Report Recieved")
-			//console.log(request.errorMessage);
-		}
+		sendResponse({msg: "recieved"});
+		errorReport = true;
+		errorMsg = request.errorMessage;
+		showError();
+		//console.log("Error Report Recieved")
+		//console.log(request.errorMessage);
 	}
 });
 
@@ -165,16 +164,20 @@ if (localStorage["button_action"] == "download") {
 	//requestDownload();
 }
 
+function showError() {
+	$('div#loading').hide();
+	$('div#center').css("width", "234px");
+	$('div#center b').text("Error recieved from server, try again.");
+	$('div#center').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
+	$('div#center').css("height", "40px");
+};
+
 // Recursive Function to check if the links are ready for download.
 // And then sends a message to the background script to begin download of the links.
 function requestDownload() {
 	if (errorReport) {
 		//console.log("Error message recieved from the server");
-		$('div#loading').hide();
-		$('div#center').css("width", "234px");
-		$('div#center b').text("Error recieved from server, try again.");
-		$('div#center').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
-		$('div#center').css("height", "40px");
+		showError();
 		return;
 	}
 

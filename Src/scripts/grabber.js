@@ -27,8 +27,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 var linkarray   = [];
 var infoarray = [];
-var currenturl = "";
 var notes;
+var grabber = {};
 
 function getAjaxData(href, type) {
 	return $.ajax({
@@ -38,7 +38,9 @@ function getAjaxData(href, type) {
 		error: function(error) {
 
 			console.error(error);
-			//errorHandling(error);
+			if(error.status !== 403) {
+				errorHandling(error);
+			}
 		}
 	});
 }
@@ -47,6 +49,7 @@ function getAjaxData(href, type) {
 var fakku = {
 	getURL: function(from, object) {
 		var currenturl;
+		grabber = object;
 
 		if(from === "info") {
 		  // Change this to "window.location.host+window.url"?
@@ -89,7 +92,7 @@ var fakku = {
 	getInfo: function(object) {
 		infoarray = [];
 
-		currenturl = this.getURL("info", object);
+		var currenturl = this.getURL("info", object);
 
 		getAjaxData(currenturl, "JSON").then(function(data) {
 			var error;
@@ -218,7 +221,7 @@ var fakku = {
 
 			if (error) {
 				if (storedError) {
-					errorHandling(object, storedError);
+					errorHandling(storedError, object);
 					return;
 				} else {
 					infoarray[1] = "error";
@@ -259,7 +262,7 @@ var fakku = {
 		linkarray   = [];
 		var that 	= this;
 
-		currenturl 	= this.getURL("links", object);
+		var currenturl 	= this.getURL("links", object);
 
 		getAjaxData(currenturl, "JSON").then(function(data) {
 			if (data.pages == "" || $.isEmptyObject(data.pages) || data.pages == undefined) {
@@ -297,33 +300,28 @@ var fakku = {
 				}
 			}
 		}).fail(function() {
-			try {
-					currenturl = that.getURL("links non-api", object);
-					getAjaxData(currenturl, "html").then(function(html) {
-						linkarray = ["linkarray"];
-						thumbArray = JSON.parse($(html).text().match(/(window\.params\.thumbs \= )(.*);/));
+			var currenturl = that.getURL("links non-api", object);
+			getAjaxData(currenturl, "html").then(function(html) {
+				try {
+					linkarray = ["linkarray"];
+					thumbArray = JSON.parse($(html).text().match(/(window\.params\.thumbs \= )(.*);/));
 
-						if(thumbArray !== null) {
-							thumbArray = thumbArray[2];
-						} else {
-							return;
-						}
+					thumbArray = thumbArray[2];
 
-						thumbArray.forEach(function(img) {
-							var image = "https:" + img.replace("thumbs", "images").replace(".thumb", "");
-							linkarray.push(image);
-						})
+					thumbArray.forEach(function(img) {
+						var image = "https:" + img.replace("thumbs", "images").replace(".thumb", "");
+						linkarray.push(image);
+					})
 
-						linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4)); // File Extension
-						sendReadyMessage("docReadyLink", linkarray);
-						if(object.from === "download") {
-							checkDownloadReady();
-						}
-					});
+					linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4)); // File Extension
+					sendReadyMessage("docReadyLink", linkarray);
+					if(object.from === "download") {
+						checkDownloadReady();
+					}
 				} catch(e) {
-					console.log("Cathcing failed try");
 					this.error({status: 0, statusText: "Query returned empty."});
 				}
+					});
 		});
 	}
 };
@@ -333,6 +331,7 @@ var fakku = {
 var pururin = {
 	getURL: function(from) {
 		var currenturl;
+		grabber = object;
 
 		if(from === "info") {
 			if (window.location.pathname.match(/.*\/(view|thumbs).*/)) {
@@ -371,7 +370,7 @@ var pururin = {
 			description: "Empty for now, might add this function later.",
 		};
 
-		currenturl = this.getURL("info");
+		var currenturl = this.getURL("info");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 
@@ -481,7 +480,7 @@ var pururin = {
 	getLinks: function(object) {
 		linkarray   = [];
 
-		currenturl = this.getURL("links");
+		var currenturl = this.getURL("links");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 			var manga = JSON.parse($(html).find("script:last-child").text().match(/{.*}/));
@@ -509,6 +508,9 @@ var pururin = {
 // getLinks: working, getInfo: not working
 var nhentai = {
 	getURL: function(from) {
+		var currenturl;
+		grabber = object;
+
 		if (window.location.pathname.match(/\/g\/[0-9]*\/[0-9]*\//)) {
 			currenturl = $('div.back-to-gallery a').prop("href");
 			//console.log("GrabLinks URL: " + currenturl);
@@ -535,7 +537,7 @@ var nhentai = {
 			description: "Empty for now, might add this function later.",
 		};
 
-		currenturl = this.getURL("info");
+		var currenturl = this.getURL("info");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 
@@ -628,7 +630,7 @@ var nhentai = {
 	getLinks: function(object) {
 		linkarray   = [];
 
-		currenturl = this.getURL("links");
+		var currenturl = this.getURL("links");
 
 		getAjaxData(currenturl, "html").then(function(html) {
 			var pageArray = $(html).find('div#thumbnail-container a.gallerythumb img');
@@ -659,7 +661,7 @@ function checkDownloadReady() {
 // Function for dealing with errors
 // FIX ERRORHANDLING //
 function errorHandling (error) {
-	if (object.from !== "notes") {
+	if (grabber.from !== "notes") {
 		msgError(error);
 		//console.log("Error: " + error);
 	}
@@ -668,7 +670,7 @@ function errorHandling (error) {
 		note[0] = "old";
 		localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
-	if (object.from === "notes" && error.status != "0") {
+	if (grabber.from === "notes" && error.status != "0") {
 		infoarray[0] = "infoarray";
 		infoarray[1] = "error";
 		infoarray[2] = error.status;

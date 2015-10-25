@@ -1099,6 +1099,7 @@ function msgError(error) {
 	if (!errorReport) {
 		errorReport = true;
 		errorMsg = error;
+		showError();
 		//console.log("Error Report Recieved")
 		//console.log(request.errorMessage);
 	}
@@ -1201,17 +1202,21 @@ function requestDownload(href) {
 
 }
 
+function showError() {
+	errorReport = false;
+	//console.log("Error message recieved from the server");
+	//console.log(errorMsg.status + ": " + errorMsg.statusText);
+	$('div#float').empty();
+	$('div#float').append("<b>Error recieved from server, try again.</b>");
+	$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
+	
+}
+
 var progressBarInterval;
 // Function that tells the background script to start downloading
 function startDownload() {
 	if (errorReport) {
-		errorReport = false;
-		//console.log("Error message recieved from the server");
-		//console.log(errorMsg.status + ": " + errorMsg.statusText);
-		$('div#float').empty();
-		$('div#float').append("<b>Error recieved from server, try again.</b>");
-		$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
-		
+		showError();
 		return;
 	}
 
