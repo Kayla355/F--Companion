@@ -49,7 +49,7 @@ function getAjaxData(href, type) {
 var fakku = {
 	getURL: function(from, object) {
 		var currenturl;
-		grabber = object;
+		grabber = (object) ? object:undefined;
 
 		if(from === "info") {
 		  // Change this to "window.location.host+window.url"?
@@ -329,9 +329,9 @@ var fakku = {
 
 // Grabber for Pururin
 var pururin = {
-	getURL: function(from) {
+	getURL: function(from, object) {
 		var currenturl;
-		grabber = object;
+		grabber = (object) ? object:undefined;
 
 		if(from === "info") {
 			if (window.location.pathname.match(/.*\/(view|thumbs).*/)) {
@@ -370,7 +370,7 @@ var pururin = {
 			description: "Empty for now, might add this function later.",
 		};
 
-		var currenturl = this.getURL("info");
+		var currenturl = this.getURL("info", object);
 
 		getAjaxData(currenturl, "html").then(function(html) {
 
@@ -480,7 +480,7 @@ var pururin = {
 	getLinks: function(object) {
 		linkarray   = [];
 
-		var currenturl = this.getURL("links");
+		var currenturl = this.getURL("links", object);
 
 		getAjaxData(currenturl, "html").then(function(html) {
 			var manga = JSON.parse($(html).find("script:last-child").text().match(/{.*}/));
@@ -507,9 +507,9 @@ var pururin = {
 // Grabber for nHentai
 // getLinks: working, getInfo: not working
 var nhentai = {
-	getURL: function(from) {
+	getURL: function(from, object) {
 		var currenturl;
-		grabber = object;
+		grabber = (object) ? object:undefined;
 
 		if (window.location.pathname.match(/\/g\/[0-9]*\/[0-9]*\//)) {
 			currenturl = $('div.back-to-gallery a').prop("href");
@@ -537,7 +537,7 @@ var nhentai = {
 			description: "Empty for now, might add this function later.",
 		};
 
-		var currenturl = this.getURL("info");
+		var currenturl = this.getURL("info", object);
 
 		getAjaxData(currenturl, "html").then(function(html) {
 
@@ -630,7 +630,7 @@ var nhentai = {
 	getLinks: function(object) {
 		linkarray   = [];
 
-		var currenturl = this.getURL("links");
+		var currenturl = this.getURL("links", object);
 
 		getAjaxData(currenturl, "html").then(function(html) {
 			var pageArray = $(html).find('div#thumbnail-container a.gallerythumb img');
