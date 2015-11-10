@@ -34,14 +34,7 @@ function getAjaxData(href, type) {
 	return $.ajax({
 		type: "GET",
 		url: href,
-		dataType: type,
-		error: function(error) {
-
-			console.error(error);
-			if(error.status !== 403) {
-				errorHandling(error);
-			}
-		}
+		dataType: type
 	});
 }
 
@@ -265,6 +258,7 @@ var fakku = {
 		var currenturl 	= this.getURL("links", object);
 
 		getAjaxData(currenturl, "JSON").then(function(data) {
+			console.log(data);
 			if (data.pages == "" || $.isEmptyObject(data.pages) || data.pages == undefined) {
 				linkarray = ["linkarray"];
 				$.each(data.pages, function(i, data) {
@@ -277,36 +271,23 @@ var fakku = {
 					checkDownloadReady();
 				}
 			} else  {
-				try {
-					currenturl = that.getURL("links non-api", object);
-					getAjaxData(currenturl, "html").then(function(html) {
-						linkarray = ["linkarray"];
-						thumbArray = JSON.parse($(html).text().match(/(window\.params\.thumbs \= )(.*);/)[2]);
-
-						thumbArray.forEach(function(img) {
-							var image = "https:" + img.replace("thumbs", "images").replace(".thumb", "");
-							linkarray.push(image);
-						})
-
-						linkarray.push(linkarray[1].match(/t.fakku.net\/.*\/images\/.*/).toString().slice(-4)); // File Extension
-						sendReadyMessage("docReadyLink", linkarray);
-						if(object.from === "download") {
-							checkDownloadReady();
-						}
-					});
-				} catch(e) {
-					console.log("Cathcing failed try");
-					//this.error({status: 0, statusText: "Query returned empty."});
-				}
+				that.getLinks_nonAPI(that, object);
 			}
-		}).fail(function() {
-			var currenturl = that.getURL("links non-api", object);
-			getAjaxData(currenturl, "html").then(function(html) {
-				try {
+		}).fail(function(error) {
+			console.error(error);
+			if(error.status !== 403) {
+				errorHandling(error);
+			} else if(error.status !== 200) {
+				that.getLinks_nonAPI(that, object);
+			}
+		});
+	},
+	getLinks_nonAPI: function(that, object) {
+			try {
+				currenturl = that.getURL("links non-api", object);
+				getAjaxData(currenturl, "html").then(function(html) {
 					linkarray = ["linkarray"];
-					thumbArray = JSON.parse($(html).text().match(/(window\.params\.thumbs \= )(.*);/));
-
-					thumbArray = thumbArray[2];
+					thumbArray = JSON.parse($(html).text().match(/(window\.params\.thumbs \= )(.*);/)[2]);
 
 					thumbArray.forEach(function(img) {
 						var image = "https:" + img.replace("thumbs", "images").replace(".thumb", "");
@@ -318,12 +299,12 @@ var fakku = {
 					if(object.from === "download") {
 						checkDownloadReady();
 					}
-				} catch(e) {
-					this.error({status: 0, statusText: "Query returned empty."});
-				}
-					});
-		});
-	}
+				});
+			} catch(e) {
+				console.log("Failed", e);
+				//this.error({status: 0, statusText: "Query returned empty."});
+			}
+		}
 };
 
 
@@ -660,23 +641,18 @@ function checkDownloadReady() {
 
 // Function for dealing with errors
 // FIX ERRORHANDLING //
-function errorHandling (error) {
+function errorHandling (error, link) {
 	if (grabber.from !== "notes") {
 		msgError(error);
 		//console.log("Error: " + error);
 	}
 	if (error.status == "410") {
-		var note = JSON.parse(localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"]);
+		var note = JSON.parse(localStorage[link.replace("https://www.fakku.net", "") + "--note"]);
 		note[0] = "old";
-		localStorage[downloadurl.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
+		localStorage[link.replace("https://www.fakku.net", "") + "--note"] = JSON.stringify(note);
 	}
 	if (grabber.from === "notes" && error.status != "0") {
-		infoarray[0] = "infoarray";
-		infoarray[1] = "error";
-		infoarray[2] = error.status;
-		infoarray[3] = downloadurl;
-		infoarray[4] = error.statusText;
-		notificationInfo(infoarray, downloadurl, nold, nseen, nshown, pend, reCache, loadmore, noteName, from);
+		msgError(error, {from: grabber.from, href: link});
 	}
 }
 

@@ -1207,9 +1207,14 @@ function showError() {
 	//console.log("Error message recieved from the server");
 	//console.log(errorMsg.status + ": " + errorMsg.statusText);
 	$('div#float').empty();
-	$('div#float').append("<b>Error recieved from server, try again.</b>");
-	$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
-	
+
+	if(errorMsg.status === 200) {
+		$('div#float').append("<b>The Fakku API appears to be down.</b>");
+		$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.responseText + "</p>");
+	} else {
+		$('div#float').append("<b>Error recieved from server, try again.</b>");
+		$('div#float').append("<p style='color:red; -webkit-margin-before: 5px; -webkit-margin-after: 0px'>" + errorMsg.status + ": " + errorMsg.statusText + "</p>");
+	}
 }
 
 var progressBarInterval;
