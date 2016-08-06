@@ -2,7 +2,7 @@
 
 
 F! Companion Chrome/Opera Extension
-==========~
+==========
 ###### As of this time I am no longer working on this extension, if it breaks it breaks.
 ###### Currently supports: ~~Fakku, Pururin & nHentai
 
